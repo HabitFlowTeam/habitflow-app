@@ -1,3 +1,6 @@
+// Import needed to read property files
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)    // Configures the module as an Android application
     alias(libs.plugins.kotlin.android)         // Adds Kotlin support for Android
@@ -19,6 +22,12 @@ android {
         versionName = "1.0"                           // User-visible version name
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"  // Test runner for instrumented tests
+
+        val localPropertiesFile = rootProject.file("local.properties")  // Configuration to read credentials from local.properties
+        val localProperties = Properties().apply { localPropertiesFile.takeIf { it.exists() }?.reader()?.use { load(it) } } // Configuration to read credentials from local.properties
+
+        buildConfigField("String", "SUPABASE_URL", "\"${localProperties.getProperty("supabase.url") ?: ""}\"")  // Get supabase url
+        buildConfigField("String", "SUPABASE_KEY", "\"${localProperties.getProperty("supabase.key") ?: ""}\"")  // Get supabase key
     }
 
     buildTypes {
@@ -38,6 +47,7 @@ android {
         jvmTarget = "11"                              // Kotlin JVM target version
     }
     buildFeatures {
+        buildConfig = true                            // Enable BuildConfig
         compose = true                                // Enables Jetpack Compose for UI
     }
 }
