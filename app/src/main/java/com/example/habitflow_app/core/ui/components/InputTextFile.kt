@@ -1,5 +1,6 @@
 package com.example.habitflow_app.core.ui.components
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -73,8 +74,20 @@ fun InputTextField(
             placeholder = if (placeholder.isNotEmpty()) {
                 { Text(text = placeholder, color = Zinc500, style = AppTypography.bodyMedium) }
             } else null,
-            leadingIcon = leadingIcon,
-            trailingIcon = trailingIcon,
+            leadingIcon = leadingIcon?.let { icon ->
+                {
+                    Box(modifier = Modifier.padding(start = 12.dp)) {
+                        icon()
+                    }
+                }
+            },
+            trailingIcon = trailingIcon?.let { icon ->
+                {
+                    Box(modifier = Modifier.padding(end = 12.dp)) {
+                        icon()
+                    }
+                }
+            },
             isError = isError,
             visualTransformation = visualTransformation,
             keyboardOptions = KeyboardOptions(
@@ -118,6 +131,12 @@ fun InputTextField(
                 focusedLabelColor = Blue500,
                 unfocusedLabelColor = Zinc500,
                 errorLabelColor = Red500,
+                focusedLeadingIconColor = Black,
+                unfocusedLeadingIconColor = Zinc500,
+                errorLeadingIconColor = Red500,
+                focusedTrailingIconColor = Black,
+                unfocusedTrailingIconColor = Zinc500,
+                errorTrailingIconColor = Red500,
             ),
             modifier = Modifier.fillMaxWidth(),
             textStyle = AppTypography.bodyMedium.copy(color = Black)
