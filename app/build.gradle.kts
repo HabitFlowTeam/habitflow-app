@@ -1,4 +1,3 @@
-// Import needed to read property files
 import java.util.Properties
 
 plugins {
@@ -15,39 +14,29 @@ android {
     compileSdk = 35                            // Android SDK version used for compilation
 
     defaultConfig {
-        applicationId =
-            "com.example.habitflow_app"   // Unique application identifier on Google Play
-        minSdk =
-            28                                   // Minimum Android version supported (Android 9.0 Pie)
+        applicationId = "com.example.habitflow_app"   // Unique application identifier on Google Play
+        minSdk = 28                                   // Minimum Android version supported (Android 9.0 Pie)
         targetSdk = 35                                // Target Android version for optimal behavior
         versionCode = 1                               // Internal version number for updates
         versionName = "1.0"                           // User-visible version name
 
-        testInstrumentationRunner =
-            "androidx.test.runner.AndroidJUnitRunner"  // Test runner for instrumented tests
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"  // Test runner for instrumented tests
 
-        val localPropertiesFile =
-            rootProject.file("local.properties")  // Configuration to read credentials from local.properties
+        val localPropertiesFile = rootProject.file("local.properties")  // Configuration to read credentials from local.properties
         val localProperties = Properties().apply {
             localPropertiesFile.takeIf { it.exists() }?.reader()?.use { load(it) }
-        } // Configuration to read credentials from local.properties
+        }
 
         buildConfigField(
             "String",
-            "SUPABASE_URL",
-            "\"${localProperties.getProperty("supabase.url") ?: ""}\""
-        )  // Get supabase url
-        buildConfigField(
-            "String",
-            "SUPABASE_KEY",
-            "\"${localProperties.getProperty("supabase.key") ?: ""}\""
-        )  // Get supabase key
+            "DIRECTUS_URL",
+            "\"${localProperties.getProperty("directus.url") ?: ""}\""
+        )
     }
 
     buildTypes {
         release {
-            isMinifyEnabled =
-                false                   // Code shrinking disabled (enable for production)
+            isMinifyEnabled = false                   // Code shrinking disabled (enable for production)
             proguardFiles(                            // ProGuard rules for code optimization
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -87,22 +76,11 @@ dependencies {
     implementation(libs.hilt.navigation.compose)        // Integration between Hilt and Compose Navigation
     ksp(libs.hilt.compiler)                             // Hilt annotation processor
 
-    // Supabase Backend Integration
-    implementation(libs.supabase.auth)                  // Supabase main client and authentication
-    implementation(libs.supabase.gotrue)                // Supabase authentication provider
-    implementation(libs.supabase.postgrest)             // Supabase database access
-    implementation(libs.supabase.realtime)              // Supabase real-time updates
-    implementation(libs.supabase.storage)               // Supabase storage for files and media
-    implementation(libs.ktor.client.core)               // Core Ktor client for making HTTP requests
-    implementation(libs.ktor.client.android)            // Platform-specific engine to run Ktor on Android
-    implementation(libs.ktor.client.content.negotiation) // Content negotiation feature (e.g., JSON serialization, content types)
-    implementation(libs.ktor.serialization.kotlinx.json) // Kotlinx JSON serialization support for Ktor client
-    implementation(libs.kotlinx.serialization.json)     // JSON serialization/deserialization
-
     // Networking
     implementation(libs.retrofit)                       // HTTP client for API calls
     implementation(libs.retrofit.converter.gson)        // Gson converter for Retrofit
     implementation(libs.okhttp.logging)                 // Logging interceptor for debugging API calls
+    implementation(libs.kotlinx.serialization.json)     // JSON serialization/deserialization
 
     // Asynchronous Programming
     implementation(libs.kotlinx.coroutines.core)        // Kotlin coroutines core library
