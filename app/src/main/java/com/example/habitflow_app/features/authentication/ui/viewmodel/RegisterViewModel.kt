@@ -3,6 +3,7 @@ package com.example.habitflow_app.features.authentication.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.habitflow_app.domain.models.User
+import com.example.habitflow_app.domain.models.Profile
 import com.example.habitflow_app.domain.usecases.RegisterUserUseCase
 import com.example.habitflow_app.features.authentication.validation.RegisterFormValidator
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -114,13 +115,17 @@ class RegisterViewModel @Inject constructor(
                 try {
                     val user = User(
                         id = "",
-                        fullName = _uiState.value.fullName,
-                        username = _uiState.value.username,
                         email = _uiState.value.email,
-                        password = _uiState.value.password
+                        password = _uiState.value.password,
                     )
 
-                    registerUserUseCase(user)
+                    val profile = Profile(
+                        id = "",
+                        fullName = _uiState.value.fullName,
+                        username = _uiState.value.username
+                    )
+
+                    registerUserUseCase(user, profile)
                     _uiState.value = _uiState.value.copy(
                         isSuccess = true,
                         isLoading = false

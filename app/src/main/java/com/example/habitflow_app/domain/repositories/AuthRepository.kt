@@ -1,5 +1,6 @@
 package com.example.habitflow_app.domain.repositories
 
+import com.example.habitflow_app.domain.models.Profile
 import com.example.habitflow_app.domain.models.User
 
 /**
@@ -9,9 +10,10 @@ interface AuthRepository {
     /**
      * Registers a new user in the system.
      * @param user User data to register
+     * @param profile User data to create
      * @return Registered user entity with generated ID
      */
-    suspend fun registerUser(user: User): User
+    suspend fun registerUser(user: User, profile: Profile): User
 
     /**
      * Authenticates a user with email and password credentials.
@@ -26,18 +28,6 @@ interface AuthRepository {
      * Clears any authentication tokens or cached user data.
      */
     suspend fun logout()
-
-    /**
-     * Retrieves the currently authenticated user.
-     * @return User entity if authenticated, null otherwise
-     */
-    suspend fun getCurrentUser(): User?
-
-    /**
-     * Checks if there's an active authenticated session.
-     * @return true if a user is authenticated, false otherwise
-     */
-    suspend fun isAuthenticated(): Boolean
 
     /**
      * Initiates a password reset flow for the given email.
