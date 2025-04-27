@@ -44,7 +44,7 @@ private val LightColorScheme = lightColorScheme(
  */
 @Composable
 fun HabitflowAppTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    darkTheme: Boolean = false, //isSystemInDarkTheme(), // Forzado a tema claro
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
