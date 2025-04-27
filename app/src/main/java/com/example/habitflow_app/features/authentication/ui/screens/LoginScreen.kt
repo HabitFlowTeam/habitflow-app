@@ -40,7 +40,6 @@ import com.example.habitflow_app.core.ui.theme.Zinc500
 import com.example.habitflow_app.features.authentication.ui.components.Logo
 import com.example.habitflow_app.features.authentication.ui.viewmodel.LoginEvent
 import com.example.habitflow_app.features.authentication.ui.viewmodel.LoginViewModel
-import com.example.habitflow_app.features.authentication.ui.viewmodel.RegisterEvent
 import com.example.habitflow_app.navigation.NavDestinations
 
 /**
@@ -70,9 +69,7 @@ fun LoginScreen(
     }
 
     // Main screen scaffold
-    Scaffold(
-
-    ) { paddingValues ->
+    Scaffold{ paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -167,7 +164,11 @@ fun LoginScreen(
             /* Login Navigation Link */
             SecondaryButton(
                 text = "¿No tienes una cuenta? Registrate",
-                onClick = { navController.navigate(NavDestinations.REGISTER) },
+                onClick = {
+                    navController.navigate(NavDestinations.REGISTER) {
+                        popUpTo(NavDestinations.LOGIN) { inclusive = true }
+                    }
+                },
                 modifier = Modifier.fillMaxWidth()
             )
 

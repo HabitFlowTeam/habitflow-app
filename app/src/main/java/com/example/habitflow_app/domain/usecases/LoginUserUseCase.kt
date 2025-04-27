@@ -9,7 +9,9 @@ import javax.inject.Inject
  *
  * @property authRepository The authentication data source
  */
-class LoginUserUseCase @Inject constructor(private val authRepository: AuthRepository) {
+class LoginUserUseCase @Inject constructor(
+    private val authRepository: AuthRepository
+) {
     /**
      * Executes the user login flow.
      * @param email User email address

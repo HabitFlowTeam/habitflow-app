@@ -4,6 +4,7 @@ import com.example.habitflow_app.core.database.SupabaseManager
 import com.example.habitflow_app.domain.repositories.AuthRepository
 import com.example.habitflow_app.features.authentication.data.datasources.AuthDataSource
 import com.example.habitflow_app.features.authentication.data.repositories.AuthRepositoryImpl
+import com.example.habitflow_app.features.authentication.validation.LoginFormValidator
 import com.example.habitflow_app.features.authentication.validation.RegisterFormValidator
 import dagger.Module
 import dagger.Provides
@@ -52,5 +53,17 @@ object AuthModule {
     @Singleton
     fun provideRegisterFormValidator(): RegisterFormValidator {
         return RegisterFormValidator()
+    }
+
+    /**
+     * Provides singleton instance of LoginFormValidator.
+     *
+     * @return New instance of form validator
+     */
+
+    @Provides
+    @Singleton
+    fun provideLoginFormValidator(): LoginFormValidator {
+        return LoginFormValidator()
     }
 }
