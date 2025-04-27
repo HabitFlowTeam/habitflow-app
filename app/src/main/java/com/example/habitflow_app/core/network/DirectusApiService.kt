@@ -2,8 +2,10 @@ package com.example.habitflow_app.core.network
 
 import com.example.habitflow_app.features.authentication.data.dto.LoginRequest
 import com.example.habitflow_app.features.authentication.data.dto.LoginResponse
-import com.example.habitflow_app.features.authentication.data.dto.RegisterRequest
-import com.example.habitflow_app.features.authentication.data.dto.RegisterResponse
+import com.example.habitflow_app.features.authentication.data.dto.RegisterUserRequest
+import com.example.habitflow_app.features.authentication.data.dto.RegisterUserResponse
+import com.example.habitflow_app.features.authentication.data.dto.CreateProfileRequest
+import com.example.habitflow_app.features.authentication.data.dto.CreateProfileResponse
 import retrofit2.http.Body
 import retrofit2.http.POST
 
@@ -25,8 +27,17 @@ interface DirectusApiService {
      * @param registerRequest DTO containing user registration data (email, password, etc.)
      * @return RegisterResponse containing the registration result and user details
      */
-    @POST("auth/register")
-    suspend fun registerUser(@Body registerRequest: RegisterRequest): RegisterResponse
+    @POST("users")
+    suspend fun registerUser(@Body registerRequest: RegisterUserRequest): RegisterUserResponse
+
+    /**
+     * Creates a new profile in the Directus system.
+     *
+     * @param createProfileRequest DTO containing profile registration data (fullName, username, etc.)
+     * @return RegisterResponse containing the registration result and user details
+     */
+    @POST("items/profile")
+    suspend fun createProfile(@Body createProfileRequest: CreateProfileRequest): CreateProfileResponse
 
     /**
      * Authenticates an existing user and retrieves access tokens.
