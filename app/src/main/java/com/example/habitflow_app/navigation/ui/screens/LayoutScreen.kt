@@ -4,12 +4,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -22,7 +18,15 @@ import com.example.habitflow_app.features.habits.ui.screens.HomeScreen
 import com.example.habitflow_app.navigation.NavDestinations
 import com.example.habitflow_app.navigation.ui.components.BottomNavItem
 import com.example.habitflow_app.R
+import com.example.habitflow_app.core.ui.components.TopAppBar
 
+/**
+ * A composable function that represents the main layout of the application.
+ * It includes a top app bar, a bottom navigation bar, and a navigation host
+ * for managing different screens within the app.
+ *
+ * @param navController The navigation controller used to manage navigation between screens.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LayoutScreen(
@@ -39,15 +43,10 @@ fun LayoutScreen(
         modifier = Modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Gray,
-                ),
-                title = {
-                    Text(
-                        text = "HabitFlow",
-                        color = Color.White
-                    )
-                }
+                streakCount = 2,
+                onNotificationsClick = {},
+                onSettingsClick = {},
+                onProfileClick = {}
             )
         },
 
