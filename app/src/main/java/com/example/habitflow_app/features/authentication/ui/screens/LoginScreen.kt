@@ -2,6 +2,7 @@ package com.example.habitflow_app.features.authentication.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -29,11 +30,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -57,15 +60,15 @@ import com.example.habitflow_app.features.authentication.validation.RegisterForm
 import com.example.habitflow_app.navigation.NavDestinations
 
 /**
- * Screen that handles user registration process.
- * Displays a form with user registration fields and handles validation.
+ * Screen that handles user login process.
+ * Displays a form with user login fields and handles validation.
  *
  * @param navController Navigation controller for screen transitions
- * @param viewModel ViewModel that handles registration logic and state management
+ * @param viewModel ViewModel that handles login logic and state management
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegisterScreen(
+fun LoginScreen(
     navController: NavController,
     viewModel: RegisterViewModel = hiltViewModel()
 ) {
@@ -91,62 +94,28 @@ fun RegisterScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
                 .padding(horizontal = 24.dp)
-                .padding(vertical = 32.dp)
+                .padding(vertical = 128.dp)
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
             /* App logo */
             Logo()
 
             Text(
-                text = "Crea tu cuenta",
+                text = "¡Bienvenido!",
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold
             )
 
             Text(
-                text = "Comienza a mejorar tus hábitos hoy",
+                text = "Inicia sesión para continuar",
                 fontSize = 20.sp,
                 color = Zinc500
             )
 
-
-            /* Full Name Input Field */
-            InputTextField(
-                value = state.fullName,
-                onValueChange = { viewModel.onEvent(RegisterEvent.FullNameChanged(it)) },
-                label = "Nombre completo",
-                isError = state.fullNameError != null,
-                errorMessage = state.fullNameError,
-                imeAction = ImeAction.Next,
-                modifier = Modifier.fillMaxWidth(),
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = "Nombre completo",
-                        tint = if (state.fullNameError != null) Red500 else Zinc500
-                    )
-                }
-            )
-
-            /* Username Input Field */
-            InputTextField(
-                value = state.username,
-                onValueChange = { viewModel.onEvent(RegisterEvent.UsernameChanged(it)) },
-                label = "Nombre de usuario",
-                isError = state.usernameError != null,
-                errorMessage = state.usernameError,
-                imeAction = ImeAction.Next,
-                modifier = Modifier.fillMaxWidth(),
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Face,
-                        contentDescription = "Nombre de usuario",
-                        tint = if (state.usernameError != null) Red500 else Zinc500
-                    )
-                }
-            )
+            Spacer(modifier = Modifier.padding(8.dp))
 
             /* Email Input Field */
             InputTextField(
@@ -186,43 +155,14 @@ fun RegisterScreen(
                     )
                 }
             )
-
-            /* Confirm Password Input Field */
-            InputTextField(
-                value = state.confirmPassword,
-                onValueChange = { viewModel.onEvent(RegisterEvent.ConfirmPasswordChanged(it)) },
-                label = "Confirmar contraseña",
-                isError = state.confirmPasswordError != null,
-                errorMessage = state.confirmPasswordError,
-                keyboardType = KeyboardType.Password,
-                visualTransformation = PasswordVisualTransformation(),
-                imeAction = ImeAction.Done,
-                modifier = Modifier.fillMaxWidth(),
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Lock,
-                        contentDescription = "Confirmar contraseña",
-                        tint = if (state.confirmPasswordError != null) Red500 else Zinc500
-                    )
-                }
-            )
-
-            /* Terms and Conditions Checkbox */
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Checkbox(
-                    checked = state.termsAccepted,
-                    onCheckedChange = { viewModel.onEvent(RegisterEvent.TermsAcceptedChanged(it)) },
-                    modifier = Modifier.size(24.dp)
-                )
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
                 Text(
-                    text = "Acepto los términos y condiciones",
+                    text = "¿Olvidaste tu contraseña?",
                     style = AppTypography.bodyMedium,
                     modifier = Modifier.padding(start = 8.dp)
                 )
             }
+
             state.termsError?.let { error ->
                 Text(
                     text = error,
@@ -232,11 +172,9 @@ fun RegisterScreen(
                 )
             }
 
-            //Spacer(modifier = Modifier.height(4.dp))
-
             /* Register Button */
             PrimaryButton(
-                text = "Registrarse",
+                text = "Iniciar sesión",
                 onClick = { viewModel.onEvent(RegisterEvent.Submit) },
                 isLoading = state.isLoading,
                 modifier = Modifier.fillMaxWidth()
@@ -244,8 +182,8 @@ fun RegisterScreen(
 
             /* Login Navigation Link */
             SecondaryButton(
-                text = "¿Ya tienes una cuenta? Inicia sesión",
-                onClick = { navController.navigate(NavDestinations.LOGIN) },
+                text = "¿No tienes una cuenta? Registrate",
+                onClick = { navController.navigate(NavDestinations.REGISTER) },
                 modifier = Modifier.fillMaxWidth()
             )
 
