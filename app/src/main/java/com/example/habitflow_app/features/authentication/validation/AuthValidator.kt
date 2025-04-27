@@ -1,11 +1,9 @@
 package com.example.habitflow_app.features.authentication.validation
 
-import com.example.habitflow_app.core.validation.ValidationResult
 import com.example.habitflow_app.core.validation.FormValidator
+import com.example.habitflow_app.core.validation.ValidationResult
 
-/**
- * Contains authentication-specific validation rules
- */
+/** Contains authentication-specific validation rules */
 object AuthValidators {
     /**
      * Validates a full name
@@ -17,19 +15,20 @@ object AuthValidators {
         val basicValidation = FormValidator.validateRequired(fullName, "Nombre completo")
         if (!basicValidation.isValid) return basicValidation
 
-        val lengthValidation = FormValidator.validateLength(
-            value = fullName,
-            fieldName = "Nombre completo",
-            minLength = 3,
-            maxLength = 255
-        )
+        val lengthValidation =
+                FormValidator.validateLength(
+                        value = fullName,
+                        fieldName = "Nombre completo",
+                        minLength = 3,
+                        maxLength = 255
+                )
         if (!lengthValidation.isValid) return lengthValidation
 
         return FormValidator.validatePattern(
-            value = fullName,
-            pattern = Regex("^[\\p{L} .'-]+$"),
-            fieldName = "Nombre completo",
-            errorMessage = "Solo se permiten letras, espacios y apóstrofes"
+                value = fullName,
+                pattern = Regex("^[\\p{L} .'-]+$"),
+                fieldName = "Nombre completo",
+                errorMessage = "Solo se permiten letras, espacios y apóstrofes"
         )
     }
 
@@ -43,19 +42,20 @@ object AuthValidators {
         val basicValidation = FormValidator.validateRequired(username, "Nombre de usuario")
         if (!basicValidation.isValid) return basicValidation
 
-        val lengthValidation = FormValidator.validateLength(
-            value = username,
-            fieldName = "Nombre de usuario",
-            minLength = 3,
-            maxLength = 255
-        )
+        val lengthValidation =
+                FormValidator.validateLength(
+                        value = username,
+                        fieldName = "Nombre de usuario",
+                        minLength = 3,
+                        maxLength = 255
+                )
         if (!lengthValidation.isValid) return lengthValidation
 
         return FormValidator.validatePattern(
-            value = username,
-            pattern = Regex("^[a-zA-Z0-9._-]+$"),
-            fieldName = "Nombre de usuario",
-            errorMessage = "Solo letras, números, puntos, guiones y guiones bajos"
+                value = username,
+                pattern = Regex("^[a-zA-Z0-9._-]+$"),
+                fieldName = "Nombre de usuario",
+                errorMessage = "Solo letras, números, puntos, guiones y guiones bajos"
         )
     }
 
@@ -70,10 +70,10 @@ object AuthValidators {
         if (!basicValidation.isValid) return basicValidation
 
         return FormValidator.validatePattern(
-            value = email,
-            pattern = Regex("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$"),
-            fieldName = "Correo electrónico",
-            errorMessage = "Correo electrónico inválido"
+                value = email,
+                pattern = Regex("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$"),
+                fieldName = "Correo electrónico",
+                errorMessage = "Correo electrónico inválido"
         )
     }
 
@@ -88,18 +88,13 @@ object AuthValidators {
         if (!basicValidation.isValid) return basicValidation
 
         return when {
-            password.length < 8 ->
-                ValidationResult(false, "Mínimo 8 caracteres")
-
+            password.length < 8 -> ValidationResult(false, "Mínimo 8 caracteres")
             !password.any { it.isDigit() } ->
-                ValidationResult(false, "Debe contener al menos un número")
-
+                    ValidationResult(false, "Debe contener al menos un número")
             !password.any { it.isUpperCase() } ->
-                ValidationResult(false, "Debe contener mayúsculas")
-
+                    ValidationResult(false, "Debe contener mayúsculas")
             !password.any { !it.isLetterOrDigit() } ->
-                ValidationResult(false, "Debe incluir un carácter especial (@, !, etc.)")
-
+                    ValidationResult(false, "Debe incluir un carácter especial (@, !, etc.)")
             else -> ValidationResult(true)
         }
     }
@@ -111,20 +106,24 @@ object AuthValidators {
      * @param confirmPassword Second password entry
      * @return ValidationResult with success status and error message if invalid
      */
-    fun validatePasswordMatch(
-        password: String,
-        confirmPassword: String
-    ): ValidationResult {
+    fun validatePasswordMatch(password: String, confirmPassword: String): ValidationResult {
         val basicValidation = FormValidator.validateRequired(password, "Confirmar contraseña")
         if (!basicValidation.isValid) return basicValidation
 
         return if (password != confirmPassword) {
-            ValidationResult(
-                isValid = false,
-                errorMessage = "Las contraseñas no coinciden"
-            )
+            ValidationResult(isValid = false, errorMessage = "Las contraseñas no coinciden")
         } else {
             ValidationResult(isValid = true)
         }
+    }
+
+    /**
+     * Validates a password for login
+     *
+     * @param password Password to validate
+     * @return ValidationResult with success status and error message if invalid
+     */
+    fun validateLoginPassword(password: String): ValidationResult {
+        return FormValidator.validateRequired(password, "Contraseña")
     }
 }
