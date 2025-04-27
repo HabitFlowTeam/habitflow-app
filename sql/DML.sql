@@ -29,12 +29,12 @@ VALUES
 -- Inserción de datos en la tabla directus_users
 INSERT INTO directus_users (id, email, password, role)
 VALUES
-    ('05e8c0f7-6433-4e23-ab06-36a67c7e23a3', 'admin@ejemplo.com', '$2a$12$ZH1QVpBpMcSXdJxEMp/LnOK1CaOZnKyRBnJu3cRmMbBCpPkPJHI4m', 'a21cfc5d-3f01-4e45-8e93-dd0d440af562'),
-    ('8c7e5a5d-6eb8-4f21-b11c-2f7c31b38d15', 'juan_colonia@ejemplo.com', '$2a$12$1RQn1UHBfxQw9QNHSCRxmeWPnVlpOJ.JZ/p4fZCCkVL5k5/dXT3Nm', '5e8b7092-6ee2-47df-b24a-b3c9f733a9c4'),
-    ('a3dc5f62-78f7-4215-b78a-cf75a6348067', 'esteban_gaviria@ejemplo.com', '$2a$12$E4EEwqJmHGq2Yd.W6Wf.v.xm2Jyj1szZ7Ufgr2M1lDfZBHfLrjWdi', '5e8b7092-6ee2-47df-b24a-b3c9f733a9c4'),
-    ('e7c5d8a9-7c1f-4b5a-9d3a-6f8a7b2c4d0e', 'juan_diaz@ejemplo.com', '$2a$12$6KJMKp1qcQZFGdE5nCKTq.GVmnctH47VxrJRXN2IHsGYCuSw2Y6yi', '5e8b7092-6ee2-47df-b24a-b3c9f733a9c4'),
-    ('b4a7c8d9-e0f1-4a5b-9c8d-7e6f5a4b3c2d', 'miguel_gonzalez@ejemplo.com', '$2a$12$oJK2ZCb3QeMZwxZTIRwqquJdY9KhzD5NUFFGy2mBr0UdYiUcFl4xO', '5e8b7092-6ee2-47df-b24a-b3c9f733a9c4'),
-    ('c8d9e0f1-a2b3-4c5d-6e7f-8a9b0c1d2e3f', 'pablo_pineda@ejemplo.com', '$2a$12$hKJiQz9v3uUfDEl0.H5KRuqn5vTkTu.oxrD/ZU7ZVFlXi7QbK7DBC', '5e8b7092-6ee2-47df-b24a-b3c9f733a9c4');
+    ('05e8c0f7-6433-4e23-ab06-36a67c7e23a3', 'admin@ejemplo.com', '$argon2id$v=19$m=64,t=3,p=4$bjJxemdpaTZhamYwMDAwMA$mQp7+d3cVuwTx71lb6TrqiZU/lB3Ph8l4K5okmS5f9oeWPzk/lzR6jAJ2ozWuxhIGSQ6iy3O8tnLRB7QcZ0O0g', 'a21cfc5d-3f01-4e45-8e93-dd0d440af562'),
+    ('8c7e5a5d-6eb8-4f21-b11c-2f7c31b38d15', 'juan_colonia@ejemplo.com', '$argon2id$v=19$m=64,t=3,p=4$bjJxemdpaTZhamYwMDAwMA$mQp7+d3cVuwTx71lb6TrqiZU/lB3Ph8l4K5okmS5f9oeWPzk/lzR6jAJ2ozWuxhIGSQ6iy3O8tnLRB7QcZ0O0g', '5e8b7092-6ee2-47df-b24a-b3c9f733a9c4'),
+    ('a3dc5f62-78f7-4215-b78a-cf75a6348067', 'esteban_gaviria@ejemplo.com', '$argon2id$v=19$m=64,t=3,p=4$bjJxemdpaTZhamYwMDAwMA$mQp7+d3cVuwTx71lb6TrqiZU/lB3Ph8l4K5okmS5f9oeWPzk/lzR6jAJ2ozWuxhIGSQ6iy3O8tnLRB7QcZ0O0g', '5e8b7092-6ee2-47df-b24a-b3c9f733a9c4'),
+    ('e7c5d8a9-7c1f-4b5a-9d3a-6f8a7b2c4d0e', 'juan_diaz@ejemplo.com', '$argon2id$v=19$m=64,t=3,p=4$bjJxemdpaTZhamYwMDAwMA$mQp7+d3cVuwTx71lb6TrqiZU/lB3Ph8l4K5okmS5f9oeWPzk/lzR6jAJ2ozWuxhIGSQ6iy3O8tnLRB7QcZ0O0g', '5e8b7092-6ee2-47df-b24a-b3c9f733a9c4'),
+    ('b4a7c8d9-e0f1-4a5b-9c8d-7e6f5a4b3c2d', 'miguel_gonzalez@ejemplo.com', '$argon2id$v=19$m=64,t=3,p=4$bjJxemdpaTZhamYwMDAwMA$mQp7+d3cVuwTx71lb6TrqiZU/lB3Ph8l4K5okmS5f9oeWPzk/lzR6jAJ2ozWuxhIGSQ6iy3O8tnLRB7QcZ0O0g', '5e8b7092-6ee2-47df-b24a-b3c9f733a9c4'),
+    ('c8d9e0f1-a2b3-4c5d-6e7f-8a9b0c1d2e3f', 'pablo_pineda@ejemplo.com', '$argon2id$v=19$m=64,t=3,p=4$bjJxemdpaTZhamYwMDAwMA$mQp7+d3cVuwTx71lb6TrqiZU/lB3Ph8l4K5okmS5f9oeWPzk/lzR6jAJ2ozWuxhIGSQ6iy3O8tnLRB7QcZ0O0g', '5e8b7092-6ee2-47df-b24a-b3c9f733a9c4');
 
 -- Inserción de datos en la tabla directus_users
 INSERT INTO profiles (id, full_name, username, streak, best_streak, avatar_url, created_at)
@@ -87,7 +87,7 @@ VALUES
     ('6f7a8b9c-0d1e-2f3a-4b5c-6d7e8f9a0b1c', 'Escribir diario de gratitud', 10, TRUE, '07:30:00', FALSE, '2024-01-05 22:00:00', '2024-07-05', '7d7cfd2a-86a3-4879-aa4f-2e5413b3538b', 'c8d9e0f1-a2b3-4c5d-6e7f-8a9b0c1d2e3f'),
     ('7a8b9c0d-1e2f-3a4b-5c6d-7e8f9a0b1c2d', 'Ahorrar 10% del sueldo', 2, FALSE, NULL, FALSE, '2024-04-01 09:45:00', '2024-10-01', '98f1c86b-8fec-4d71-b95e-da7f2e4c0ff3', 'e7c5d8a9-7c1f-4b5a-9d3a-6f8a7b2c4d0e');
 
--- Continuación de la inserción en habits_days
+-- Inserción en habits_days
 INSERT INTO habits_days (habit_id, week_day_id)
 VALUES
     ('1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d', 'd3b15c58-711f-40d9-9f4b-06d0d6e925d1'), -- Meditar: Lunes
