@@ -2,11 +2,6 @@ package com.example.habitflow_app.navigation.ui.screens
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -26,7 +21,7 @@ import com.example.habitflow_app.features.habits.ui.screens.HabitsMainScreen
 import com.example.habitflow_app.features.habits.ui.screens.HomeScreen
 import com.example.habitflow_app.navigation.NavDestinations
 import com.example.habitflow_app.navigation.ui.components.BottomNavItem
-import kotlin.String
+import com.example.habitflow_app.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,10 +30,10 @@ fun LayoutScreen(
 ) {
     val barNavController = rememberNavController()
     val bottomNavItem = listOf(
-        BottomNavItem(NavDestinations.HOME, Icons.Default.Home, "Home"),
-        BottomNavItem(NavDestinations.ARTICLES, Icons.Default.Star, "Articles"),
-        BottomNavItem(NavDestinations.HABITS, Icons.Default.Menu, "Habits"),
-        BottomNavItem(NavDestinations.GAMIFICATION, Icons.Default.ThumbUp, "Stats"),
+        BottomNavItem(NavDestinations.HOME, R.drawable.ic_home, "Home"),
+        BottomNavItem(NavDestinations.ARTICLES, R.drawable.ic_social, "Articles"),
+        BottomNavItem(NavDestinations.HABITS, R.drawable.ic_habits, "Habits"),
+        BottomNavItem(NavDestinations.GAMIFICATION, R.drawable.ic_stats, "Stats"),
     )
     Scaffold(
         modifier = Modifier.fillMaxSize(),

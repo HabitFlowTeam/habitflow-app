@@ -68,6 +68,8 @@ android {
 }
 
 dependencies {
+
+    implementation("io.coil-kt:coil-compose:2.4.0")
     // Android Core Libraries
     implementation(libs.androidx.core.ktx)              // Kotlin extensions for Android core
     implementation(libs.androidx.lifecycle.runtime.ktx) // Lifecycle-aware components with Kotlin extensions

@@ -22,7 +22,7 @@ import com.example.habitflow_app.navigation.ui.screens.LayoutScreen
 @Composable
 fun AppNavGraph(
     navController: NavHostController,
-    startDestination: String = NavDestinations.REGISTER,
+    startDestination: String = NavDestinations.MAIN,
     modifier: Modifier = Modifier
 ) {
     NavHost(
