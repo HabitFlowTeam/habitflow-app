@@ -32,6 +32,24 @@ android {
             "DIRECTUS_URL",
             "\"${localProperties.getProperty("directus.url") ?: ""}\""
         )
+
+        buildConfigField(
+            "String",
+            "LOGO_URL",
+            "\"${localProperties.getProperty("logo.url") ?: ""}\""
+        )
+
+        buildConfigField(
+            "String",
+            "DEFAULT_PROFILE_URL",
+            "\"${localProperties.getProperty("default.profile.url") ?: ""}\""
+        )
+
+        buildConfigField(
+            "String",
+            "ROLE_ID",
+            "\"${localProperties.getProperty("role.user.id") ?: ""}\""
+        )
     }
 
     buildTypes {
