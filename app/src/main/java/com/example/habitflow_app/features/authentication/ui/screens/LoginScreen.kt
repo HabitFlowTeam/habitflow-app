@@ -1,25 +1,18 @@
 package com.example.habitflow_app.features.authentication.ui.screens
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -30,33 +23,24 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.focusModifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import com.example.habitflow_app.R
 import com.example.habitflow_app.core.ui.components.InputTextField
 import com.example.habitflow_app.core.ui.components.PrimaryButton
 import com.example.habitflow_app.core.ui.components.SecondaryButton
 import com.example.habitflow_app.core.ui.theme.AppTypography
 import com.example.habitflow_app.core.ui.theme.Red500
 import com.example.habitflow_app.core.ui.theme.Zinc500
-import com.example.habitflow_app.domain.models.User
-import com.example.habitflow_app.domain.repositories.AuthRepository
-import com.example.habitflow_app.domain.usecases.RegisterUserUseCase
 import com.example.habitflow_app.features.authentication.ui.components.Logo
+import com.example.habitflow_app.features.authentication.ui.viewmodel.LoginEvent
+import com.example.habitflow_app.features.authentication.ui.viewmodel.LoginViewModel
 import com.example.habitflow_app.features.authentication.ui.viewmodel.RegisterEvent
-import com.example.habitflow_app.features.authentication.ui.viewmodel.RegisterViewModel
-import com.example.habitflow_app.features.authentication.validation.RegisterFormValidator
 import com.example.habitflow_app.navigation.NavDestinations
 
 /**
@@ -70,17 +54,17 @@ import com.example.habitflow_app.navigation.NavDestinations
 @Composable
 fun LoginScreen(
     navController: NavController,
-    viewModel: RegisterViewModel = hiltViewModel()
+    viewModel: LoginViewModel = hiltViewModel()
 ) {
     // Collect UI state from ViewModel
     val state by viewModel.uiState.collectAsState()
 
-    // Handle successful registration navigation
+    // Handle successful login navigation
     LaunchedEffect(state.isSuccess) {
         if (state.isSuccess) {
             navController.navigate(NavDestinations.HOME) {
                 // Clear back stack including this screen
-                popUpTo(NavDestinations.REGISTER) { inclusive = true }
+                popUpTo(NavDestinations.LOGIN) { inclusive = true }
             }
         }
     }
@@ -120,7 +104,7 @@ fun LoginScreen(
             /* Email Input Field */
             InputTextField(
                 value = state.email,
-                onValueChange = { viewModel.onEvent(RegisterEvent.EmailChanged(it)) },
+                onValueChange = { viewModel.onEvent(LoginEvent.EmailChanged(it)) },
                 label = "Correo electrónico",
                 isError = state.emailError != null,
                 errorMessage = state.emailError,
@@ -139,7 +123,7 @@ fun LoginScreen(
             /* Password Input Field */
             InputTextField(
                 value = state.password,
-                onValueChange = { viewModel.onEvent(RegisterEvent.PasswordChanged(it)) },
+                onValueChange = { viewModel.onEvent(LoginEvent.PasswordChanged(it)) },
                 label = "Contraseña",
                 isError = state.passwordError != null,
                 errorMessage = state.passwordError,
@@ -163,7 +147,7 @@ fun LoginScreen(
                 )
             }
 
-            state.termsError?.let { error ->
+            state.error?.let { error ->
                 Text(
                     text = error,
                     color = Red500,
@@ -175,7 +159,7 @@ fun LoginScreen(
             /* Register Button */
             PrimaryButton(
                 text = "Iniciar sesión",
-                onClick = { viewModel.onEvent(RegisterEvent.Submit) },
+                onClick = { viewModel.onEvent(LoginEvent.Submit) },
                 isLoading = state.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )

@@ -2,6 +2,7 @@ package com.example.habitflow_app.features.authentication.data.datasources
 
 import com.example.habitflow_app.core.database.SupabaseManager
 import com.example.habitflow_app.domain.models.User
+import com.example.habitflow_app.features.authentication.data.dto.LoginDto
 import com.example.habitflow_app.features.authentication.data.dto.RegisterDto
 import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.gotrue.providers.builtin.Email
@@ -10,12 +11,10 @@ import java.time.Instant
 import javax.inject.Inject
 
 /**
- * Data source implementation for authentication operations using Supabase.
- * Handles direct communication with Supabase services for auth-related operations.
+ * Data source implementation for authentication operations using Supabase. Handles direct
+ * communication with Supabase services for auth-related operations.
  */
-class AuthDataSource @Inject constructor(
-    private val supabaseManager: SupabaseManager
-) {
+class AuthDataSource @Inject constructor(private val supabaseManager: SupabaseManager) {
 
     /**
      * Registers a new user in both Supabase Auth and custom users table.
@@ -32,30 +31,34 @@ class AuthDataSource @Inject constructor(
         }
 
         // Retrieve the newly created user's UID
-        val currentUser = supabaseManager.client.auth.currentUserOrNull()
-            ?: throw Exception("Error en el registro del usuario: no se encontró ningún usuario autenticado")
+        val currentUser =
+                supabaseManager.client.auth.currentUserOrNull()
+                        ?: throw Exception(
+                                "Error en el registro del usuario: no se encontró ningún usuario autenticado"
+                        )
 
         // Insert user profile data into custom 'users' table
-        supabaseManager.client
-            .from("users")
-            .insert(
-                mapOf(
-                    "id" to currentUser.id,
-                    "fullname" to registerDto.fullName,
-                    "username" to registerDto.username,
-                    "email" to registerDto.email,
+        supabaseManager
+                .client
+                .from("users")
+                .insert(
+                        mapOf(
+                                "id" to currentUser.id,
+                                "fullname" to registerDto.fullName,
+                                "username" to registerDto.username,
+                                "email" to registerDto.email,
+                        )
                 )
-            )
 
         return User(
-            id = currentUser.id,
-            fullName = registerDto.fullName,
-            username = registerDto.username,
-            email = registerDto.email,
-            password = "",
-            streak = 0,
-            avatarUrl = null,
-            createdAt = Instant.now()
+                id = currentUser.id,
+                fullName = registerDto.fullName,
+                username = registerDto.username,
+                email = registerDto.email,
+                password = "",
+                streak = 0,
+                avatarUrl = null,
+                createdAt = Instant.now()
         )
     }
 
@@ -66,13 +69,11 @@ class AuthDataSource @Inject constructor(
      * @param password User's password
      * @return Authenticated [User] object
      */
-    suspend fun login(email: String, password: String): User {
+    suspend fun login(loginDto: LoginDto): User {
         TODO("Implement login functionality")
     }
 
-    /**
-     * Terminates the current authenticated session.
-     */
+    /** Terminates the current authenticated session. */
     suspend fun logout() {
         TODO("Implement logout functionality")
     }
