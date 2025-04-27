@@ -11,4 +11,5 @@ object NavDestinations {
     const val HABITS = "habits"
     const val ARTICLES = "articles"
     const val GAMIFICATION = "gamification"
+    const val MAIN = "main"
 }
