@@ -13,6 +13,12 @@ data class LoginRequest(
 
 @Serializable
 data class LoginResponse(
+    val data: LoginResponseData
+)
+
+@Serializable
+data class LoginResponseData(
     val access_token: String,
-    val refresh_token: String
+    val refresh_token: String,
+    val expires: Int
 )

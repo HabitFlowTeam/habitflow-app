@@ -13,12 +13,6 @@ data class RegisterUserRequest(
 )
 
 @Serializable
-data class RegisterUserResponse(
-    val access_token: String,
-    val refresh_token: String
-)
-
-@Serializable
 data class CreateProfileRequest(
     val id: String,
     val fullName: String,
@@ -28,13 +22,3 @@ data class CreateProfileRequest(
     val avatarUrl: String
 )
 
-@Serializable
-data class CreateProfileResponse(
-    val id: String,
-    val fullName: String,
-    val username: String,
-    val streak: Int,
-    val bestStreak: Int,
-    val avatarUrl: String,
-    val createdAt: String? = null
-)
