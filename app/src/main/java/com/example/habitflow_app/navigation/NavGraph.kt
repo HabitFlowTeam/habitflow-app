@@ -5,6 +5,8 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.habitflow_app.features.authentication.ui.screens.LoginScreen
+import com.example.habitflow_app.features.habits.ui.screens.HomeScreen
 import com.example.habitflow_app.navigation.routes.RegisterRoute
 
 /**
@@ -26,6 +28,14 @@ fun AppNavGraph(
             RegisterRoute(
                 navController = navController
             )
+        }
+
+        composable(NavDestinations.LOGIN){
+            LoginScreen()
+        }
+
+        composable(NavDestinations.HOME) {
+            HomeScreen()
         }
     }
 }
