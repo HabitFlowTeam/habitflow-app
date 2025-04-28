@@ -41,15 +41,6 @@ fun LayoutScreen(
     )
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        topBar = {
-            TopAppBar(
-                streakCount = 2,
-                onNotificationsClick = {},
-                onSettingsClick = {},
-                onProfileClick = {}
-            )
-        },
-
         bottomBar = {
             BottomNavigationBar(
                 items = bottomNavItem,

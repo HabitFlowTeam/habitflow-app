@@ -28,6 +28,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.example.habitflow_app.navigation.NavDestinations
 
 
 /**
@@ -41,6 +44,7 @@ import androidx.compose.ui.unit.sp
  */
 @Composable
 fun TopAppBar(
+    navController: NavController = rememberNavController(),
     streakCount: Int,
     onNotificationsClick: () -> Unit,
     onSettingsClick: () -> Unit,
@@ -109,7 +113,9 @@ fun TopAppBar(
                 )
             }
 
-            IconButton(onClick = onProfileClick) {
+            IconButton(
+                onClick = { navController.navigate(NavDestinations.PROFILE) }
+            ) {
                 Box(
                     modifier = Modifier
                         .size(32.dp)
