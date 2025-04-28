@@ -59,3 +59,47 @@ habitflow_app/
 - **Navigation**: Jetpack Navigation Compose
 - **Database**: Supabase
 - **Networking**: Retrofit
+
+## 📜 Roles and Permissions
+
+#### **Roles**
+1. **ADMIN**: Full access to all models in the application.
+2. **USER**: Limited permissions to create users and profiles.
+
+#### **Permissions by Model**
+
+- **directus_users**:
+    - **ADMIN**: Read, Create, Update, Delete, Share
+    - **USER**: Create
+- **directus_roles**:
+    - **ADMIN**: Read, Create, Update, Delete, Share
+    - **USER**: Read
+- **profiles**:
+    - **ADMIN**: Read, Create, Update, Delete, Share
+    - **USER**: Create
+- **categories**:
+    - **ADMIN**: Read, Create, Update, Delete, Share
+    - **USER**: No access
+- **week_days**:
+    - **ADMIN**: Read, Create, Update, Delete, Share
+    - **USER**: No access
+- **articles**:
+    - **ADMIN**: Read, Create, Update, Delete, Share
+    - **USER**: No access
+- **articles_liked**:
+    - **ADMIN**: Read, Create, Update, Delete, Share
+    - **USER**: No access
+- **articles_saved**:
+    - **ADMIN**: Read, Create, Update, Delete, Share
+    - **USER**: No access
+- **habits**:
+    - **ADMIN**: Read, Create, Update, Delete, Share
+    - **USER**: No access
+- **habits_days**:
+    - **ADMIN**: Read, Create, Update, Delete, Share
+    - **USER**: No access
+- **habits_tracking**:
+    - **ADMIN**: Read, Create, Update, Delete, Share
+    - **USER**: No access
+
+This configuration ensures that the `ADMIN` role has unrestricted access to all models, while the `USER` role is restricted to creating users and profiles only.
