@@ -231,7 +231,11 @@ fun RegisterScreen(
             /* Login Navigation Link */
             SecondaryButton(
                 text = "¿Ya tienes una cuenta? Inicia sesión",
-                onClick = { navController.navigate(NavDestinations.LOGIN) },
+                onClick = {
+                    navController.navigate(NavDestinations.LOGIN) {
+                        popUpTo(NavDestinations.REGISTER) { inclusive = true }
+                    }
+                },
                 modifier = Modifier.fillMaxWidth()
             )
 
