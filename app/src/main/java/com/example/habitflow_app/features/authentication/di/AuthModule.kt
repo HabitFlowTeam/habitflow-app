@@ -5,7 +5,6 @@ import com.example.habitflow_app.domain.repositories.AuthRepository
 import com.example.habitflow_app.features.authentication.data.datasources.AuthDataSource
 import com.example.habitflow_app.features.authentication.data.repositories.AuthRepositoryImpl
 import com.example.habitflow_app.features.authentication.validation.LoginFormValidator
-import com.example.habitflow_app.features.authentication.validation.LoginFormValidator
 import com.example.habitflow_app.features.authentication.validation.RegisterFormValidator
 import dagger.Module
 import dagger.Provides
