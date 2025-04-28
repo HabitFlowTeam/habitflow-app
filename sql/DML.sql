@@ -9,120 +9,85 @@ VALUES
     ('7d7cfd2a-86a3-4879-aa4f-2e5413b3538b', 'Meditación', 'Prácticas de mindfulness y bienestar emocional'),
     ('98f1c86b-8fec-4d71-b95e-da7f2e4c0ff3', 'Finanzas', 'Hábitos de ahorro y gestión económica');
 
--- Inserción de datos en la tabla permissions
-INSERT INTO permissions (id, name, description)
-VALUES
-    ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 'CREATE_ARTICLE', 'Permiso para crear artículos'),
-    ('6ca15fa8-ec7e-40a8-9cc5-785b10b7cf97', 'EDIT_ARTICLE', 'Permiso para editar artículos existentes'),
-    ('dbf34864-3144-4158-a9f5-6b71e3999369', 'DELETE_ARTICLE', 'Permiso para eliminar artículos'),
-    ('9e4a096a-8d44-4e62-8309-6e73320db276', 'CREATE_HABIT', 'Permiso para crear hábitos'),
-    ('7c9e6679-7425-40de-944b-e07fc1f90ae7', 'USER_MANAGEMENT', 'Permiso para gestionar usuarios'),
-    ('d4669188-4b12-4d1e-a84a-04b36db52b9e', 'VIEW_ANALYTICS', 'Permiso para ver estadísticas'),
-    ('4e8ffc84-fb54-4b13-90de-466c659e5a09', 'MODERATE_CONTENT', 'Permiso para moderar contenido');
-
--- Inserción de datos en la tabla roles
-INSERT INTO roles (id, name)
-VALUES
-    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'ADMIN'),
-    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'USER'),
-    ('f7d53838-c1e5-4e1e-9ab6-7a7f6cad4a0c', 'EDITOR'),
-    ('8f8bfa3d-6fef-41a6-bdcf-887463baac8c', 'MODERATOR');
-
 -- Inserción de datos en la tabla week_days
 INSERT INTO week_days (id, name, abbreviation)
 VALUES
-    ('d3b15c58-711f-40d9-9f4b-06d0d6e925d1', 'Lunes', 'LUN'),
-    ('b9b3995e-c6a5-46c7-bf8a-f1c1c2e65dd6', 'Martes', 'MAR'),
-    ('4afe91c2-9851-4af7-b282-39a543989ea3', 'Miércoles', 'MIE'),
-    ('ea5e7c7a-182c-4b49-8b2d-2162cd138384', 'Jueves', 'JUE'),
-    ('22f2bf21-fcbd-473f-98d2-96ba47fabe16', 'Viernes', 'VIE'),
-    ('f31a5698-2a4d-4818-8a0b-e7f843b9ec14', 'Sábado', 'SAB'),
-    ('82a4b1c9-72a8-4e91-aaa4-2c92d30b810f', 'Domingo', 'DOM');
+    ('d3b15c58-711f-40d9-9f4b-06d0d6e925d1', 'Lunes', 'LU'),
+    ('b9b3995e-c6a5-46c7-bf8a-f1c1c2e65dd6', 'Martes', 'MA'),
+    ('4afe91c2-9851-4af7-b282-39a543989ea3', 'Miércoles', 'MI'),
+    ('ea5e7c7a-182c-4b49-8b2d-2162cd138384', 'Jueves', 'JU'),
+    ('22f2bf21-fcbd-473f-98d2-96ba47fabe16', 'Viernes', 'VI'),
+    ('f31a5698-2a4d-4818-8a0b-e7f843b9ec14', 'Sábado', 'SA'),
+    ('82a4b1c9-72a8-4e91-aaa4-2c92d30b810f', 'Domingo', 'DO');
 
--- Inserción de datos en la tabla users
-INSERT INTO users (id, full_name, username, email, password, streak, best_streak, avatar_url, created_at)
+-- Inserción de datos en la tabla directus_roles
+INSERT INTO directus_roles (id, name)
 VALUES
-    ('05e8c0f7-6433-4e23-ab06-36a67c7e23a3', 'María Rodríguez', 'maria_r', 'maria@ejemplo.com', '$2a$12$ZH1QVpBpMcSXdJxEMp/LnOK1CaOZnKyRBnJu3cRmMbBCpPkPJHI4m', 15, 20, 'https://randomuser.me/api/portraits/women/22.jpg', '2024-01-15 08:30:00'),
-    ('8c7e5a5d-6eb8-4f21-b11c-2f7c31b38d15', 'Carlos Sánchez', 'carlos_s', 'carlos@ejemplo.com', '$2a$12$1RQn1UHBfxQw9QNHSCRxmeWPnVlpOJ.JZ/p4fZCCkVL5k5/dXT3Nm', 3, 8, 'https://randomuser.me/api/portraits/men/35.jpg', '2024-02-10 14:45:00'),
-    ('a3dc5f62-78f7-4215-b78a-cf75a6348067', 'Ana López', 'ana_l', 'ana@ejemplo.com', '$2a$12$E4EEwqJmHGq2Yd.W6Wf.v.xm2Jyj1szZ7Ufgr2M1lDfZBHfLrjWdi', 7, 12, 'https://randomuser.me/api/portraits/women/68.jpg', '2023-11-22 11:15:00'),
-    ('e7c5d8a9-7c1f-4b5a-9d3a-6f8a7b2c4d0e', 'Javier Martínez', 'javier_m', 'javier@ejemplo.com', '$2a$12$6KJMKp1qcQZFGdE5nCKTq.GVmnctH47VxrJRXN2IHsGYCuSw2Y6yi', 0, 5, 'https://randomuser.me/api/portraits/men/42.jpg', '2024-03-05 09:20:00'),
-    ('b4a7c8d9-e0f1-4a5b-9c8d-7e6f5a4b3c2d', 'Laura García', 'laura_g', 'laura@ejemplo.com', '$2a$12$oJK2ZCb3QeMZwxZTIRwqquJdY9KhzD5NUFFGy2mBr0UdYiUcFl4xO', 22, 30, 'https://randomuser.me/api/portraits/women/15.jpg', '2023-10-18 16:50:00'),
-    ('c8d9e0f1-a2b3-4c5d-6e7f-8a9b0c1d2e3f', 'Gabriel Hernández', 'gabriel_h', 'gabriel@ejemplo.com', '$2a$12$hKJiQz9v3uUfDEl0.H5KRuqn5vTkTu.oxrD/ZU7ZVFlXi7QbK7DBC', 9, 14, 'https://randomuser.me/api/portraits/men/19.jpg', '2024-01-30 12:10:00');
+    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'ADMIN'),
+    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'USER');
 
--- Asociación de roles y permisos
-INSERT INTO roles_permissions (role_id, permission_id)
+-- Inserción de datos en la tabla directus_users
+INSERT INTO directus_users (id, email, password, role)
 VALUES
-    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'f47ac10b-58cc-4372-a567-0e02b2c3d479'), -- ADMIN puede CREATE_ARTICLE
-    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', '6ca15fa8-ec7e-40a8-9cc5-785b10b7cf97'), -- ADMIN puede EDIT_ARTICLE
-    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'dbf34864-3144-4158-a9f5-6b71e3999369'), -- ADMIN puede DELETE_ARTICLE
-    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', '9e4a096a-8d44-4e62-8309-6e73320db276'), -- ADMIN puede CREATE_HABIT
-    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', '7c9e6679-7425-40de-944b-e07fc1f90ae7'), -- ADMIN puede USER_MANAGEMENT
-    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'd4669188-4b12-4d1e-a84a-04b36db52b9e'), -- ADMIN puede VIEW_ANALYTICS
-    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', '4e8ffc84-fb54-4b13-90de-466c659e5a09'), -- ADMIN puede MODERATE_CONTENT
-    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'f47ac10b-58cc-4372-a567-0e02b2c3d479'), -- USER puede CREATE_ARTICLE
-    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', '9e4a096a-8d44-4e62-8309-6e73320db276'), -- USER puede CREATE_HABIT
-    ('f7d53838-c1e5-4e1e-9ab6-7a7f6cad4a0c', 'f47ac10b-58cc-4372-a567-0e02b2c3d479'), -- EDITOR puede CREATE_ARTICLE
-    ('f7d53838-c1e5-4e1e-9ab6-7a7f6cad4a0c', '6ca15fa8-ec7e-40a8-9cc5-785b10b7cf97'), -- EDITOR puede EDIT_ARTICLE
-    ('f7d53838-c1e5-4e1e-9ab6-7a7f6cad4a0c', 'd4669188-4b12-4d1e-a84a-04b36db52b9e'), -- EDITOR puede VIEW_ANALYTICS
-    ('8f8bfa3d-6fef-41a6-bdcf-887463baac8c', '4e8ffc84-fb54-4b13-90de-466c659e5a09'), -- MODERATOR puede MODERATE_CONTENT
-    ('8f8bfa3d-6fef-41a6-bdcf-887463baac8c', 'd4669188-4b12-4d1e-a84a-04b36db52b9e'); -- MODERATOR puede VIEW_ANALYTICS
+    ('05e8c0f7-6433-4e23-ab06-36a67c7e23a3', 'admin@ejemplo.com', '$argon2id$v=19$m=64,t=3,p=4$bjJxemdpaTZhamYwMDAwMA$mQp7+d3cVuwTx71lb6TrqiZU/lB3Ph8l4K5okmS5f9oeWPzk/lzR6jAJ2ozWuxhIGSQ6iy3O8tnLRB7QcZ0O0g', 'a21cfc5d-3f01-4e45-8e93-dd0d440af562'),
+    ('8c7e5a5d-6eb8-4f21-b11c-2f7c31b38d15', 'juan_colonia@ejemplo.com', '$argon2id$v=19$m=64,t=3,p=4$bjJxemdpaTZhamYwMDAwMA$mQp7+d3cVuwTx71lb6TrqiZU/lB3Ph8l4K5okmS5f9oeWPzk/lzR6jAJ2ozWuxhIGSQ6iy3O8tnLRB7QcZ0O0g', '5e8b7092-6ee2-47df-b24a-b3c9f733a9c4'),
+    ('a3dc5f62-78f7-4215-b78a-cf75a6348067', 'esteban_gaviria@ejemplo.com', '$argon2id$v=19$m=64,t=3,p=4$bjJxemdpaTZhamYwMDAwMA$mQp7+d3cVuwTx71lb6TrqiZU/lB3Ph8l4K5okmS5f9oeWPzk/lzR6jAJ2ozWuxhIGSQ6iy3O8tnLRB7QcZ0O0g', '5e8b7092-6ee2-47df-b24a-b3c9f733a9c4'),
+    ('e7c5d8a9-7c1f-4b5a-9d3a-6f8a7b2c4d0e', 'juan_diaz@ejemplo.com', '$argon2id$v=19$m=64,t=3,p=4$bjJxemdpaTZhamYwMDAwMA$mQp7+d3cVuwTx71lb6TrqiZU/lB3Ph8l4K5okmS5f9oeWPzk/lzR6jAJ2ozWuxhIGSQ6iy3O8tnLRB7QcZ0O0g', '5e8b7092-6ee2-47df-b24a-b3c9f733a9c4'),
+    ('b4a7c8d9-e0f1-4a5b-9c8d-7e6f5a4b3c2d', 'miguel_gonzalez@ejemplo.com', '$argon2id$v=19$m=64,t=3,p=4$bjJxemdpaTZhamYwMDAwMA$mQp7+d3cVuwTx71lb6TrqiZU/lB3Ph8l4K5okmS5f9oeWPzk/lzR6jAJ2ozWuxhIGSQ6iy3O8tnLRB7QcZ0O0g', '5e8b7092-6ee2-47df-b24a-b3c9f733a9c4'),
+    ('c8d9e0f1-a2b3-4c5d-6e7f-8a9b0c1d2e3f', 'pablo_pineda@ejemplo.com', '$argon2id$v=19$m=64,t=3,p=4$bjJxemdpaTZhamYwMDAwMA$mQp7+d3cVuwTx71lb6TrqiZU/lB3Ph8l4K5okmS5f9oeWPzk/lzR6jAJ2ozWuxhIGSQ6iy3O8tnLRB7QcZ0O0g', '5e8b7092-6ee2-47df-b24a-b3c9f733a9c4');
 
--- Asignación de roles a usuarios
-INSERT INTO user_roles (user_id, role_id)
+-- Inserción de datos en la tabla directus_users
+INSERT INTO profiles (id, full_name, username, streak, best_streak, avatar_url, created_at)
 VALUES
-    ('05e8c0f7-6433-4e23-ab06-36a67c7e23a3', '5e8b7092-6ee2-47df-b24a-b3c9f733a9c4'), -- María es USER
-    ('8c7e5a5d-6eb8-4f21-b11c-2f7c31b38d15', '5e8b7092-6ee2-47df-b24a-b3c9f733a9c4'), -- Carlos es USER
-    ('a3dc5f62-78f7-4215-b78a-cf75a6348067', 'f7d53838-c1e5-4e1e-9ab6-7a7f6cad4a0c'), -- Ana es EDITOR
-    ('e7c5d8a9-7c1f-4b5a-9d3a-6f8a7b2c4d0e', '5e8b7092-6ee2-47df-b24a-b3c9f733a9c4'), -- Javier es USER
-    ('b4a7c8d9-e0f1-4a5b-9c8d-7e6f5a4b3c2d', 'a21cfc5d-3f01-4e45-8e93-dd0d440af562'), -- Laura es ADMIN
-    ('c8d9e0f1-a2b3-4c5d-6e7f-8a9b0c1d2e3f', '8f8bfa3d-6fef-41a6-bdcf-887463baac8c'); -- Gabriel es MODERATOR
+    ('05e8c0f7-6433-4e23-ab06-36a67c7e23a3', 'Administrador', 'admin', 15, 20, 'https://randomuser.me/api/portraits/men/22.jpg', '2024-01-15 08:30:00'),
+    ('8c7e5a5d-6eb8-4f21-b11c-2f7c31b38d15', 'Juan Colonia','juan_colonia', 3, 8, 'https://randomuser.me/api/portraits/men/35.jpg', '2024-02-10 14:45:00'),
+    ('a3dc5f62-78f7-4215-b78a-cf75a6348067', 'Esteban Gaviria', 'esteban_gaviria', 7, 12, 'https://randomuser.me/api/portraits/men/68.jpg', '2023-11-22 11:15:00'),
+    ('e7c5d8a9-7c1f-4b5a-9d3a-6f8a7b2c4d0e', 'Juan Diaz', 'juan_diaz', 0, 5, 'https://randomuser.me/api/portraits/men/42.jpg', '2024-03-05 09:20:00'),
+    ('b4a7c8d9-e0f1-4a5b-9c8d-7e6f5a4b3c2d', 'Miguel Gonzalez', 'miguel_gonzalez', 22, 30, 'https://randomuser.me/api/portraits/men/15.jpg', '2023-10-18 16:50:00'),
+    ('c8d9e0f1-a2b3-4c5d-6e7f-8a9b0c1d2e3f', 'Pablo Pineda', 'pablo_pineda', 9, 14, 'https://randomuser.me/api/portraits/men/19.jpg', '2024-01-30 12:10:00');
+
 
 -- Inserción de artículos
 INSERT INTO articles (id, title, content, image_url, is_deleted, created_at, user_id, category_id)
 VALUES
     ('f57ab8c9-d6e0-4f12-9ae0-5b8c4c1d2e3f', '5 Hábitos para mejorar tu salud mental', 'La salud mental es tan importante como la física. En este artículo exploraremos cinco hábitos cotidianos que pueden ayudarte a mantener un equilibrio mental saludable. Primero, establece una rutina de sueño regular, intentando dormir entre 7-8 horas cada noche. Segundo, practica la meditación o mindfulness durante al menos 10 minutos diarios. Tercero, mantén un diario donde expresar tus pensamientos y emociones. Cuarto, realiza actividad física moderada regularmente, ya que libera endorfinas que mejoran el estado de ánimo. Quinto, limita el uso de dispositivos electrónicos, especialmente antes de dormir.', 'https://images.unsplash.com/photo-1507120410856-1f35574c3b45', FALSE, '2024-01-20 09:15:00', 'a3dc5f62-78f7-4215-b78a-cf75a6348067', '1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed'),
-    
     ('a7c9e0f1-b2d3-4e5f-6a7b-8c9d0e1f2a3b', 'Técnica Pomodoro: Aumenta tu productividad', 'La técnica Pomodoro es un método de gestión del tiempo desarrollado por Francesco Cirillo que utiliza intervalos de trabajo de 25 minutos separados por breves descansos. Para implementarla: 1) Elige una tarea a realizar, 2) Configura un temporizador para 25 minutos, 3) Trabaja en la tarea hasta que suene el temporizador, 4) Toma un descanso de 5 minutos, 5) Después de cuatro ciclos, toma un descanso más largo de 15-30 minutos. Esta técnica ayuda a mantener la concentración, reduce la fatiga mental y mejora la calidad del trabajo realizado.', 'https://images.unsplash.com/photo-1513128034602-7814ccaddd4e', FALSE, '2024-02-05 14:30:00', 'b4a7c8d9-e0f1-4a5b-9c8d-7e6f5a4b3c2d', '6ecd8c99-4036-403d-bf84-cf8400f67836'),
-    
     ('d1e2f3a4-b5c6-7d8e-9f0a-1b2c3d4e5f6a', 'Guía para comenzar a meditar', 'La meditación es una práctica milenaria que ofrece numerosos beneficios para la salud física y mental. Para comenzar: 1) Encuentra un lugar tranquilo donde no serás interrumpido, 2) Siéntate en una posición cómoda, con la espalda recta, 3) Cierra los ojos y enfócate en tu respiración, 4) Cuando tu mente divague, gentilmente vuelve a prestar atención a tu respiración, 5) Comienza con sesiones de 5 minutos e incrementa gradualmente. La consistencia es más importante que la duración. Recuerda que es normal que tu mente se distraiga; el objetivo no es detener tus pensamientos sino observarlos sin juzgar.', 'https://images.unsplash.com/photo-1508672019048-805c876b67e2', FALSE, '2024-02-15 17:45:00', '05e8c0f7-6433-4e23-ab06-36a67c7e23a3', '7d7cfd2a-86a3-4879-aa4f-2e5413b3538b'),
-    
     ('b8c9d0e1-f2a3-4b5c-6d7e-8f9a0b1c2d3e', 'Los beneficios del ayuno intermitente', 'El ayuno intermitente es un patrón de alimentación que alterna períodos de ingesta calórica con períodos de ayuno. Existen diferentes métodos como el 16/8 (16 horas de ayuno, 8 horas de alimentación) o el 5:2 (5 días normales, 2 días de restricción calórica). Entre sus beneficios se incluyen: pérdida de peso, mejora de la sensibilidad a la insulina, reducción de la inflamación, promoción de la autofagia celular y posible aumento de la longevidad. Sin embargo, no es adecuado para todos, y se recomienda consultar con un profesional de la salud antes de comenzar, especialmente si tienes condiciones médicas preexistentes.', 'https://images.unsplash.com/photo-1505576399279-565b52d4ac71', FALSE, '2024-03-10 10:20:00', 'c8d9e0f1-a2b3-4c5d-6e7f-8a9b0c1d2e3f', 'd2546fcd-39d8-4370-b34c-87d472a7a757'),
-    
     ('e5f6a7b8-c9d0-1e2f-3a4b-5c6d7e8f9a0b', 'Cómo establecer un fondo de emergencia', 'Un fondo de emergencia es crucial para la estabilidad financiera. Idealmente, debería cubrir entre 3 y 6 meses de gastos básicos. Para crearlo: 1) Analiza tus gastos mensuales esenciales, 2) Establece una meta realista, 3) Configura transferencias automáticas a una cuenta separada, 4) Busca una cuenta de ahorro con buen rendimiento pero fácil acceso, 5) Utiliza ingresos inesperados (reembolsos, bonos) para aumentar tu fondo más rápidamente. Recuerda que este dinero debe usarse solo para verdaderas emergencias como problemas médicos, reparaciones urgentes o pérdida de empleo, no para gastos discrecionales.', 'https://images.unsplash.com/photo-1579621970563-ebec7560ff3e', FALSE, '2024-03-22 15:55:00', 'a3dc5f62-78f7-4215-b78a-cf75a6348067', '98f1c86b-8fec-4d71-b95e-da7f2e4c0ff3'),
-    
     ('a1b2c3d4-e5f6-a7b8-c9d0-e1f2a3b4c5d6', 'Rutina de ejercicios en casa sin equipamiento', 'Mantenerse en forma no requiere una membresía de gimnasio costosa. Esta rutina de 30 minutos puede realizarse en cualquier espacio: 1) Calentamiento (5 min): Marcha en el sitio, rotaciones de brazos y tobillos, 2) Circuito principal (20 min): 45 segundos de ejercicio, 15 segundos de descanso - Sentadillas, flexiones modificadas, zancadas alternadas, plancha, saltos de tijera, 3) Enfriamiento (5 min): Estiramientos suaves para piernas, brazos y espalda. Realiza este circuito 3-4 veces por semana para ver resultados. Recuerda mantener una buena postura y respiración adecuada durante todos los ejercicios.', 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438', FALSE, '2024-04-05 08:40:00', '8c7e5a5d-6eb8-4f21-b11c-2f7c31b38d15', '3e7c78bc-e145-4c2d-aa36-58b97f68a6d3');
 
 -- Inserción de artículos guardados y me gusta
 INSERT INTO articles_saved (user_id, article_id)
 VALUES
-    ('05e8c0f7-6433-4e23-ab06-36a67c7e23a3', 'a7c9e0f1-b2d3-4e5f-6a7b-8c9d0e1f2a3b'), -- María guardó el artículo sobre Pomodoro
-    ('05e8c0f7-6433-4e23-ab06-36a67c7e23a3', 'b8c9d0e1-f2a3-4b5c-6d7e-8f9a0b1c2d3e'), -- María guardó el artículo sobre ayuno intermitente
-    ('8c7e5a5d-6eb8-4f21-b11c-2f7c31b38d15', 'f57ab8c9-d6e0-4f12-9ae0-5b8c4c1d2e3f'), -- Carlos guardó el artículo sobre salud mental
-    ('a3dc5f62-78f7-4215-b78a-cf75a6348067', 'a1b2c3d4-e5f6-a7b8-c9d0-e1f2a3b4c5d6'), -- Ana guardó el artículo sobre ejercicios en casa
-    ('b4a7c8d9-e0f1-4a5b-9c8d-7e6f5a4b3c2d', 'd1e2f3a4-b5c6-7d8e-9f0a-1b2c3d4e5f6a'); -- Laura guardó el artículo sobre meditación
+    ('05e8c0f7-6433-4e23-ab06-36a67c7e23a3', 'a7c9e0f1-b2d3-4e5f-6a7b-8c9d0e1f2a3b'), -- Administrador guardó el artículo sobre Pomodoro
+    ('05e8c0f7-6433-4e23-ab06-36a67c7e23a3', 'b8c9d0e1-f2a3-4b5c-6d7e-8f9a0b1c2d3e'), -- Administrador guardó el artículo sobre ayuno intermitente
+    ('8c7e5a5d-6eb8-4f21-b11c-2f7c31b38d15', 'f57ab8c9-d6e0-4f12-9ae0-5b8c4c1d2e3f'), -- Juan Colonia guardó el artículo sobre salud mental
+    ('a3dc5f62-78f7-4215-b78a-cf75a6348067', 'a1b2c3d4-e5f6-a7b8-c9d0-e1f2a3b4c5d6'), -- Esteban Gaviria guardó el artículo sobre ejercicios en casa
+    ('b4a7c8d9-e0f1-4a5b-9c8d-7e6f5a4b3c2d', 'd1e2f3a4-b5c6-7d8e-9f0a-1b2c3d4e5f6a'); -- Juan Diaz guardó el artículo sobre meditación
 
 INSERT INTO articles_liked (user_id, article_id)
 VALUES
-    ('05e8c0f7-6433-4e23-ab06-36a67c7e23a3', 'f57ab8c9-d6e0-4f12-9ae0-5b8c4c1d2e3f'), -- María dio like al artículo sobre salud mental
-    ('05e8c0f7-6433-4e23-ab06-36a67c7e23a3', 'a7c9e0f1-b2d3-4e5f-6a7b-8c9d0e1f2a3b'), -- María dio like al artículo sobre Pomodoro
-    ('8c7e5a5d-6eb8-4f21-b11c-2f7c31b38d15', 'f57ab8c9-d6e0-4f12-9ae0-5b8c4c1d2e3f'), -- Carlos dio like al artículo sobre salud mental
-    ('8c7e5a5d-6eb8-4f21-b11c-2f7c31b38d15', 'a1b2c3d4-e5f6-a7b8-c9d0-e1f2a3b4c5d6'), -- Carlos dio like al artículo sobre ejercicios en casa
-    ('a3dc5f62-78f7-4215-b78a-cf75a6348067', 'b8c9d0e1-f2a3-4b5c-6d7e-8f9a0b1c2d3e'), -- Ana dio like al artículo sobre ayuno intermitente
-    ('b4a7c8d9-e0f1-4a5b-9c8d-7e6f5a4b3c2d', 'd1e2f3a4-b5c6-7d8e-9f0a-1b2c3d4e5f6a'), -- Laura dio like al artículo sobre meditación
-    ('c8d9e0f1-a2b3-4c5d-6e7f-8a9b0c1d2e3f', 'e5f6a7b8-c9d0-1e2f-3a4b-5c6d7e8f9a0b'); -- Gabriel dio like al artículo sobre fondo de emergencia
+    ('05e8c0f7-6433-4e23-ab06-36a67c7e23a3', 'f57ab8c9-d6e0-4f12-9ae0-5b8c4c1d2e3f'), -- Administrador dio like al artículo sobre salud mental
+    ('05e8c0f7-6433-4e23-ab06-36a67c7e23a3', 'a7c9e0f1-b2d3-4e5f-6a7b-8c9d0e1f2a3b'), -- Administrador dio like al artículo sobre Pomodoro
+    ('8c7e5a5d-6eb8-4f21-b11c-2f7c31b38d15', 'f57ab8c9-d6e0-4f12-9ae0-5b8c4c1d2e3f'), -- Juan Colonia dio like al artículo sobre salud mental
+    ('8c7e5a5d-6eb8-4f21-b11c-2f7c31b38d15', 'a1b2c3d4-e5f6-a7b8-c9d0-e1f2a3b4c5d6'), -- Juan Colonia dio like al artículo sobre ejercicios en casa
+    ('a3dc5f62-78f7-4215-b78a-cf75a6348067', 'b8c9d0e1-f2a3-4b5c-6d7e-8f9a0b1c2d3e'), -- Esteban Gaviria dio like al artículo sobre ayuno intermitente
+    ('b4a7c8d9-e0f1-4a5b-9c8d-7e6f5a4b3c2d', 'd1e2f3a4-b5c6-7d8e-9f0a-1b2c3d4e5f6a'), -- Juan Diaz dio like al artículo sobre meditación
+    ('c8d9e0f1-a2b3-4c5d-6e7f-8a9b0c1d2e3f', 'e5f6a7b8-c9d0-1e2f-3a4b-5c6d7e8f9a0b'); -- Pablo Pineda dio like al artículo sobre fondo de emergencia
 
 -- Inserción de hábitos
 INSERT INTO habits (id, name, streak, notifications_enable, reminder_time, is_deleted, created_at, expiration_date, category_id, user_id)
 VALUES
-    ('1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d', 'Meditar 10 minutos', 8, TRUE, '2024-04-21', FALSE, '2024-01-10 07:30:00', '2024-07-10', '7d7cfd2a-86a3-4879-aa4f-2e5413b3538b', '05e8c0f7-6433-4e23-ab06-36a67c7e23a3'),
-    ('2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e', 'Beber 2 litros de agua', 4, TRUE, '2024-04-21', FALSE, '2024-02-15 08:00:00', '2024-08-15', '1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed', '05e8c0f7-6433-4e23-ab06-36a67c7e23a3'),
+    ('1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d', 'Meditar 10 minutos', 8, TRUE, '08:00:00', FALSE, '2024-01-10 07:30:00', '2024-07-10', '7d7cfd2a-86a3-4879-aa4f-2e5413b3538b', '05e8c0f7-6433-4e23-ab06-36a67c7e23a3'),
+    ('2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e', 'Beber 2 litros de agua', 4, TRUE, '07:30:00', FALSE, '2024-02-15 08:00:00', '2024-08-15', '1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed', '05e8c0f7-6433-4e23-ab06-36a67c7e23a3'),
     ('3c4d5e6f-7a8b-9c0d-1e2f-3a4b5c6d7e8f', 'Leer 30 minutos', 2, FALSE, NULL, FALSE, '2024-03-01 21:15:00', '2024-09-01', 'b5a9f41d-31a6-4f11-b80f-7d2764c0a75b', '8c7e5a5d-6eb8-4f21-b11c-2f7c31b38d15'),
-    ('4d5e6f7a-8b9c-0d1e-2f3a-4b5c6d7e8f9a', 'Hacer ejercicio', 6, TRUE, '2024-04-21', FALSE, '2024-02-20 17:00:00', '2024-08-20', '3e7c78bc-e145-4c2d-aa36-58b97f68a6d3', 'a3dc5f62-78f7-4215-b78a-cf75a6348067'),
-    ('5e6f7a8b-9c0d-1e2f-3a4b-5c6d7e8f9a0b', 'Planificar comidas semanales', 3, TRUE, '2024-04-21', FALSE, '2024-03-15 18:30:00', '2024-09-15', 'd2546fcd-39d8-4370-b34c-87d472a7a757', 'b4a7c8d9-e0f1-4a5b-9c8d-7e6f5a4b3c2d'),
-    ('6f7a8b9c-0d1e-2f3a-4b5c-6d7e8f9a0b1c', 'Escribir diario de gratitud', 10, TRUE, '2024-04-21', FALSE, '2024-01-05 22:00:00', '2024-07-05', '7d7cfd2a-86a3-4879-aa4f-2e5413b3538b', 'c8d9e0f1-a2b3-4c5d-6e7f-8a9b0c1d2e3f'),
+    ('4d5e6f7a-8b9c-0d1e-2f3a-4b5c6d7e8f9a', 'Hacer ejercicio', 6, TRUE, '07:30:00', FALSE, '2024-02-20 17:00:00', '2024-08-20', '3e7c78bc-e145-4c2d-aa36-58b97f68a6d3', 'a3dc5f62-78f7-4215-b78a-cf75a6348067'),
+    ('5e6f7a8b-9c0d-1e2f-3a4b-5c6d7e8f9a0b', 'Planificar comidas semanales', 3, TRUE, '07:30:00', FALSE, '2024-03-15 18:30:00', '2024-09-15', 'd2546fcd-39d8-4370-b34c-87d472a7a757', 'b4a7c8d9-e0f1-4a5b-9c8d-7e6f5a4b3c2d'),
+    ('6f7a8b9c-0d1e-2f3a-4b5c-6d7e8f9a0b1c', 'Escribir diario de gratitud', 10, TRUE, '07:30:00', FALSE, '2024-01-05 22:00:00', '2024-07-05', '7d7cfd2a-86a3-4879-aa4f-2e5413b3538b', 'c8d9e0f1-a2b3-4c5d-6e7f-8a9b0c1d2e3f'),
     ('7a8b9c0d-1e2f-3a4b-5c6d-7e8f9a0b1c2d', 'Ahorrar 10% del sueldo', 2, FALSE, NULL, FALSE, '2024-04-01 09:45:00', '2024-10-01', '98f1c86b-8fec-4d71-b95e-da7f2e4c0ff3', 'e7c5d8a9-7c1f-4b5a-9d3a-6f8a7b2c4d0e');
 
--- Continuación de la inserción en habits_days
+-- Inserción en habits_days
 INSERT INTO habits_days (habit_id, week_day_id)
 VALUES
     ('1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d', 'd3b15c58-711f-40d9-9f4b-06d0d6e925d1'), -- Meditar: Lunes

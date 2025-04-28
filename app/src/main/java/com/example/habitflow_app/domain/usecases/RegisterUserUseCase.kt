@@ -1,5 +1,6 @@
 package com.example.habitflow_app.domain.usecases
 
+import com.example.habitflow_app.domain.models.Profile
 import com.example.habitflow_app.domain.models.User
 import com.example.habitflow_app.domain.repositories.AuthRepository
 import javax.inject.Inject
@@ -13,11 +14,15 @@ class RegisterUserUseCase @Inject constructor(
     private val authRepository: AuthRepository
 ) {
     /**
-     * Executes the user registration flow.
-     * @param user User data to register
-     * @return Registered user entity
+     * Executes the complete user registration flow:
+     * 1. Register user in Directus
+     * 2. Create user profile
+     *
+     * @param user User credentials and basic info
+     * @param profile User profile details
+     * @return Registered user entity with ID
      */
-    suspend operator fun invoke(user: User): User {
-        return authRepository.registerUser(user)
+    suspend operator fun invoke(user: User, profile: Profile): User {
+        return authRepository.registerUser(user, profile)
     }
 }

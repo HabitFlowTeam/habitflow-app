@@ -73,7 +73,7 @@ fun RegisterScreen(
     }
 
     // Main screen scaffold
-    Scaffold{ paddingValues ->
+    Scaffold { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -219,8 +219,6 @@ fun RegisterScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
             }
-
-            //Spacer(modifier = Modifier.height(4.dp))
 
             /* Register Button */
             PrimaryButton(
