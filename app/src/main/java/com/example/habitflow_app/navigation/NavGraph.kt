@@ -1,26 +1,16 @@
 package com.example.habitflow_app.navigation
 
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.only
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.habitflow_app.core.ui.components.TopAppBar
-import com.example.habitflow_app.features.articles.ui.screens.ArticlesMainScreen
-import com.example.habitflow_app.features.authentication.ui.screens.LoginScreen
-import com.example.habitflow_app.features.gamification.ui.screens.StatsMainScreen
-import com.example.habitflow_app.features.habits.ui.screens.HabitsMainScreen
-import com.example.habitflow_app.features.habits.ui.screens.HomeScreen
 import com.example.habitflow_app.features.profile.ui.screens.ProfileScreen
 import com.example.habitflow_app.navigation.routes.LoginRoute
 import com.example.habitflow_app.navigation.routes.RegisterRoute
@@ -33,12 +23,13 @@ import com.example.habitflow_app.navigation.ui.screens.LayoutScreen
 fun AppNavGraph(
     navController: NavHostController,
     startDestination: String = NavDestinations.LOGIN,
-    modifier: Modifier = Modifier
-        .fillMaxSize()
+    @SuppressLint("ModifierParameter") modifier: Modifier = Modifier
 ) {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination?.route
+
     Scaffold(
         topBar = {
-            val currentDestination = navController.currentDestination?.route
             if (currentDestination != NavDestinations.LOGIN && currentDestination != NavDestinations.REGISTER) {
                 TopAppBar(
                     navController = navController,
@@ -62,7 +53,7 @@ fun AppNavGraph(
                 )
             }
 
-            composable(NavDestinations.LOGIN){
+            composable(NavDestinations.LOGIN) {
                 LoginRoute(
                     navController = navController
                 )
@@ -74,7 +65,7 @@ fun AppNavGraph(
                 )
             }
 
-            composable(NavDestinations.PROFILE){
+            composable(NavDestinations.PROFILE) {
                 ProfileScreen(
                     navController = navController
                 )
