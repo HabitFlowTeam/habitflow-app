@@ -65,7 +65,7 @@ fun RegisterScreen(
     // Handle successful registration navigation
     LaunchedEffect(state.isSuccess) {
         if (state.isSuccess) {
-            navController.navigate(NavDestinations.HOME) {
+            navController.navigate(NavDestinations.MAIN) {
                 // Clear back stack including this screen
                 popUpTo(NavDestinations.REGISTER) { inclusive = true }
             }

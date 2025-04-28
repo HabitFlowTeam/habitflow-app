@@ -32,7 +32,7 @@ import com.example.habitflow_app.navigation.ui.screens.LayoutScreen
 @Composable
 fun AppNavGraph(
     navController: NavHostController,
-    startDestination: String = NavDestinations.MAIN,
+    startDestination: String = NavDestinations.LOGIN,
     modifier: Modifier = Modifier
         .fillMaxSize()
 ) {

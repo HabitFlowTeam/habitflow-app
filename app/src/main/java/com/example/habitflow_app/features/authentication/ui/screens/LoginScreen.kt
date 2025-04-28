@@ -61,7 +61,7 @@ fun LoginScreen(
     // Handle successful login navigation
     LaunchedEffect(state.isSuccess) {
         if (state.isSuccess) {
-            navController.navigate(NavDestinations.HOME) {
+            navController.navigate(NavDestinations.MAIN) {
                 // Clear back stack including this screen
                 popUpTo(NavDestinations.LOGIN) { inclusive = true }
             }
