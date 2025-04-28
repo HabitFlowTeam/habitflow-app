@@ -46,6 +46,54 @@ VALUES
     ('b4a7c8d9-e0f1-4a5b-9c8d-7e6f5a4b3c2d', 'Miguel Gonzalez', 'miguel_gonzalez', 22, 30, 'https://randomuser.me/api/portraits/men/15.jpg', '2023-10-18 16:50:00'),
     ('c8d9e0f1-a2b3-4c5d-6e7f-8a9b0c1d2e3f', 'Pablo Pineda', 'pablo_pineda', 9, 14, 'https://randomuser.me/api/portraits/men/19.jpg', '2024-01-30 12:10:00');
 
+INSERT INTO directus_permissions (
+    collection,
+    action,
+    fields,
+    policy,
+    permissions,
+    validation
+) VALUES (
+    'directus_users',
+    'create',
+    '*',
+    (SELECT id FROM directus_policies WHERE name LIKE '%public_label%'),
+    '{}',
+    '{}'
+);
+
+-- Hacemos publico el acceso a listar los roles
+INSERT INTO directus_permissions (
+    collection,
+    action,
+    fields,
+    policy,
+    permissions,
+    validation
+) VALUES (
+    'directus_roles',
+    'read',
+    '*',
+    (SELECT id FROM directus_policies WHERE name LIKE '%public_label%'),
+    '{}',
+    '{}'
+);
+
+INSERT INTO directus_permissions (
+    collection,
+    action,
+    fields,
+    policy,
+    permissions,
+    validation
+) VALUES (
+    'profiles',
+    'create',
+    '*',
+    (SELECT id FROM directus_policies WHERE name LIKE '%public_label%'),
+    '{}',
+    '{}'
+);
 
 -- Inserción de artículos
 INSERT INTO articles (id, title, content, image_url, is_deleted, created_at, user_id, category_id)
