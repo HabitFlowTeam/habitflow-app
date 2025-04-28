@@ -2,6 +2,7 @@ package com.example.habitflow_app.features.authentication.data.datasources
 
 import android.util.Log
 import com.example.habitflow_app.core.network.DirectusApiService
+import com.example.habitflow_app.core.utils.ExtractInfoToken
 import com.example.habitflow_app.domain.models.Profile
 import com.example.habitflow_app.domain.models.User
 import com.example.habitflow_app.features.authentication.data.dto.*
@@ -13,6 +14,7 @@ import javax.inject.Inject
  */
 class AuthDataSource @Inject constructor(
     private val directusApiService: DirectusApiService,
+    private val extractInfoToken: ExtractInfoToken
 ) {
 
     private companion object {
@@ -77,7 +79,7 @@ class AuthDataSource @Inject constructor(
 
             // Extract user ID from token
             Log.d(TAG, "[Paso 4/5] Extrayendo ID del token...")
-            val userId = extractUserIdFromToken(accessToken)
+            val userId = extractInfoToken.extractUserIdFromToken(accessToken)
             Log.d(TAG, "[Paso 4/5] ID extraído: $userId")
 
             // Step 3: Create profile in profiles table with the same ID
@@ -132,45 +134,6 @@ class AuthDataSource @Inject constructor(
     }
 
     /**
-     * Extracts the user ID from the JWT token.
-     *
-     * @param token The JWT token
-     * @return The user ID
-     */
-    private fun extractUserIdFromToken(token: String): String {
-        try {
-            Log.d(TAG, "Analizando token JWT...")
-
-            // JWT tokens are in the format: header.payload.signature
-            val parts = token.split(".").also {
-                Log.d(TAG, "Partes del token: ${it.size} (se esperaban 3)")
-            }
-            if (parts.size != 3) {
-                throw Exception("Invalid token format")
-            }
-
-            // Decode the payload (second part)
-            val payload = android.util.Base64.decode(parts[1], android.util.Base64.URL_SAFE)
-                .toString(Charsets.UTF_8)
-                .also {
-                    Log.d(TAG, "Payload decodificado (primeros 50 chars): ${it.take(50)}...")
-                }
-
-            // Parse the JSON to extract the user ID
-            val regex = "\"id\"\\s*:\\s*\"([^\"]+)\"".toRegex()
-            val matchResult = regex.find(payload)
-
-            return matchResult?.groupValues?.get(1)?.also {
-                Log.d(TAG, "ID encontrado en token: $it")
-            } ?: throw Exception("Could not extract user ID from token")
-
-        } catch (e: Exception) {
-            Log.e(TAG, "Fallo al extraer ID del token:", e)
-            throw e
-        }
-    }
-
-    /**
      * Authenticates a user with email and password credentials.
      *
      * @param email User's email address
@@ -183,7 +146,7 @@ class AuthDataSource @Inject constructor(
             val response = directusApiService.login(loginRequest)
             Log.d(TAG, "Login exitoso. Token recibido")
             return User(
-                id = extractUserIdFromToken(response.data.access_token),
+                id = extractInfoToken.extractUserIdFromToken(response.data.access_token),
                 email = loginRequest.email,
                 password = "",
                 role = "authenticated"
@@ -213,4 +176,5 @@ class AuthDataSource @Inject constructor(
     suspend fun resetPassword(email: String) {
         TODO("Implement password reset functionality")
     }
+
 }
