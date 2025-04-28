@@ -1,6 +1,7 @@
 package com.example.habitflow_app.features.authentication.di
 
 import com.example.habitflow_app.core.network.DirectusApiService
+import com.example.habitflow_app.core.utils.ExtractInfoToken
 import com.example.habitflow_app.domain.repositories.AuthRepository
 import com.example.habitflow_app.features.authentication.data.datasources.AuthDataSource
 import com.example.habitflow_app.features.authentication.data.repositories.AuthRepositoryImpl
@@ -24,12 +25,16 @@ object AuthModule {
      * Provides singleton instance of AuthDataSource.
      *
      * @param directusApiService Injected Directus API service
+     * @param extractInfoToken Injected Extract info token service
      * @return Configured AuthDataSource implementation
      */
     @Provides
     @Singleton
-    fun provideAuthDataSource(directusApiService: DirectusApiService): AuthDataSource {
-        return AuthDataSource(directusApiService)
+    fun provideAuthDataSource(
+        directusApiService: DirectusApiService,
+        extractInfoToken: ExtractInfoToken
+    ): AuthDataSource {
+        return AuthDataSource(directusApiService, extractInfoToken)
     }
 
     /**
