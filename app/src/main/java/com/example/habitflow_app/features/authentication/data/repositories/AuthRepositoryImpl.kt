@@ -31,6 +31,10 @@ class AuthRepositoryImpl @Inject constructor(private val authDataSource: AuthDat
         return authDataSource.login(LoginRequest(email = email, password = password))
     }
 
+    override suspend fun sendPasswordResetEmail(email: String) {
+        authDataSource.sendPasswordResetEmail(email)
+    }
+
     override suspend fun logout() {
         TODO("Not yet implemented")
     }

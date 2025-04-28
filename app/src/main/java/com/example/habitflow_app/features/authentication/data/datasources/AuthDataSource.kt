@@ -194,6 +194,25 @@ class AuthDataSource @Inject constructor(
         }
     }
 
+    suspend fun sendPasswordResetEmail(email: String) {
+        try {
+            Log.d(TAG, "Enviando solicitud de recuperación a Directus para: $email")
+
+            val response = directusApiService.requestPasswordReset(
+                PasswordResetRequest(email = email)
+            )
+
+            if (!response.isSuccessful) {
+                throw Exception("Error al enviar solicitud: ${response.code()}")
+            }
+
+            Log.d(TAG, "Solicitud de recuperación enviada exitosamente")
+        } catch (e: Exception) {
+            Log.e(TAG, "Error en sendPasswordResetEmail:", e)
+            throw Exception("Error al enviar correo de recuperación: ${e.message}")
+        }
+    }
+
     /** Terminates the current authenticated session. */
     suspend fun logout() {
         try {

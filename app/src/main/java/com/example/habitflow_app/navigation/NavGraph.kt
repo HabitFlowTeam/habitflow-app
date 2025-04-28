@@ -22,6 +22,7 @@ import com.example.habitflow_app.features.gamification.ui.screens.StatsMainScree
 import com.example.habitflow_app.features.habits.ui.screens.HabitsMainScreen
 import com.example.habitflow_app.features.habits.ui.screens.HomeScreen
 import com.example.habitflow_app.features.profile.ui.screens.ProfileScreen
+import com.example.habitflow_app.navigation.routes.ForgotPasswordRoute
 import com.example.habitflow_app.navigation.routes.LoginRoute
 import com.example.habitflow_app.navigation.routes.RegisterRoute
 import com.example.habitflow_app.navigation.ui.screens.LayoutScreen
@@ -78,6 +79,10 @@ fun AppNavGraph(
                 ProfileScreen(
                     navController = navController
                 )
+            }
+
+            composable(NavDestinations.FORGOT_PASSWORD) {
+                ForgotPasswordRoute(navController = navController)
             }
         }
     }

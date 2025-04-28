@@ -1,5 +1,6 @@
 package com.example.habitflow_app.features.authentication.ui.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -140,7 +141,9 @@ fun LoginScreen(
                 Text(
                     text = "¿Olvidaste tu contraseña?",
                     style = AppTypography.bodyMedium,
-                    modifier = Modifier.padding(start = 8.dp)
+                    modifier = Modifier
+                        .padding(start = 8.dp)
+                        .clickable { navController.navigate(NavDestinations.FORGOT_PASSWORD) }
                 )
             }
 
