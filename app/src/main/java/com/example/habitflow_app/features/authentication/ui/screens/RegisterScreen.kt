@@ -17,9 +17,7 @@ import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -53,7 +51,6 @@ import com.example.habitflow_app.navigation.NavDestinations
  * @param navController Navigation controller for screen transitions
  * @param viewModel ViewModel that handles registration logic and state management
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(
     navController: NavController,
@@ -72,15 +69,16 @@ fun RegisterScreen(
         }
     }
 
-    // Main screen scaffold
-    Scaffold { paddingValues ->
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 24.dp)
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.Center
+    ) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(horizontal = 24.dp)
-                .padding(vertical = 32.dp)
-                .verticalScroll(rememberScrollState()),
+                .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
