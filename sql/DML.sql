@@ -46,158 +46,35 @@ VALUES
     ('b4a7c8d9-e0f1-4a5b-9c8d-7e6f5a4b3c2d', 'Miguel Gonzalez', 'miguel_gonzalez', 22, 30, 'https://randomuser.me/api/portraits/men/15.jpg', '2023-10-18 16:50:00'),
     ('c8d9e0f1-a2b3-4c5d-6e7f-8a9b0c1d2e3f', 'Pablo Pineda', 'pablo_pineda', 9, 14, 'https://randomuser.me/api/portraits/men/19.jpg', '2024-01-30 12:10:00');
 
+
 -- Inserción de la política ACCESS_USER
 INSERT INTO directus_policies (id, name, description, app_access)
 VALUES
     ('2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e', 'ACCESS_USER', 'Limited access to users', true);
 
+-- Inserción de la política ACCESS_ADMIN
 INSERT INTO directus_policies (id, name, description, admin_access, app_access)
 VALUES
     ('f9a8b7c6-d5e4-4f3a-9b2c-1a0e8d7f6c5b', 'ACCESS_ADMIN', 'Unlimited access to users', true, true);
 
--- Inserción de las políticas PUBLIC_LABEL
-INSERT INTO directus_permissions (collection, action, fields, policy, permissions, validation)
+-- Inserción de permisos en policies
+INSERT INTO directus_permissions (collection, action, fields, permissions, validation, policy)
 VALUES
-    ('directus_users', 'create', '*', (SELECT id FROM directus_policies WHERE name LIKE '%public_label%'), '{}', '{}'),
-    ('directus_users', 'delete', '*', (SELECT id FROM directus_policies WHERE name LIKE '%public_label%'), '{}', '{}'),
-    ('profiles', 'create', '*', (SELECT id FROM directus_policies WHERE name LIKE '%public_label%'), '{}', '{}');
+    ('directus_users', 'create', '*', '{}', '{}', (SELECT id FROM directus_policies WHERE name LIKE '%public_label%')), -- Creación de usuario a publico
+    ('directus_users', 'delete', '*', '{}', '{}', (SELECT id FROM directus_policies WHERE name LIKE '%public_label%')), -- Eliminación de usuario a publico
+    ('profiles', 'create', '*', '{}', '{}', (SELECT id FROM directus_policies WHERE name LIKE '%public_label%')), -- Creación de perfil a publico
+    ('profiles', 'read', '*', '{}', '{}', '2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e'), -- Leer perfil a ACCESS_USER
+    ('profiles', 'update', '*', '{}', '{}', '2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e'), -- Actualizar perfil a ACCESS_USER
+    ('profiles', 'delete', '*', '{}', '{}', '2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e'), -- Eliminar perfil a ACCESS_USER
+    ('profiles', 'read', '*', '{}', '{}', 'f9a8b7c6-d5e4-4f3a-9b2c-1a0e8d7f6c5b'), -- Leer perfil a ACCESS_ADMIN
+    ('profiles', 'update', '*', '{}', '{}', 'f9a8b7c6-d5e4-4f3a-9b2c-1a0e8d7f6c5b'), -- Actualizar perfil a ACCESS_ADMIN
+    ('profiles', 'delete', '*', '{}', '{}', 'f9a8b7c6-d5e4-4f3a-9b2c-1a0e8d7f6c5b'); -- Eliminar perfil a ACCESS_ADMIN
 
 -- Inserción de politicas con sus roles
 INSERT INTO directus_access(id, role, policy)
 VALUES
     ('3f2a1b4c-5d6e-7f8a-9b0c-1d2e3f4a5b6c', 'a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'f9a8b7c6-d5e4-4f3a-9b2c-1a0e8d7f6c5b'), -- Administrador
     ('4a5b6c7d-8e9f-0a1b-2c3d-4e5f6a7b8c9d', '5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', '2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e'); -- Usuario
-
--- PROFILE PERMISSIONS
--- 1. Create public access policy (without restrictions)
-INSERT INTO directus_policies (
-    id,
-    name,
-    icon,
-    description,
-    ip_access,
-    enforce_tfa,
-    admin_access,
-    app_access
-) VALUES (
-    'd9a8e7f6-5b4c-3d2e-1f0a-9b8c7d6e5f4a',
-    'Public Profiles Access',
-    'people_alt',
-    'Permite acceso público a perfiles',
-    NULL,  -- Sin restricción por IP
-    false, -- No requiere TFA
-    false, -- No es acceso de administrador
-    true   -- Acceso a la app
-)
-ON CONFLICT (id) DO NOTHING;
-
--- 2. Assign public reading permission to profiles
-INSERT INTO directus_permissions (
-    collection,
-    action,
-    fields,
-    policy,
-    permissions,
-    validation
-) VALUES (
-    'profiles',
-    'read',
-    '*',
-    'd9a8e7f6-5b4c-3d2e-1f0a-9b8c7d6e5f4a',
-    '{}',
-    '{}'
-);
-
--- 3. Create policy for ADMIN role (full access)
-INSERT INTO directus_policies (
-    id,
-    name,
-    icon,
-    description,
-    ip_access,
-    enforce_tfa,
-    admin_access,
-    app_access
-) VALUES (
-    'a21cfc5d-0001-4e45-8e93-dd0d440af562',
-    'Admin Profiles Access',
-    'admin_panel_settings',
-    'Acceso completo a perfiles para administradores',
-    NULL,
-    false,
-    true,  -- Acceso de administrador
-    true
-)
-ON CONFLICT (id) DO NOTHING;
-
--- 4. Assign full permissions to ADMIN
-INSERT INTO directus_permissions (
-    collection,
-    action,
-    fields,
-    policy,
-    permissions,
-    validation
-) VALUES
-    ('profiles', 'create', '*', 'a21cfc5d-0001-4e45-8e93-dd0d440af562', '{}', '{}'),
-    ('profiles', 'read', '*', 'a21cfc5d-0001-4e45-8e93-dd0d440af562', '{}', '{}'),
-    ('profiles', 'update', '*', 'a21cfc5d-0001-4e45-8e93-dd0d440af562', '{}', '{}'),
-    ('profiles', 'delete', '*', 'a21cfc5d-0001-4e45-8e93-dd0d440af562', '{}', '{}');
-
--- 5. Create policy for USER role
-INSERT INTO directus_policies (
-    id,
-    name,
-    icon,
-    description,
-    ip_access,
-    enforce_tfa,
-    admin_access,
-    app_access
-) VALUES (
-    '5e8b7092-0001-47df-b24a-b3c9f733a9c4',
-    'User Profiles Access',
-    'person',
-    'Acceso a perfiles para usuarios regulares',
-    NULL,
-    false,
-    false,
-    true
-)
-ON CONFLICT (id) DO NOTHING;
-
--- 6. Assign read permissions to USER
-INSERT INTO directus_permissions (
-    collection,
-    action,
-    fields,
-    policy,
-    permissions,
-    validation
-) VALUES (
-    'profiles',
-    'read',
-    '*',
-    '5e8b7092-0001-47df-b24a-b3c9f733a9c4',
-    '{}',
-    '{}'
-);
-
-INSERT INTO directus_permissions (
-    collection,
-    action,
-    fields,
-    policy,
-    permissions,
-    validation
-) VALUES (
-    'profiles',
-    'update',
-    '*',
-    (SELECT id FROM directus_policies WHERE name LIKE '%public_label%'),
-    '{}',
-    '{}'
-);
 
 -- Inserción de artículos
 INSERT INTO articles (id, title, content, image_url, is_deleted, created_at, user_id, category_id)
