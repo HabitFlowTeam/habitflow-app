@@ -15,10 +15,10 @@ data class RegisterUserRequest(
 @Serializable
 data class CreateProfileRequest(
     val id: String,
-    val fullName: String,
+    val full_name: String,
     val username: String,
     val streak: Int,
-    val bestStreak: Int,
-    val avatarUrl: String
+    val best_streak: Int,
+    val avatar_url: String
 )
 

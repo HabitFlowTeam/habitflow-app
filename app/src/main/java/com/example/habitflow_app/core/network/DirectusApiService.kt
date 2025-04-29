@@ -6,7 +6,9 @@ import com.example.habitflow_app.features.authentication.data.dto.RegisterUserRe
 import com.example.habitflow_app.features.authentication.data.dto.CreateProfileRequest
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.POST
+import retrofit2.http.Path
 
 /**
  * Retrofit service interface defining all API endpoints for Directus backend communication.
@@ -29,6 +31,16 @@ interface DirectusApiService {
      */
     @POST("users")
     suspend fun registerUser(@Body registerRequest: RegisterUserRequest): Response<Void>
+
+    /**
+     * Delete a user in the Directus system.
+     * This endpoint returns a 204 No Content response on success.
+     *
+     * @param id The ID of the user to delete
+     * @return Retrofit Response object to check for status codes
+     */
+    @DELETE("users/{id}")
+    suspend fun deleteUser(@Path("id") id: String): Response<Void>
 
     /**
      * Creates a new profile in the Directus system.
