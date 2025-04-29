@@ -1,15 +1,17 @@
 package com.example.habitflow_app.navigation.ui.screens
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.habitflow_app.R
 import com.example.habitflow_app.core.ui.components.BottomNavigationBar
 import com.example.habitflow_app.features.articles.ui.screens.ArticlesMainScreen
 import com.example.habitflow_app.features.gamification.ui.screens.StatsMainScreen
@@ -17,8 +19,6 @@ import com.example.habitflow_app.features.habits.ui.screens.HabitsMainScreen
 import com.example.habitflow_app.features.habits.ui.screens.HomeScreen
 import com.example.habitflow_app.navigation.NavDestinations
 import com.example.habitflow_app.navigation.ui.components.BottomNavItem
-import com.example.habitflow_app.R
-import com.example.habitflow_app.core.ui.components.TopAppBar
 
 /**
  * A composable function that represents the main layout of the application.
@@ -39,21 +39,32 @@ fun LayoutScreen(
         BottomNavItem(NavDestinations.HABITS, R.drawable.ic_habits, "Habits"),
         BottomNavItem(NavDestinations.GAMIFICATION, R.drawable.ic_stats, "Stats"),
     )
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        bottomBar = {
-            BottomNavigationBar(
-                items = bottomNavItem,
-                navController = barNavController
-            )
-        }
-    ) {innerPadding ->
-        NavHost(navController = barNavController, startDestination= NavDestinations.HOME, modifier = Modifier.padding(innerPadding)) {
-            composable(NavDestinations.HOME) { HomeScreen() }
-            composable(NavDestinations.ARTICLES) { ArticlesMainScreen() }
-            composable(NavDestinations.HABITS) { HabitsMainScreen() }
-            composable(NavDestinations.GAMIFICATION) { StatsMainScreen() }
+
+    Column(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+        ) {
+            NavHost(
+                navController = barNavController,
+                startDestination = NavDestinations.HOME,
+            ) {
+                composable(NavDestinations.HOME) { HomeScreen() }
+                composable(NavDestinations.ARTICLES) { ArticlesMainScreen() }
+                composable(NavDestinations.HABITS) { HabitsMainScreen() }
+                composable(NavDestinations.GAMIFICATION) { StatsMainScreen() }
+            }
         }
 
+
+        BottomNavigationBar(
+            items = bottomNavItem,
+            navController = barNavController
+        )
+
     }
+
 }

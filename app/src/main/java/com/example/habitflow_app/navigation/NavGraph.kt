@@ -1,11 +1,8 @@
 package com.example.habitflow_app.navigation
 
-import android.annotation.SuppressLint
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -27,14 +24,18 @@ import com.example.habitflow_app.navigation.ui.screens.LayoutScreen
 @Composable
 fun AppNavGraph(
     navController: NavHostController,
-    startDestination: String = NavDestinations.LOGIN,
-    @SuppressLint("ModifierParameter") modifier: Modifier = Modifier
+    startDestination: String = NavDestinations.LOGIN
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination?.route
 
-    Scaffold(
-        topBar = {
+    Scaffold()
+    { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
             if (currentDestination != NavDestinations.LOGIN && currentDestination != NavDestinations.REGISTER && currentDestination != NavDestinations.FORGOT_PASSWORD) {
                 TopAppBar(
                     navController = navController,
@@ -44,40 +45,39 @@ fun AppNavGraph(
                     onProfileClick = {}
                 )
             }
-        }
-    ) { innerPadding ->
-        NavHost(
-            navController = navController,
-            startDestination = startDestination,
-            modifier = modifier.padding(innerPadding)
-        ) {
-            // Registry route
-            composable(NavDestinations.REGISTER) {
-                RegisterRoute(
-                    navController = navController
-                )
-            }
 
-            composable(NavDestinations.LOGIN) {
-                LoginRoute(
-                    navController = navController
-                )
-            }
+            NavHost(
+                navController = navController,
+                startDestination = startDestination
+            ) {
+                // Registry route
+                composable(NavDestinations.REGISTER) {
+                    RegisterRoute(
+                        navController = navController
+                    )
+                }
 
-            composable(NavDestinations.MAIN) {
-                LayoutScreen(
-                    navController = navController
-                )
-            }
+                composable(NavDestinations.LOGIN) {
+                    LoginRoute(
+                        navController = navController
+                    )
+                }
 
-            composable(NavDestinations.PROFILE) {
-                ProfileScreen(
-                    navController = navController
-                )
-            }
+                composable(NavDestinations.MAIN) {
+                    LayoutScreen(
+                        navController = navController
+                    )
+                }
 
-            composable(NavDestinations.FORGOT_PASSWORD) {
-                ForgotPasswordRoute(navController = navController)
+                composable(NavDestinations.PROFILE) {
+                    ProfileScreen(
+                        navController = navController
+                    )
+                }
+
+                composable(NavDestinations.FORGOT_PASSWORD) {
+                    ForgotPasswordRoute(navController = navController)
+                }
             }
         }
     }
