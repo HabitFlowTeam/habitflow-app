@@ -43,6 +43,10 @@ import com.example.habitflow_app.features.authentication.ui.components.Logo
 import com.example.habitflow_app.features.authentication.ui.viewmodel.RegisterEvent
 import com.example.habitflow_app.features.authentication.ui.viewmodel.RegisterViewModel
 import com.example.habitflow_app.navigation.NavDestinations
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.IconButton
+import androidx.compose.ui.text.input.VisualTransformation
 
 /**
  * Screen that handles user registration process.
@@ -161,7 +165,7 @@ fun RegisterScreen(
                 isError = state.passwordError != null,
                 errorMessage = state.passwordError,
                 keyboardType = KeyboardType.Password,
-                visualTransformation = PasswordVisualTransformation(),
+                visualTransformation = if (state.passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 imeAction = ImeAction.Next,
                 modifier = Modifier.fillMaxWidth(),
                 leadingIcon = {
@@ -170,6 +174,12 @@ fun RegisterScreen(
                         contentDescription = "Contraseña",
                         tint = if (state.passwordError != null) Red500 else Zinc500
                     )
+                },
+                trailingIcon = {
+                    val icon = if (state.passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility
+                    IconButton(onClick = { viewModel.onEvent(RegisterEvent.TogglePasswordVisibility) }) {
+                        Icon(imageVector = icon, contentDescription = "Mostrar/ocultar contraseña")
+                    }
                 }
             )
 
@@ -181,7 +191,7 @@ fun RegisterScreen(
                 isError = state.confirmPasswordError != null,
                 errorMessage = state.confirmPasswordError,
                 keyboardType = KeyboardType.Password,
-                visualTransformation = PasswordVisualTransformation(),
+                visualTransformation = if (state.confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 imeAction = ImeAction.Done,
                 modifier = Modifier.fillMaxWidth(),
                 leadingIcon = {
@@ -190,6 +200,16 @@ fun RegisterScreen(
                         contentDescription = "Confirmar contraseña",
                         tint = if (state.confirmPasswordError != null) Red500 else Zinc500
                     )
+                },
+                trailingIcon = {
+                    IconButton(onClick = {
+                        viewModel.onEvent(RegisterEvent.ToggleConfirmPasswordVisibility)
+                    }) {
+                        Icon(
+                            imageVector = if (state.confirmPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                            contentDescription = if (state.confirmPasswordVisible) "Ocultar contraseña" else "Mostrar contraseña"
+                        )
+                    }
                 }
             )
 

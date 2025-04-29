@@ -40,6 +40,10 @@ import com.example.habitflow_app.features.authentication.ui.components.Logo
 import com.example.habitflow_app.features.authentication.ui.viewmodel.LoginEvent
 import com.example.habitflow_app.features.authentication.ui.viewmodel.LoginViewModel
 import com.example.habitflow_app.navigation.NavDestinations
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.IconButton
+import androidx.compose.ui.text.input.VisualTransformation
 
 /**
  * Screen that handles user login process.
@@ -125,7 +129,7 @@ fun LoginScreen(
                 isError = state.passwordError != null,
                 errorMessage = state.passwordError,
                 keyboardType = KeyboardType.Password,
-                visualTransformation = PasswordVisualTransformation(),
+                visualTransformation = if (state.isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 imeAction = ImeAction.Next,
                 modifier = Modifier.fillMaxWidth(),
                 leadingIcon = {
@@ -133,6 +137,22 @@ fun LoginScreen(
                         imageVector = Icons.Default.Lock,
                         contentDescription = "Contraseña",
                         tint = if (state.passwordError != null) Red500 else Zinc500
+                    )
+                },
+                trailingIcon = {
+                    val icon = if (state.isPasswordVisible) {
+                        Icons.Default.VisibilityOff
+                    } else {
+                        Icons.Default.Visibility
+                    }
+                    val description = if (state.isPasswordVisible) "Ocultar contraseña" else "Mostrar contraseña"
+
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = description,
+                        modifier = Modifier.clickable {
+                            viewModel.onEvent(LoginEvent.TogglePasswordVisibility)
+                        }
                     )
                 }
             )

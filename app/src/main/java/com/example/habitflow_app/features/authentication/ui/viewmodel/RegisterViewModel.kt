@@ -79,6 +79,17 @@ class RegisterViewModel @Inject constructor(
                 )
             }
 
+            is RegisterEvent.TogglePasswordVisibility -> {
+                _uiState.value = _uiState.value.copy(
+                    passwordVisible = !_uiState.value.passwordVisible
+                )
+            }
+            is RegisterEvent.ToggleConfirmPasswordVisibility -> {
+                _uiState.value = _uiState.value.copy(
+                    confirmPasswordVisible = !_uiState.value.confirmPasswordVisible
+                )
+            }
+
             RegisterEvent.Submit -> validateAndRegister()
         }
     }
@@ -209,7 +220,9 @@ data class RegisterUiState(
     val termsError: String? = null,
     val isLoading: Boolean = false,
     val isSuccess: Boolean = false,
-    val error: String? = null
+    val error: String? = null,
+    val passwordVisible: Boolean = false,
+    val confirmPasswordVisible: Boolean = false
 )
 
 /**
@@ -223,4 +236,6 @@ sealed class RegisterEvent {
     data class ConfirmPasswordChanged(val value: String) : RegisterEvent()
     data class TermsAcceptedChanged(val value: Boolean) : RegisterEvent()
     data object Submit : RegisterEvent()
+    object TogglePasswordVisibility : RegisterEvent()
+    object ToggleConfirmPasswordVisibility : RegisterEvent()
 }

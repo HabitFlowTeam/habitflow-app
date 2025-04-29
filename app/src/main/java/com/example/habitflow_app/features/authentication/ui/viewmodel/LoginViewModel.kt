@@ -49,6 +49,12 @@ class LoginViewModel @Inject constructor(
                 )
             }
 
+            LoginEvent.TogglePasswordVisibility -> {
+                _uiState.value = _uiState.value.copy(
+                    isPasswordVisible = !_uiState.value.isPasswordVisible
+                )
+            }
+
             LoginEvent.Submit -> validateAndLogin()
         }
     }
@@ -146,7 +152,8 @@ data class LoginUiState(
     val passwordError: String? = null,
     val isLoading: Boolean = false,
     val isSuccess: Boolean = false,
-    val error: String? = null
+    val error: String? = null,
+    val isPasswordVisible: Boolean = false
 )
 
 /**
@@ -156,4 +163,5 @@ sealed class LoginEvent {
     data class EmailChanged(val value: String) : LoginEvent()
     data class PasswordChanged(val value: String) : LoginEvent()
     data object Submit : LoginEvent()
+    data object TogglePasswordVisibility : LoginEvent()
 }
