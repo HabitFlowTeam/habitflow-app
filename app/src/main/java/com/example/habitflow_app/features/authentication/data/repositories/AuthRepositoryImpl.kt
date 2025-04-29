@@ -4,6 +4,7 @@ import com.example.habitflow_app.domain.models.Profile
 import com.example.habitflow_app.domain.models.User
 import com.example.habitflow_app.domain.repositories.AuthRepository
 import com.example.habitflow_app.features.authentication.data.datasources.AuthDataSource
+import com.example.habitflow_app.features.authentication.data.datasources.LocalDataSourceProvider
 import com.example.habitflow_app.features.authentication.data.dto.LoginRequest
 import javax.inject.Inject
 
@@ -37,5 +38,13 @@ class AuthRepositoryImpl @Inject constructor(private val authDataSource: AuthDat
 
     override suspend fun resetPassword(email: String) {
         TODO("Not yet implemented")
+    }
+
+    override suspend fun getAccessToken(): String? {
+        var accessToken: String? = null
+        LocalDataSourceProvider.getInstance().load("access_token").collect { token ->
+            accessToken = token
+        }
+        return accessToken
     }
 }

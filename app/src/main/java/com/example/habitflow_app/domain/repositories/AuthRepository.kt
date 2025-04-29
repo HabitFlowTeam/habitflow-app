@@ -34,4 +34,6 @@ interface AuthRepository {
      * @param email Email address associated with the account
      */
     suspend fun resetPassword(email: String)
+
+    suspend fun getAccessToken(): String?
 }
