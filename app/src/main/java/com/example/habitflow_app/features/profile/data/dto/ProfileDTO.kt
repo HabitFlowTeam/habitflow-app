@@ -1,6 +1,7 @@
 package com.example.habitflow_app.features.profile.data.dto
 
 import com.example.habitflow_app.domain.models.Profile
+import kotlinx.serialization.Serializable
 
 @Serializable
 data class ProfileDTO(
