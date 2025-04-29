@@ -50,7 +50,7 @@ interface DirectusApiService {
     suspend fun login(@Body loginDto: LoginRequest): LoginResponse
 
     @POST("auth/password/request")
-    suspend fun requestPasswordReset(
+    suspend fun resetPassword(
         @Body request: PasswordResetRequest
     ): Response<Unit>
 

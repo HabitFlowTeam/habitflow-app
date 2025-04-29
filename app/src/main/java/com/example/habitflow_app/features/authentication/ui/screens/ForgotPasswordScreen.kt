@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -69,13 +70,13 @@ fun ForgotPasswordScreen(
             Logo()
 
             Text(
-                text = "Recuperar contraseña",
+                text = "Restablecer contraseña",
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold
             )
 
             Text(
-                text = "Ingresa tu correo electrónico para recibir instrucciones",
+                text = "Ingresa tu correo",
                 fontSize = 20.sp,
                 color = Zinc500
             )
@@ -106,7 +107,7 @@ fun ForgotPasswordScreen(
                 isError = state.emailError != null,
                 errorMessage = state.emailError,
                 keyboardType = KeyboardType.Email,
-                imeAction = ImeAction.Done,
+                imeAction = ImeAction.Next,
                 modifier = Modifier.fillMaxWidth(),
                 leadingIcon = {
                     Icon(
@@ -118,7 +119,7 @@ fun ForgotPasswordScreen(
             )
 
             PrimaryButton(
-                text = "Enviar instrucciones",
+                text = "Cambiar contraseña",
                 onClick = { viewModel.onEvent(ForgotPasswordEvent.Submit) },
                 isLoading = state.isLoading,
                 modifier = Modifier.fillMaxWidth()

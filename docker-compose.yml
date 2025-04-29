@@ -4,15 +4,15 @@ services:
     container_name: habitflow-db
     image: postgres:17
     environment:
-      POSTGRES_DB: directus
-      POSTGRES_USER: directus
-      POSTGRES_PASSWORD: directus
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U directus -d directus"]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
       interval: 10s
       retries: 5
       start_period: 10s
@@ -28,23 +28,48 @@ services:
       - directus_uploads:/directus/uploads
       - directus_extensions:/directus/extensions
     environment:
-      SECRET: "habitflow"
-      ADMIN_EMAIL: "habitflow@gmail.com"
-      ADMIN_PASSWORD: "habitflow"
-      DB_CLIENT: "pg"
-      DB_HOST: "db"
-      DB_PORT: "5432"
-      DB_DATABASE: "directus"
-      DB_USER: "directus"
-      DB_PASSWORD: "directus"
-      WEBSOCKETS_ENABLED: "true"
-      ACCESS_TOKEN_TTL: "3600"
+      SECRET: ${SECRET}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      DB_CLIENT: ${DB_CLIENT}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      WEBSOCKETS_ENABLED: ${WEBSOCKETS_ENABLED}
+      ACCESS_TOKEN_TTL: ${ACCESS_TOKEN_TTL}
+
+      EMAIL_TRANSPORT: ${EMAIL_TRANSPORT}
+      EMAIL_SMTP_HOST: ${EMAIL_SMTP_HOST}
+      EMAIL_SMTP_PORT: ${EMAIL_SMTP_PORT}
+      EMAIL_SMTP_SECURE: ${EMAIL_SMTP_SECURE}
+      EMAIL_SMTP_USER: ${EMAIL_SMTP_USER}
+      EMAIL_SMTP_PASSWORD: ${EMAIL_SMTP_PASSWORD}
+      EMAIL_SMTP_FROM: ${EMAIL_SMTP_FROM}
+      EMAIL_SMTP_NAME: ${EMAIL_SMTP_NAME}
+      PUBLIC_URL: ${PUBLIC_URL}
+
     depends_on:
       db:
         condition: service_healthy
+
+  pgadmin:
+    container_name: habitflow-pgadmin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${ADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${ADMIN_PASSWORD}
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
 
 volumes:
   db_data:
   directus_database:
   directus_uploads:
   directus_extensions:
+  pgadmin_data:

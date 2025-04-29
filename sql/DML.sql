@@ -95,6 +95,22 @@ INSERT INTO directus_permissions (
     '{}'
 );
 
+INSERT INTO directus_permissions (
+    collection,
+    action,
+    fields,
+    policy,
+    permissions,
+    validation
+) VALUES (
+    'profiles',
+    'update',
+    '*',
+    (SELECT id FROM directus_policies WHERE name LIKE '%public_label%'),
+    '{}',
+    '{}'
+);
+
 -- Inserción de artículos
 INSERT INTO articles (id, title, content, image_url, is_deleted, created_at, user_id, category_id)
 VALUES

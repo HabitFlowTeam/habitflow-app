@@ -33,11 +33,5 @@ interface AuthRepository {
      * Initiates a password reset flow for the given email.
      * @param email Email address associated with the account
      */
-    suspend fun resetPassword(email: String)
-
-    /**
-     * Sends a password reset email to the specified address
-     * @param email Email address to send reset instructions to
-     */
-    suspend fun sendPasswordResetEmail(email: String)
+    suspend fun requestPasswordReset(email: String)
 }

@@ -27,12 +27,11 @@ class ForgotPasswordViewModel @Inject constructor(
                     emailError = null
                 )
             }
-
-            ForgotPasswordEvent.Submit -> sendResetEmail()
+            ForgotPasswordEvent.Submit -> requestPasswordReset()
         }
     }
 
-    private fun sendResetEmail() {
+    private fun requestPasswordReset() {
         val email = _uiState.value.email
         val emailError = emailValidator.validate(email)
 
@@ -47,16 +46,16 @@ class ForgotPasswordViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 _uiState.value = _uiState.value.copy(isLoading = true)
-                authRepository.sendPasswordResetEmail(email)
+                authRepository.requestPasswordReset(email)
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
                     isSuccess = true,
-                    message = "Se ha enviado un correo con instrucciones para restablecer tu contraseña"
+                    message = "Se ha enviado un enlace para restablecer tu contraseña a tu correo electrónico"
                 )
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    error = e.message ?: "Error al enviar el correo de recuperación"
+                    error = e.message ?: "Error al solicitar el restablecimiento de contraseña"
                 )
             }
         }
