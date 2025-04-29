@@ -229,7 +229,8 @@ class AuthDataSource @Inject constructor(
     suspend fun logout() {
         try {
             Log.d(TAG, "Ejecutando logout")
-            directusApiService.logout()
+            // TODO: Inhabilitar el token con directusApiService.logout()
+            localDataStore.clearAccessToken()
             Log.d(TAG, "Logout completado")
         } catch (e: retrofit2.HttpException) {
             val errorBody = e.response()?.errorBody()?.string() ?: "no details"

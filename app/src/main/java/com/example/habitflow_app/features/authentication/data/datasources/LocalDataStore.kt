@@ -35,4 +35,10 @@ class LocalDataStore @Inject constructor(
             .firstOrNull()
     }
 
+    suspend fun clearAccessToken() {
+        dataStore.edit { preferences ->
+            preferences.remove(ACCESS_TOKEN_KEY)
+        }
+    }
+
 }

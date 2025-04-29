@@ -20,9 +20,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.habitflow_app.core.ui.theme.Background
+import com.example.habitflow_app.navigation.NavDestinations
 
 /**
  * A composable function that displays the profile screen, including the top app bar,
@@ -92,6 +92,24 @@ fun ProfileScreen(
                     bestStreak = profile!!.bestStreak,
                     completedHabits = 100
                 )
+
+                // Logout button
+                Button(
+                    onClick = {
+                        viewModel.logout()
+                        navController.navigate(NavDestinations.LOGIN) {
+                            popUpTo(0) // Limpia toda la pila de navegación
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Red500
+                    )
+                ) {
+                    Text("Cerrar sesión", color = MaterialTheme.colorScheme.onPrimary)
+                }
 
                 // List of articles
                 MyArticleItem(

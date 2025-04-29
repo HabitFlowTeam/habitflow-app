@@ -52,4 +52,15 @@ class ProfileViewModel @Inject constructor(
             }
         }
     }
+
+    fun logout() {
+        viewModelScope.launch {
+            try {
+                authRepository.logout()
+            } catch (e: Exception) {
+                _error.value = "Error al cerrar sesión: ${e.message}"
+            }
+        }
+    }
+
 }

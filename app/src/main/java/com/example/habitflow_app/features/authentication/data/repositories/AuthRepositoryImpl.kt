@@ -37,7 +37,7 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun logout() {
-        TODO("Not yet implemented")
+        authDataSource.logout()
     }
 
     override suspend fun requestPasswordReset(email: String) {
