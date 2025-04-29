@@ -4,7 +4,9 @@ import com.example.habitflow_app.domain.models.Profile
 import com.example.habitflow_app.domain.models.User
 import com.example.habitflow_app.domain.repositories.AuthRepository
 import com.example.habitflow_app.features.authentication.data.datasources.AuthDataSource
+import com.example.habitflow_app.features.authentication.data.datasources.LocalDataStore
 import com.example.habitflow_app.features.authentication.data.dto.LoginRequest
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 /**
@@ -13,7 +15,10 @@ import javax.inject.Inject
  *
  * @property authDataSource The authentication data source
  */
-class AuthRepositoryImpl @Inject constructor(private val authDataSource: AuthDataSource) :
+class AuthRepositoryImpl @Inject constructor(
+    private val authDataSource: AuthDataSource,
+    private val localDataStore: LocalDataStore
+) :
     AuthRepository {
 
     /**
@@ -37,5 +42,13 @@ class AuthRepositoryImpl @Inject constructor(private val authDataSource: AuthDat
 
     override suspend fun resetPassword(email: String) {
         TODO("Not yet implemented")
+    }
+
+    override fun getAccessToken(): Flow<String?> {
+        return localDataStore.getAccessToken()
+    }
+
+    override suspend fun getAccessTokenOnce(): String? {
+        return localDataStore.getAccessTokenOnce()
     }
 }

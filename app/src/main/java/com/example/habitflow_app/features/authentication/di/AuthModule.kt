@@ -4,6 +4,7 @@ import com.example.habitflow_app.core.network.DirectusApiService
 import com.example.habitflow_app.core.utils.ExtractInfoToken
 import com.example.habitflow_app.domain.repositories.AuthRepository
 import com.example.habitflow_app.features.authentication.data.datasources.AuthDataSource
+import com.example.habitflow_app.features.authentication.data.datasources.LocalDataStore
 import com.example.habitflow_app.features.authentication.data.repositories.AuthRepositoryImpl
 import com.example.habitflow_app.features.authentication.validation.LoginFormValidator
 import com.example.habitflow_app.features.authentication.validation.RegisterFormValidator
@@ -32,21 +33,10 @@ object AuthModule {
     @Singleton
     fun provideAuthDataSource(
         directusApiService: DirectusApiService,
-        extractInfoToken: ExtractInfoToken
+        extractInfoToken: ExtractInfoToken,
+        localDataStore: LocalDataStore
     ): AuthDataSource {
-        return AuthDataSource(directusApiService, extractInfoToken)
-    }
-
-    /**
-     * Provides singleton instance of AuthRepository.
-     *
-     * @param authDataSource Injected data source instance
-     * @return Configured AuthRepository implementation
-     */
-    @Provides
-    @Singleton
-    fun provideAuthRepository(authDataSource: AuthDataSource): AuthRepository {
-        return AuthRepositoryImpl(authDataSource)
+        return AuthDataSource(directusApiService, extractInfoToken, localDataStore)
     }
 
     /**
@@ -69,5 +59,21 @@ object AuthModule {
     @Singleton
     fun provideLoginFormValidator(): LoginFormValidator {
         return LoginFormValidator()
+    }
+
+    /**
+     * Provides singleton instance of AuthRepository.
+     *
+     * @param authDataSource Injected data source instance
+     * @param localDataStore Injected local data store instance
+     * @return Configured AuthRepository implementation
+     */
+    @Provides
+    @Singleton
+    fun provideAuthRepository(
+        authDataSource: AuthDataSource,
+        localDataStore: LocalDataStore
+    ): AuthRepository {
+        return AuthRepositoryImpl(authDataSource, localDataStore)
     }
 }

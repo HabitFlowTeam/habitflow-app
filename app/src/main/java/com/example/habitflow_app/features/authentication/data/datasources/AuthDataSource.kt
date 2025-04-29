@@ -15,7 +15,8 @@ import javax.inject.Inject
  */
 class AuthDataSource @Inject constructor(
     private val directusApiService: DirectusApiService,
-    private val extractInfoToken: ExtractInfoToken
+    private val extractInfoToken: ExtractInfoToken,
+    private val localDataStore: LocalDataStore
 ) {
 
     private companion object {
@@ -79,6 +80,9 @@ class AuthDataSource @Inject constructor(
                     accessToken.take(10)
                 }..."
             )
+
+            // Save tokens to local storage
+            localDataStore.saveAccessToken(accessToken)
 
             // Extract user ID from token
             Log.d(TAG, "[Paso 4/5] Extrayendo ID del token...")
@@ -165,7 +169,7 @@ class AuthDataSource @Inject constructor(
     /**
      * Authenticates a user with email and password credentials.
      *
-     * @param loginRequest Login credentials request
+     * @param loginRequest DTO containing user credentials (email and password)
      * @return Authenticated [User] object
      * @throws AuthException if login fails with specific error
      */
@@ -173,6 +177,7 @@ class AuthDataSource @Inject constructor(
         try {
             Log.d(TAG, "Iniciando login para: ${loginRequest.email}")
             val response = directusApiService.login(loginRequest)
+            localDataStore.saveAccessToken(response.data.access_token)
             Log.d(TAG, "Login exitoso. Token recibido")
             return User(
                 id = extractInfoToken.extractUserIdFromToken(response.data.access_token),
