@@ -14,9 +14,9 @@
     "author": "",
     "license": "ISC",
     "bugs": {
-      "url": "https://github.com/HabitFlowTeam/habitflow-app.git"
+      "url": "https://github.com/HabitFlowTeam/habitflow-app.git/issues"
     },
-    "homepage": "https://github.com/HabitFlowTeam/habitflow-app.git",
+    "homepage": "https://github.com/HabitFlowTeam/habitflow-app.git#readme",
     "devDependencies": {
       "@semantic-release/changelog": "^6.0.3",
       "@semantic-release/git": "^10.0.1",
