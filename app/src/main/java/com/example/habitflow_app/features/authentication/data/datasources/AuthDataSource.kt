@@ -1,6 +1,7 @@
 package com.example.habitflow_app.features.authentication.data.datasources
 
 import android.util.Log
+import com.example.habitflow_app.core.exceptions.*
 import com.example.habitflow_app.core.network.DirectusApiService
 import com.example.habitflow_app.core.utils.ExtractInfoToken
 import com.example.habitflow_app.domain.models.Profile
@@ -27,7 +28,7 @@ class AuthDataSource @Inject constructor(
      * @param user User data to register
      * @param profile Profile data to create
      * @return Registered User object if successful
-     * @throws Exception if registration fails at any step
+     * @throws AuthException if registration fails with specific error
      */
     suspend fun registerUser(user: User, profile: Profile): User {
         try {
@@ -54,7 +55,11 @@ class AuthDataSource @Inject constructor(
                     TAG,
                     "[Paso 2/5] Error en registro: ${registerResponse.code()} ${registerResponse.message()}"
                 )
-                throw Exception("Registration failed with code: ${registerResponse.code()}")
+                val errorBody = registerResponse.errorBody()?.string() ?: "No error details"
+                Log.e(TAG, "Error body: $errorBody")
+
+                // Parse the error to get a specific exception
+                throw AuthExceptionHandler.parseDirectusError(errorBody, registerResponse.code())
             }
 
             // Step 2: Authenticate to get access tokens
@@ -75,8 +80,6 @@ class AuthDataSource @Inject constructor(
                 }..."
             )
 
-            // TODO: Save tokens to local storage
-
             // Extract user ID from token
             Log.d(TAG, "[Paso 4/5] Extrayendo ID del token...")
             val userId = extractInfoToken.extractUserIdFromToken(accessToken)
@@ -87,15 +90,15 @@ class AuthDataSource @Inject constructor(
             val profileResponse = directusApiService.createProfile(
                 CreateProfileRequest(
                     id = userId,
-                    fullName = profile.fullName,
+                    full_name = profile.fullName,
                     username = profile.username,
                     streak = profile.streak,
-                    bestStreak = profile.bestStreak,
-                    avatarUrl = profile.avatarUrl
+                    best_streak = profile.bestStreak,
+                    avatar_url = profile.avatarUrl
                 )
             )
 
-            // Check if registration was successful (200 status code)
+            // Check if profile creation was successful (200 status code)
             if (profileResponse.isSuccessful) {
                 Log.d(
                     TAG,
@@ -104,9 +107,31 @@ class AuthDataSource @Inject constructor(
             } else {
                 Log.w(
                     TAG,
-                    "[Paso 5/5] Error en registro: ${profileResponse.code()} ${profileResponse.message()}"
+                    "[Paso 5/5] Error en creación de perfil: ${profileResponse.code()} ${profileResponse.message()}"
                 )
-                throw Exception("Registration failed with code: ${profileResponse.code()}")
+                val errorBody = profileResponse.errorBody()?.string() ?: "No error details"
+                Log.e(TAG, "Error body: $errorBody")
+
+                // If profile creation fails, delete the user we just created to maintain consistency
+                try {
+                    directusApiService.deleteUser(userId)
+                    Log.d(TAG, "Usuario eliminado tras fallo en creación de perfil")
+                } catch (e: Exception) {
+                    Log.e(TAG, "No se pudo eliminar el usuario tras error en perfil", e)
+                }
+
+                // Parse the error to determine if it's a username uniqueness issue
+                val exception =
+                    AuthExceptionHandler.parseDirectusError(errorBody, profileResponse.code())
+
+                // If it's not specifically a username issue but we know we're creating a profile,
+                // it's likely a username uniqueness issue
+                if (exception is ApiException && errorBody.contains("username", ignoreCase = true)
+                ) {
+                    throw UsernameAlreadyExistsException()
+                } else {
+                    throw exception
+                }
             }
 
             // Return the registered user with the ID
@@ -121,24 +146,28 @@ class AuthDataSource @Inject constructor(
         } catch (e: retrofit2.HttpException) {
             val errorBody = e.response()?.errorBody()?.string() ?: "no details"
             Log.e(TAG, "ERROR HTTP ${e.code()}: $errorBody")
-            throw Exception("API Error: ${e.message}")
+            throw AuthExceptionHandler.parseDirectusError(errorBody, e.code())
 
         } catch (e: java.io.IOException) {
             Log.e(TAG, "ERROR de red: ${e.message}")
-            throw Exception("Connection Error")
+            throw NetworkConnectionException()
+
+        } catch (e: AuthException) {
+            Log.e(TAG, "ERROR de autenticación: ${e.message}")
+            throw e
 
         } catch (e: Exception) {
             Log.e(TAG, "ERROR inesperado:", e)
-            throw Exception("Registration Error: ${e.message}")
+            throw ApiException("Error de registro: ${e.message}")
         }
     }
 
     /**
      * Authenticates a user with email and password credentials.
      *
-     * @param email User's email address
-     * @param password User's password
+     * @param loginRequest Login credentials request
      * @return Authenticated [User] object
+     * @throws AuthException if login fails with specific error
      */
     suspend fun login(loginRequest: LoginRequest): User {
         try {
@@ -151,20 +180,42 @@ class AuthDataSource @Inject constructor(
                 password = "",
                 role = "authenticated"
             )
+        } catch (e: retrofit2.HttpException) {
+            val errorBody = e.response()?.errorBody()?.string() ?: "no details"
+            Log.e(TAG, "ERROR HTTP ${e.code()}: $errorBody")
+
+            // Use HTTP code to help identify specific errors for login
+            throw AuthExceptionHandler.parseDirectusError(errorBody, e.code())
+
+        } catch (e: java.io.IOException) {
+            Log.e(TAG, "ERROR de red: ${e.message}")
+            throw NetworkConnectionException()
         } catch (e: Exception) {
             Log.e(TAG, "Error en login:", e)
-            throw Exception("Login Error: ${e.message}")
+            throw ApiException("Error de inicio de sesión: ${e.message}")
         }
     }
 
-    /** Terminates the current authenticated session. */
+    /**
+     * Terminates the current authenticated session.
+     *
+     * @throws AuthException if logout fails
+     */
     suspend fun logout() {
         try {
             Log.d(TAG, "Ejecutando logout")
             directusApiService.logout()
             Log.d(TAG, "Logout completado")
+        } catch (e: retrofit2.HttpException) {
+            val errorBody = e.response()?.errorBody()?.string() ?: "no details"
+            Log.e(TAG, "ERROR HTTP ${e.code()}: $errorBody")
+            throw AuthExceptionHandler.parseDirectusError(errorBody, e.code())
+        } catch (e: java.io.IOException) {
+            Log.e(TAG, "ERROR de red: ${e.message}")
+            throw NetworkConnectionException()
         } catch (e: Exception) {
             Log.e(TAG, "Error en logout:", e)
+            throw ApiException("Error al cerrar sesión: ${e.message}")
         }
     }
 
@@ -172,9 +223,23 @@ class AuthDataSource @Inject constructor(
      * Initiates password reset flow for the given email.
      *
      * @param email Email address associated with the account
+     * @throws AuthException if password reset request fails
      */
     suspend fun resetPassword(email: String) {
-        TODO("Implement password reset functionality")
+        try {
+            Log.d(TAG, "Solicitando restablecimiento de contraseña para: $email")
+            // Implement actual API call here
+            // TODO("Implement password reset functionality")
+        } catch (e: retrofit2.HttpException) {
+            val errorBody = e.response()?.errorBody()?.string() ?: "no details"
+            Log.e(TAG, "ERROR HTTP ${e.code()}: $errorBody")
+            throw AuthExceptionHandler.parseDirectusError(errorBody, e.code())
+        } catch (e: java.io.IOException) {
+            Log.e(TAG, "ERROR de red: ${e.message}")
+            throw NetworkConnectionException()
+        } catch (e: Exception) {
+            Log.e(TAG, "Error en restablecimiento de contraseña:", e)
+            throw ApiException("Error al restablecer contraseña: ${e.message}")
+        }
     }
-
 }
