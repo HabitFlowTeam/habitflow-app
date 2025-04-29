@@ -12,6 +12,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.habitflow_app.core.ui.components.TopAppBar
 import com.example.habitflow_app.features.profile.ui.screens.ProfileScreen
+import com.example.habitflow_app.navigation.routes.ForgotPasswordRoute
 import com.example.habitflow_app.navigation.routes.LoginRoute
 import com.example.habitflow_app.navigation.routes.RegisterRoute
 import com.example.habitflow_app.navigation.ui.screens.LayoutScreen
@@ -69,6 +70,10 @@ fun AppNavGraph(
                 ProfileScreen(
                     navController = navController
                 )
+            }
+
+            composable(NavDestinations.FORGOT_PASSWORD) {
+                ForgotPasswordRoute(navController = navController)
             }
         }
     }

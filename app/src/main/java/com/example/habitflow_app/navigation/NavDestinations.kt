@@ -12,4 +12,5 @@ object NavDestinations {
     const val ARTICLES = "articles"
     const val GAMIFICATION = "gamification"
     const val MAIN = "main"
+    const val FORGOT_PASSWORD = "forgot_password"
 }

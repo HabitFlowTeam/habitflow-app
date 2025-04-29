@@ -40,8 +40,8 @@ class AuthRepositoryImpl @Inject constructor(
         TODO("Not yet implemented")
     }
 
-    override suspend fun resetPassword(email: String) {
-        TODO("Not yet implemented")
+    override suspend fun requestPasswordReset(email: String) {
+        authDataSource.requestPasswordReset(email)
     }
 
     override fun getAccessToken(): Flow<String?> {

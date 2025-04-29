@@ -4,6 +4,7 @@ import com.example.habitflow_app.features.authentication.data.dto.LoginRequest
 import com.example.habitflow_app.features.authentication.data.dto.LoginResponse
 import com.example.habitflow_app.features.authentication.data.dto.RegisterUserRequest
 import com.example.habitflow_app.features.authentication.data.dto.CreateProfileRequest
+import com.example.habitflow_app.features.authentication.data.dto.PasswordResetRequest
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -59,6 +60,11 @@ interface DirectusApiService {
      */
     @POST("auth/login")
     suspend fun login(@Body loginDto: LoginRequest): LoginResponse
+
+    @POST("auth/password/request")
+    suspend fun resetPassword(
+        @Body request: PasswordResetRequest
+    ): Response<Unit>
 
     /**
      * Invalidates the current user's authentication session.

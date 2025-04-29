@@ -201,6 +201,26 @@ class AuthDataSource @Inject constructor(
         }
     }
 
+    suspend fun requestPasswordReset(email: String) {
+        try {
+            Log.d(TAG, "Iniciando solicitud de reset de contraseña para: $email")
+
+            val response = directusApiService.resetPassword(
+                PasswordResetRequest(email = email)
+            )
+
+            if (!response.isSuccessful) {
+                throw Exception("Error al solicitar reset de contraseña: ${response.code()}")
+            }
+
+            Log.d(TAG, "Solicitud de reset de contraseña enviada exitosamente")
+        } catch (e: Exception) {
+            Log.e(TAG, "Error en requestPasswordReset:", e)
+            throw Exception("Error al solicitar reset de contraseña: ${e.message}")
+        }
+    }
+
+    /** Terminates the current authenticated session. */
     /**
      * Terminates the current authenticated session.
      *
