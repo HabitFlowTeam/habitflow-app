@@ -1,7 +1,6 @@
 package com.example.habitflow_app.navigation
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -24,6 +23,7 @@ import com.example.habitflow_app.navigation.ui.screens.LayoutScreen
 @Composable
 fun AppNavGraph(
     navController: NavHostController,
+    modifier: Modifier,
     startDestination: String = NavDestinations.LOGIN
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -32,8 +32,7 @@ fun AppNavGraph(
     Scaffold()
     { innerPadding ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
+            modifier = modifier
                 .padding(innerPadding)
         ) {
             if (currentDestination != NavDestinations.LOGIN && currentDestination != NavDestinations.REGISTER && currentDestination != NavDestinations.FORGOT_PASSWORD) {
