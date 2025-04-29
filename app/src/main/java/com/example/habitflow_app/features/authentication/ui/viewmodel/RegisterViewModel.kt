@@ -2,6 +2,7 @@ package com.example.habitflow_app.features.authentication.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.habitflow_app.core.exceptions.*
 import com.example.habitflow_app.domain.models.User
 import com.example.habitflow_app.domain.models.Profile
 import com.example.habitflow_app.domain.usecases.RegisterUserUseCase
@@ -86,6 +87,13 @@ class RegisterViewModel @Inject constructor(
      * Validates form fields and initiates registration if valid.
      */
     private fun validateAndRegister() {
+        // Clear previous errors
+        _uiState.value = _uiState.value.copy(
+            emailError = null,
+            usernameError = null,
+            error = null,
+        )
+
         // Validate all form fields
         val validationResults = formValidator.validateForm(
             fullName = _uiState.value.fullName,
@@ -131,10 +139,36 @@ class RegisterViewModel @Inject constructor(
                         isLoading = false
                     )
                 } catch (e: Exception) {
-                    _uiState.value = _uiState.value.copy(
-                        error = e.message ?: "Error al registrar el usuario",
-                        isLoading = false
-                    )
+                    // Handle specific errors
+                    when (e) {
+                        is EmailAlreadyExistsException -> {
+                            _uiState.value = _uiState.value.copy(
+                                emailError = e.message,
+                                isLoading = false
+                            )
+                        }
+
+                        is UsernameAlreadyExistsException -> {
+                            _uiState.value = _uiState.value.copy(
+                                usernameError = e.message,
+                                isLoading = false
+                            )
+                        }
+
+                        is NetworkConnectionException -> {
+                            _uiState.value = _uiState.value.copy(
+                                error = e.message,
+                                isLoading = false
+                            )
+                        }
+
+                        else -> {
+                            _uiState.value = _uiState.value.copy(
+                                error = e.message ?: "Error desconocido al registrar el usuario",
+                                isLoading = false
+                            )
+                        }
+                    }
                 }
             }
         }

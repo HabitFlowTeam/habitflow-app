@@ -218,6 +218,16 @@ fun RegisterScreen(
                 )
             }
 
+            /* Error Message Display */
+            state.error?.let { error ->
+                Text(
+                    text = error,
+                    color = Red500,
+                    style = AppTypography.bodyMedium,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
             /* Register Button */
             PrimaryButton(
                 text = "Registrarse",
@@ -236,16 +246,6 @@ fun RegisterScreen(
                 },
                 modifier = Modifier.fillMaxWidth()
             )
-
-            /* Error Message Display */
-            state.error?.let { error ->
-                Text(
-                    text = error,
-                    color = Red500,
-                    style = AppTypography.bodyMedium,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
 
             Spacer(modifier = Modifier.height(24.dp))
         }

@@ -2,6 +2,7 @@ package com.example.habitflow_app.features.authentication.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.habitflow_app.core.exceptions.*
 import com.example.habitflow_app.domain.usecases.LoginUserUseCase
 import com.example.habitflow_app.features.authentication.validation.LoginFormValidator
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -56,6 +57,13 @@ class LoginViewModel @Inject constructor(
      * Validates form fields and initiates login if valid.
      */
     private fun validateAndLogin() {
+        // Clear previous errors
+        _uiState.value = _uiState.value.copy(
+            emailError = null,
+            passwordError = null,
+            error = null
+        )
+
         // Validate all form fields
         val validationResults = formValidator.validateForm(
             email = _uiState.value.email,
@@ -84,10 +92,36 @@ class LoginViewModel @Inject constructor(
                         isLoading = false
                     )
                 } catch (e: Exception) {
-                    _uiState.value = _uiState.value.copy(
-                        error = e.message ?: "Error al iniciar sesión",
-                        isLoading = false
-                    )
+                    // Handle specific errors
+                    when (e) {
+                        is InvalidCredentialsException -> {
+                            _uiState.value = _uiState.value.copy(
+                                error = e.message,
+                                isLoading = false
+                            )
+                        }
+
+                        is NetworkConnectionException -> {
+                            _uiState.value = _uiState.value.copy(
+                                error = e.message,
+                                isLoading = false
+                            )
+                        }
+
+                        is SessionExpiredException -> {
+                            _uiState.value = _uiState.value.copy(
+                                error = e.message,
+                                isLoading = false
+                            )
+                        }
+
+                        else -> {
+                            _uiState.value = _uiState.value.copy(
+                                error = e.message ?: "Error desconocido al iniciar sesión",
+                                isLoading = false
+                            )
+                        }
+                    }
                 }
             }
         }
