@@ -1,5 +1,6 @@
 package com.example.habitflow_app.domain.usecases
 
+import android.util.Log
 import com.example.habitflow_app.domain.models.User
 import com.example.habitflow_app.domain.repositories.AuthRepository
 import javax.inject.Inject
@@ -19,6 +20,8 @@ class LoginUserUseCase @Inject constructor(
      * @return Logged-in user entity
      */
     suspend operator fun invoke(email: String, password: String): User {
-        return authRepository.login(email, password)
+        val result = authRepository.login(email, password)
+        Log.e("Access Token: ", authRepository.getAccessTokenOnce().toString())
+        return result
     }
 }

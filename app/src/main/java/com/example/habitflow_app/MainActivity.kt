@@ -12,6 +12,7 @@ import com.example.habitflow_app.core.ui.theme.HabitflowAppTheme
 import com.example.habitflow_app.navigation.AppNavGraph
 import dagger.hilt.android.AndroidEntryPoint
 
+
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

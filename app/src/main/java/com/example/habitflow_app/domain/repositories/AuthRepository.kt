@@ -2,6 +2,7 @@ package com.example.habitflow_app.domain.repositories
 
 import com.example.habitflow_app.domain.models.Profile
 import com.example.habitflow_app.domain.models.User
+import kotlinx.coroutines.flow.Flow
 
 /**
  * Interface defining the authentication operations for the application.
@@ -34,4 +35,12 @@ interface AuthRepository {
      * @param email Email address associated with the account
      */
     suspend fun resetPassword(email: String)
+
+    /**
+     * Retrieves the current access token for the authenticated user.
+     * This token is used for making authenticated API requests.
+     */
+    fun getAccessToken(): Flow<String?>
+
+    suspend fun getAccessTokenOnce(): String?
 }
