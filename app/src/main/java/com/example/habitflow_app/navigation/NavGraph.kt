@@ -2,6 +2,10 @@ package com.example.habitflow_app.navigation
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -31,7 +35,7 @@ fun AppNavGraph(
 
     Scaffold(
         topBar = {
-            if (currentDestination != NavDestinations.LOGIN && currentDestination != NavDestinations.REGISTER) {
+            if (currentDestination != NavDestinations.LOGIN && currentDestination != NavDestinations.REGISTER && currentDestination != NavDestinations.FORGOT_PASSWORD) {
                 TopAppBar(
                     navController = navController,
                     streakCount = 2,
