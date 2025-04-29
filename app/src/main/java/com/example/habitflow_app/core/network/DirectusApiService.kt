@@ -8,6 +8,8 @@ import com.example.habitflow_app.features.authentication.data.dto.PasswordResetR
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
+import com.example.habitflow_app.features.profile.data.dto.ProfileDTO
+import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
 
@@ -72,6 +74,11 @@ interface DirectusApiService {
      */
     @POST("auth/logout")
     suspend fun logout()
+
+    @GET("items/profiles/{id}")
+    suspend fun getProfile(@Path("id") userId: String): Response<ProfileResponse>
+
+    data class ProfileResponse(val data: ProfileDTO)
 
     /* Gamification Endpoints */
     // TODO: Add gamification-related endpoints as needed
