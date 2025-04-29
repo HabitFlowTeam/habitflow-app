@@ -6,30 +6,33 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.firstOrNull
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object LocalDataSourceProvider {
-    private var instance: LocalDataStore? = null
-    fun init(dataStore: DataStore<Preferences>) {
-        if (instance == null) {
-            instance = LocalDataStore(dataStore)
-        }
+@Singleton
+class LocalDataStore @Inject constructor(
+    private val dataStore: DataStore<Preferences>
+) {
+    companion object {
+        private val ACCESS_TOKEN_KEY = stringPreferencesKey("access_token")
     }
 
-    fun getInstance(): LocalDataStore {
-        return instance ?: throw IllegalStateException("LocalDataStore not initialized")
-    }
-}
-
-class LocalDataStore(val dataStore: DataStore<Preferences>) {
-    // Save
-    suspend fun save(key: String, value: String) {
+    suspend fun saveAccessToken(token: String) {
         dataStore.edit { preferences ->
-            preferences[stringPreferencesKey(key)] = value
+            preferences[ACCESS_TOKEN_KEY] = token
         }
     }
 
-    // Load
-    fun load(key: String): Flow<String> = dataStore.data.map { preferences ->
-        preferences[stringPreferencesKey(key)] ?: ""
+    fun getAccessToken(): Flow<String?> = dataStore.data
+        .map { preferences ->
+            preferences[ACCESS_TOKEN_KEY]
+        }
+
+    suspend fun getAccessTokenOnce(): String? {
+        return dataStore.data
+            .map { preferences -> preferences[ACCESS_TOKEN_KEY] }
+            .firstOrNull()
     }
+
 }
