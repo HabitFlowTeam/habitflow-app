@@ -26,7 +26,7 @@ CREATE TABLE week_days (
 CREATE TABLE profiles (
     id              UUID PRIMARY KEY REFERENCES directus_users(id) ON DELETE CASCADE,
     full_name       VARCHAR(255),
-    username        VARCHAR(100),
+    username        VARCHAR(100) UNIQUE,
     streak          INTEGER DEFAULT 0,
     best_streak     INTEGER DEFAULT 0,
     avatar_url      VARCHAR(255),
