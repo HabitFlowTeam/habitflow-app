@@ -11,31 +11,40 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = Blue500,
+    secondary = Green500,
+    tertiary = Yellow500,
+    background = Zinc700,
+    surface = Zinc700,
+    onPrimary = White,
+    onSecondary = Black,
+    onTertiary = Black,
+    onBackground = White,
+    onSurface = White
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    primary = Blue500,
+    secondary = Green500,
+    tertiary = Yellow500,
+    background = Background,
+    surface = Surface,
+    onPrimary = White,
+    onSecondary = Black,
+    onTertiary = Black,
+    onBackground = Black,
+    onSurface = Black
 )
 
+/**
+ * Composable theme that automatically adapts to system dark/light mode
+ * @param darkTheme Whether to use dark theme (defaults to system setting)
+ * @param dynamicColor Enable Android 12+ dynamic theming (default true)
+ * @param content Child composable that will use this theme
+ */
 @Composable
-fun HabitflowappTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
+fun HabitflowAppTheme(
+    darkTheme: Boolean = false, //isSystemInDarkTheme(), // Forzado a tema claro
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
@@ -51,7 +60,7 @@ fun HabitflowappTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography,
+        typography = AppTypography,
         content = content
     )
 }
