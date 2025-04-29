@@ -40,7 +40,7 @@ fun AppNavGraph(
     Scaffold(
         topBar = {
             val currentDestination = navController.currentDestination?.route
-            if (currentDestination != NavDestinations.LOGIN && currentDestination != NavDestinations.REGISTER) {
+            if (currentDestination != NavDestinations.LOGIN && currentDestination != NavDestinations.REGISTER && currentDestination != NavDestinations.FORGOT_PASSWORD) {
                 TopAppBar(
                     navController = navController,
                     streakCount = 2,
