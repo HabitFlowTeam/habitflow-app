@@ -103,3 +103,7 @@ habitflow_app/
     - **USER**: No access
 
 This configuration ensures that the `ADMIN` role has unrestricted access to all models, while the `USER` role is restricted to creating users and profiles only.
+
+## 🎥Videos Showing the features that were worked on in the sprint
+
+- [FIRST SPRINT](https://youtube.com/shorts/6DV_3rcoUUM?si=5ZLLSyCo3XZZiW75)
