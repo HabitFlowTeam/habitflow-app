@@ -1,5 +1,6 @@
 package com.example.habitflow_app.core.network
 
+import com.example.habitflow_app.domain.models.Habit
 import com.example.habitflow_app.features.authentication.data.dto.LoginRequest
 import com.example.habitflow_app.features.authentication.data.dto.LoginResponse
 import com.example.habitflow_app.features.authentication.data.dto.RegisterUserRequest
@@ -12,6 +13,7 @@ import com.example.habitflow_app.features.profile.data.dto.ProfileDTO
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 /**
  * Retrofit service interface defining all API endpoints for Directus backend communication.
@@ -77,8 +79,10 @@ interface DirectusApiService {
 
     @GET("items/profiles/{id}")
     suspend fun getProfile(@Path("id") userId: String): Response<ProfileResponse>
-
     data class ProfileResponse(val data: ProfileDTO)
+
+    @GET("items/habits")
+    suspend fun getHabits(@Query("filter[user_id][_eq]") userId: String): Response<List<Habit>>
 
     /* Gamification Endpoints */
     // TODO: Add gamification-related endpoints as needed
