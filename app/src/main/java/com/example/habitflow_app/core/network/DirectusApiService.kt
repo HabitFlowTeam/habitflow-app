@@ -93,6 +93,9 @@ interface DirectusApiService {
     @PATCH("items/habits/{habit_id}")
     suspend fun updateHabit(@Path("habit_id") habitId: String, @Body request: HabitUpdateRequest): Response<Habit>
 
+    @DELETE("items/habits/{habitId}")
+    suspend fun deleteHabit(@Path("habitId") habitId: String): Response<Unit>
+
     /* Gamification Endpoints */
     // TODO: Add gamification-related endpoints as needed
 
