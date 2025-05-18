@@ -99,7 +99,7 @@ fun DailyProgressBar(
             // Progress summary text
             Text(
                 text = progressText,
-                fontSize = 14.sp,
+                fontSize = 12.sp,
                 color = Color.DarkGray
             )
 
