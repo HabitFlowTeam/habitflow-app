@@ -21,6 +21,16 @@ import coil.compose.AsyncImage
 import com.example.habitflow_app.R
 import com.example.habitflow_app.core.ui.theme.*
 
+/**
+ * A leaderboard row displaying a user's rank, avatar or initial, name, and points with a streak icon.
+ *
+ * @param rank The user's current rank in the leaderboard.
+ * @param name The name of the user to display.
+ * @param points The total points or streak value to display.
+ * @param imageUrl Optional URL for the user's avatar image. If null, the first letter of the name is used.
+ * @param modifier Modifier to customize layout and appearance.
+ * @param isHighlighted Whether the item should be visually highlighted (e.g., for current user).
+ */
 @Composable
 fun LeaderboardItem(
     rank: Int,

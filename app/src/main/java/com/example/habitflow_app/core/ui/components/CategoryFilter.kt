@@ -19,6 +19,14 @@ import com.example.habitflow_app.core.ui.theme.Black
 import com.example.habitflow_app.core.ui.theme.White
 import com.example.habitflow_app.core.ui.theme.Zinc100
 
+/**
+ * Displays a horizontally scrollable list of category chips for filtering content.
+ * Adds a subtle fade effect on the right edge when scrollable.
+ *
+ * @param categories A list of category labels to be displayed.
+ * @param selectedCategory The currently selected category.
+ * @param onCategorySelected Callback triggered when a category is selected.
+ */
 @Composable
 fun CategoryFilterRow(
     categories: List<String>,
@@ -52,6 +60,14 @@ fun CategoryFilterRow(
     }
 }
 
+/**
+ * A single selectable chip representing a category.
+ * Highlights the chip if selected and calls the provided callback when clicked.
+ *
+ * @param label The text to display inside the chip.
+ * @param isSelected Whether the chip is currently selected.
+ * @param onClick Callback triggered when the chip is clicked.
+ */
 @Composable
 fun CategoryChip(
     label: String,
@@ -79,6 +95,12 @@ fun CategoryChip(
     }
 }
 
+/**
+ * Adds a horizontal gradient to the right edge of the content to simulate a fade-out effect.
+ * Useful for scrollable containers to subtly indicate overflowing content.
+ *
+ * @return The [Modifier] with the applied right-edge fade effect.
+ */
 fun Modifier.fadeRightEdge(): Modifier = this.then(
     Modifier.drawWithContent {
         drawContent()
