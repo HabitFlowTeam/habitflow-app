@@ -2,6 +2,7 @@ package com.example.habitflow_app.features.habits.data.datasources
 
 import com.example.habitflow_app.core.network.DirectusApiService
 import com.example.habitflow_app.domain.models.Habit
+import com.example.habitflow_app.features.habits.data.dto.HabitRequest
 import javax.inject.Inject
 
 class HabitsDataSource @Inject constructor(
@@ -14,6 +15,15 @@ class HabitsDataSource @Inject constructor(
         }
         else {
             throw Exception("Falló algo en algun lado jaja")
+        }
+    }
+
+    suspend fun createHabit(habitData: HabitRequest): Habit {
+        val response = directusApiService.createHabit(habitData)
+        if (response.isSuccessful) {
+            return response.body() ?: throw Exception("Empty response body")
+        } else {
+            throw Exception("Failed to create habit: ${response.errorBody()?.string()}")
         }
     }
 }
