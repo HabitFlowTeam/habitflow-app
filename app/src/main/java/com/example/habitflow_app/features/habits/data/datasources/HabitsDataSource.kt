@@ -36,4 +36,14 @@ class HabitsDataSource @Inject constructor(
             throw Exception("Failed to update habit: ${response.errorBody()?.string()}")
         }
     }
+
+    suspend fun softDeleteHabit(habitId: String): Boolean {
+        val response = directusApiService.softDeleteHabit(habitId)
+        if (response.isSuccessful) {
+            return response.body()?.isDeleted == true
+        } else {
+            throw Exception("Failed to delete habit: ${response.errorBody()?.string()}")
+        }
+    }
+
 }
