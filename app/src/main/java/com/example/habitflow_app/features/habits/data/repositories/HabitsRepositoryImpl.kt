@@ -21,4 +21,8 @@ class HabitsRepositoryImpl @Inject constructor(
     override suspend fun updateHabit(habitId: String, request: HabitUpdateRequest): Habit {
         return habitsDataSource.updateHabit(habitId, request)
     }
+
+    override suspend fun softDeleteHabit(habitId: String): Boolean {
+        return habitsDataSource.softDeleteHabit(habitId)
+    }
 }

@@ -8,4 +8,5 @@ interface HabitsRepository {
     suspend fun getHabits(userId: String): List<Habit>
     suspend fun createHabit(request: HabitRequest): Habit
     suspend fun updateHabit(habitId: String, request: HabitUpdateRequest): Habit
+    suspend fun softDeleteHabit(habitId: String): Boolean
 }
