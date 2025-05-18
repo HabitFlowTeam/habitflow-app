@@ -1,5 +1,6 @@
 package com.example.habitflow_app.features.habits.ui.components
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,9 +14,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -76,9 +77,8 @@ sealed class DayStatus {
 fun Calendar(
     currentDate: LocalDate = LocalDate.now(),
     dayStatuses: Map<LocalDate, DayStatus> = emptyMap(),
-    modifier: Modifier = Modifier
+    @SuppressLint("ModifierParameter") modifier: Modifier = Modifier
 ) {
-    val daysToShow = 7
     val today = LocalDate.now()
     val spanishLocale = Locale("es", "ES")
 
@@ -90,7 +90,7 @@ fun Calendar(
             text = "Hoy",
             style = MaterialTheme.typography.titleLarge.copy(
                 fontWeight = FontWeight.Bold,
-                fontSize = 20.sp
+                fontSize = 18.sp
             ),
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(bottom = 8.dp)
@@ -170,7 +170,7 @@ private fun DayCircle(
         isPast -> Triple(
             when (status) {
                 is DayStatus.Completed -> Icons.Default.Check
-                is DayStatus.Partial -> Icons.Default.KeyboardArrowRight
+                is DayStatus.Partial -> Icons.AutoMirrored.Filled.KeyboardArrowRight
                 is DayStatus.Failed -> Icons.Default.Close
                 else -> null
             },

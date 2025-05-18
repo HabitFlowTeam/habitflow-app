@@ -34,10 +34,10 @@ fun LayoutScreen(
 ) {
     val barNavController = rememberNavController()
     val bottomNavItem = listOf(
-        BottomNavItem(NavDestinations.HOME, R.drawable.ic_home, "Home"),
-        BottomNavItem(NavDestinations.ARTICLES, R.drawable.ic_social, "Articles"),
-        BottomNavItem(NavDestinations.HABITS, R.drawable.ic_habits, "Habits"),
-        BottomNavItem(NavDestinations.GAMIFICATION, R.drawable.ic_stats, "Stats"),
+        BottomNavItem(NavDestinations.HOME, R.drawable.ic_home, "Inicio"),
+        BottomNavItem(NavDestinations.HABITS, R.drawable.ic_habits, "Hábitos"),
+        BottomNavItem(NavDestinations.GAMIFICATION, R.drawable.ic_stats, "Estadísticas"),
+        BottomNavItem(NavDestinations.ARTICLES, R.drawable.ic_social, "Artículos"),
     )
 
     Column(
@@ -58,8 +58,6 @@ fun LayoutScreen(
                 composable(NavDestinations.GAMIFICATION) { StatsMainScreen() }
             }
         }
-
-
         BottomNavigationBar(
             items = bottomNavItem,
             navController = barNavController
