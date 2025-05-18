@@ -134,4 +134,28 @@ class HabitsViewModel @Inject constructor(
         }
     }
 
+    fun softDeleteHabit(habitId: String) {
+        viewModelScope.launch {
+            try {
+                val accessToken = authRepository.getAccessTokenOnce()
+                if (accessToken.isNullOrBlank()) {
+                    _error.value = "Autenticación requerida"
+                    return@launch
+                }
+
+                val success = habitsRepository.softDeleteHabit(habitId)
+                if (success) {
+                    _habitsState.value = _habitsState.value.map {
+                        if (it.id == habitId) it.copy(isDeleted = true) else it
+                    }
+                } else {
+                    _error.value = "No se pudo eliminar el hábito"
+                }
+            } catch (e: Exception) {
+                _error.value = "Error al eliminar hábito: ${e.message}"
+                Log.e("HabitsVM", "softDeleteHabit error", e)
+            }
+        }
+    }
+
 }
