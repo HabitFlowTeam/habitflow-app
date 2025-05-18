@@ -6,6 +6,7 @@ import com.example.habitflow_app.features.authentication.data.dto.LoginResponse
 import com.example.habitflow_app.features.authentication.data.dto.RegisterUserRequest
 import com.example.habitflow_app.features.authentication.data.dto.CreateProfileRequest
 import com.example.habitflow_app.features.authentication.data.dto.PasswordResetRequest
+import com.example.habitflow_app.features.habits.data.dto.HabitRequest
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -83,6 +84,9 @@ interface DirectusApiService {
 
     @GET("items/habits")
     suspend fun getHabits(@Query("filter[user_id][_eq]") userId: String): Response<List<Habit>>
+
+    @POST
+    suspend fun createHabit(@Body habitDTO: HabitRequest): Response<Habit>
 
     /* Gamification Endpoints */
     // TODO: Add gamification-related endpoints as needed
