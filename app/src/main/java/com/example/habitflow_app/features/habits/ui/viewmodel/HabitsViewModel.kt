@@ -8,7 +8,9 @@ import com.example.habitflow_app.domain.models.Habit
 import com.example.habitflow_app.domain.repositories.AuthRepository
 import com.example.habitflow_app.domain.repositories.HabitsRepository
 import com.example.habitflow_app.features.habits.data.dto.HabitDayCreateRequest
+import com.example.habitflow_app.features.habits.data.dto.HabitDayUpdateRequest
 import com.example.habitflow_app.features.habits.data.dto.HabitRequest
+import com.example.habitflow_app.features.habits.data.dto.HabitUpdateRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -89,6 +91,45 @@ class HabitsViewModel @Inject constructor(
             } catch (e: Exception) {
                 _error.value = "Error al crear hábito: ${e.message}"
                 Log.e("HabitsVM", "Error en createHabit", e)
+            }
+        }
+    }
+
+    fun updateHabit(
+        habitId: String,
+        name: String? = null,
+        categoryId: String? = null,
+        selectedDays: List<Pair<String?, String>>? = null, // Pair(idExistente?, weekDayId)
+        reminderTime: LocalTime? = null,
+        notificationsEnabled: Boolean? = null
+    ) {
+        viewModelScope.launch {
+            try {
+                val accessToken = authRepository.getAccessTokenOnce()
+                if (accessToken.isNullOrBlank()) {
+                    _error.value = "Autenticación requerida"
+                    return@launch
+                }
+
+                val request = HabitUpdateRequest(
+                    name = name,
+                    categoryId = categoryId,
+                    reminderTime = reminderTime?.toString(),
+                    notificationsEnabled = notificationsEnabled,
+                    days = selectedDays?.map {
+                        HabitDayUpdateRequest(id = it.first, weekDayId = it.second)
+                    }
+                )
+
+                val updatedHabit = habitsRepository.updateHabit(habitId, request)
+                // update the list
+                _habitsState.value = _habitsState.value.map {
+                    if (it.id == habitId) updatedHabit else it
+                }
+
+            } catch (e: Exception) {
+                _error.value = "Error al actualizar hábito: ${e.message}"
+                Log.e("HabitsVM", "updateHabit error", e)
             }
         }
     }
