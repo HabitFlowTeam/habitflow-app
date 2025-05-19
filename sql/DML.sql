@@ -68,7 +68,16 @@ VALUES
     ('profiles', 'delete', '*', '{}', '{}', '2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e'), -- Eliminar perfil a ACCESS_USER
     ('profiles', 'read', '*', '{}', '{}', 'f9a8b7c6-d5e4-4f3a-9b2c-1a0e8d7f6c5b'), -- Leer perfil a ACCESS_ADMIN
     ('profiles', 'update', '*', '{}', '{}', 'f9a8b7c6-d5e4-4f3a-9b2c-1a0e8d7f6c5b'), -- Actualizar perfil a ACCESS_ADMIN
-    ('profiles', 'delete', '*', '{}', '{}', 'f9a8b7c6-d5e4-4f3a-9b2c-1a0e8d7f6c5b'); -- Eliminar perfil a ACCESS_ADMIN
+    ('profiles', 'delete', '*', '{}', '{}', 'f9a8b7c6-d5e4-4f3a-9b2c-1a0e8d7f6c5b'), -- Eliminar perfil a ACCESS_ADMIN
+    ('habits', 'read', '*', '{}', '{}', (SELECT id FROM directus_policies WHERE name LIKE '%public_label%')), -- obtener habitos a publico
+    ('habits', 'read', '*', '{}', '{}', '2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e'), -- Leer habito a ACCESS_USER
+    ('habits', 'create', '*', '{}', '{}', '2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e'), -- Crear habito a ACCESS_USER
+    ('habits', 'update', '*', '{}', '{}', '2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e'), -- Actualizar habito a ACCESS_USER
+    ('habits', 'delete', '*', '{}', '{}', '2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e'), -- Eliminar habito a ACCESS_USER
+    ('habits', 'read', '*', '{}', '{}', 'f9a8b7c6-d5e4-4f3a-9b2c-1a0e8d7f6c5b'), -- Leer habito a ACCESS_ADMIN
+    ('habits', 'create', '*', '{}', '{}', 'f9a8b7c6-d5e4-4f3a-9b2c-1a0e8d7f6c5b'), -- Crear habito a ACCESS_ADMIN
+    ('habits', 'update', '*', '{}', '{}', 'f9a8b7c6-d5e4-4f3a-9b2c-1a0e8d7f6c5b'), -- Actualizar habito a ACCESS_ADMIN
+    ('habits', 'delete', '*', '{}', '{}', 'f9a8b7c6-d5e4-4f3a-9b2c-1a0e8d7f6c5b'); -- Eliminar habito a ACCESS_ADMIN
 
 -- Inserción de politicas con sus roles
 INSERT INTO directus_access(id, role, policy)
