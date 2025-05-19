@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.habitflow_app.domain.models.Category
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
@@ -34,7 +35,14 @@ fun FrequencySelector(
     onFrequencySelected: (Boolean) -> Unit
 ) {
     Column {
-        SectionTitle("Frecuencia")
+        Text(
+            text = "Frecuencia",
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.Black,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -47,7 +55,7 @@ fun FrequencySelector(
                 selected = isDailySelected,
                 onClick = { onFrequencySelected(true) },
                 colors = RadioButtonDefaults.colors(
-                    selectedColor = Color(0xFF00C853)
+                    selectedColor = Color(0xFF000000)
                 )
             )
             Text(
@@ -68,7 +76,7 @@ fun FrequencySelector(
                 selected = !isDailySelected,
                 onClick = { onFrequencySelected(false) },
                 colors = RadioButtonDefaults.colors(
-                    selectedColor = Color(0xFF00C853)
+                    selectedColor = Color(0xFF000000)
                 )
             )
             Text(
@@ -88,7 +96,7 @@ fun DaysSelector(
     val days = listOf(
         "L" to "1", // Lunes
         "M" to "2", // Martes
-        "X" to "3", // Miércoles
+        "M" to "3", // Miércoles
         "J" to "4", // Jueves
         "V" to "5", // Viernes
         "S" to "6", // Sábado
@@ -156,44 +164,35 @@ fun ReminderSection(
     onTimeChange: (LocalTime) -> Unit
 ) {
     Column {
-        SectionTitle("Recordatorios")
+        Text(
+            text = "Recordatorios",
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.clickable { onEnabledChange(!isEnabled) }
-            ) {
-                Checkbox(
-                    checked = isEnabled,
-                    onCheckedChange = { onEnabledChange(it) },
-                    colors = CheckboxDefaults.colors(
-                        checkedColor = Color(0xFF00C853)
-                    )
-                )
-                Text(
-                    text = "Activar Recordatorios",
-                    fontSize = 15.sp,
-                    modifier = Modifier.padding(start = 8.dp)
-                )
-            }
+            Text(
+                text = "Activar Recordatorios",
+                fontSize = 15.sp
+            )
 
             Switch(
                 checked = isEnabled,
-                onCheckedChange = { onEnabledChange(it) },
+                onCheckedChange = onEnabledChange,
                 colors = SwitchDefaults.colors(
                     checkedThumbColor = Color.White,
-                    checkedTrackColor = Color(0xFF00C853)
+                    checkedTrackColor = Color(0xFF000000)
                 )
             )
         }
 
         if (isEnabled) {
+            Spacer(modifier = Modifier.height(8.dp))
             TimeSelector(
                 selectedTime = reminderTime ?: LocalTime.of(8, 0),
                 onTimeSelected = onTimeChange
@@ -346,25 +345,31 @@ fun HabitNameField(
     onNameChange: (String) -> Unit
 ) {
     Column {
-        SectionTitle("Información básica")
+        Text(
+            text = "Información básica",
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
 
         Text(
             text = "Nombre del hábito",
             fontSize = 14.sp,
             color = Color.Gray,
-            modifier = Modifier.padding(top = 4.dp, bottom = 8.dp)
+            modifier = Modifier.padding(bottom = 8.dp)
         )
 
         OutlinedTextField(
             value = name,
             onValueChange = onNameChange,
-            placeholder = { Text("Meditación, lectura, etc.") },
+            placeholder = { Text("Meditación, ejercicio, etc.") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color(0xFF00C853),
+                focusedBorderColor = Color(0xFF000000),
                 unfocusedBorderColor = Color.LightGray
-            )
+            ),
+            shape = RoundedCornerShape(8.dp)
         )
     }
 }
@@ -428,4 +433,85 @@ fun DeleteConfirmationDialog(
             }
         }
     )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CategorySelector(
+    categories: List<Category>,
+    selectedCategoryId: String?,
+    onCategorySelected: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var expanded by remember { mutableStateOf(false) }
+    var searchQuery by remember { mutableStateOf("") }
+
+    val filteredCategories = remember(searchQuery, categories) {
+        if (searchQuery.isBlank()) {
+            categories
+        } else {
+            categories.filter {
+                it.name.contains(searchQuery, ignoreCase = true)
+            }
+        }
+    }
+
+    val selectedCategory = remember(selectedCategoryId, categories) {
+        categories.find { it.id == selectedCategoryId }
+    }
+
+    Column(modifier = modifier) {
+        Text(
+            text = "Categoría",
+            fontSize = 14.sp,
+            color = Color.Gray,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = !expanded }
+        ) {
+            OutlinedTextField(
+                value = selectedCategory?.name ?: "Seleccionar categoría",
+                onValueChange = { searchQuery = it },
+                readOnly = true,
+                trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                },
+                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(
+                    focusedBorderColor = Color.LightGray,
+                    unfocusedBorderColor = Color.LightGray
+                ),
+                modifier = Modifier
+                    .menuAnchor()
+                    .fillMaxWidth()
+            )
+
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = { searchQuery = it },
+                    placeholder = { Text("Buscar categoría...") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                )
+
+                filteredCategories.forEach { category ->
+                    DropdownMenuItem(
+                        text = { Text(category.name) },
+                        onClick = {
+                            onCategorySelected(category.id)
+                            expanded = false
+                            searchQuery = ""
+                        }
+                    )
+                }
+            }
+        }
+    }
 }
