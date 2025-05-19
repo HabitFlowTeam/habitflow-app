@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.example.habitflow_app.core.di.dataStore
 import com.example.habitflow_app.core.ui.theme.HabitflowAppTheme
+import com.example.habitflow_app.core.utils.JwtUtils
 import com.example.habitflow_app.features.authentication.data.datasources.LocalDataStore
 import com.example.habitflow_app.navigation.AppNavGraph
 import com.example.habitflow_app.navigation.NavDestinations
@@ -32,7 +33,8 @@ class MainActivity : ComponentActivity() {
                 LaunchedEffect(Unit) {
                     val token = localDataStore.getAccessTokenOnce()
                     Log.d("AuthDebug", "Token al iniciar: ${token?.take(5)}...")
-                    if (token != null) {
+                    Log.d("AuthDebug", "Token vencido? ${JwtUtils.isTokenExpired(token.toString())}...")
+                    if (token != null && !JwtUtils.isTokenExpired(token)) {
                         navController.navigate(NavDestinations.MAIN) {
                             popUpTo(NavDestinations.LOGIN) { inclusive = true }
                         }

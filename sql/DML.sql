@@ -62,7 +62,8 @@ INSERT INTO directus_permissions (collection, action, fields, permissions, valid
 VALUES
     ('directus_users', 'create', '*', '{}', '{}', (SELECT id FROM directus_policies WHERE name LIKE '%public_label%')), -- Creación de usuario a publico
     ('directus_users', 'delete', '*', '{}', '{}', (SELECT id FROM directus_policies WHERE name LIKE '%public_label%')), -- Eliminación de usuario a publico
-    ('profiles', 'create', '*', '{}', '{}', (SELECT id FROM directus_policies WHERE name LIKE '%public_label%')), -- Creación de perfil a publico
+    ('profiles', 'create', '*', '{}', '{}', (SELECT id FROM directus_policies WHERE name LIKE '%public_label%')),
+    ('profiles', 'create', '*', '{}', '{}', '2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e'),-- Creación de perfil a ACCESS_USER
     ('profiles', 'read', '*', '{}', '{}', '2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e'), -- Leer perfil a ACCESS_USER
     ('profiles', 'update', '*', '{}', '{}', '2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e'), -- Actualizar perfil a ACCESS_USER
     ('profiles', 'delete', '*', '{}', '{}', '2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e'), -- Eliminar perfil a ACCESS_USER
