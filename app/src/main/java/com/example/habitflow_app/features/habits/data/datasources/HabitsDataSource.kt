@@ -50,7 +50,7 @@ class HabitsDataSource @Inject constructor(
     suspend fun getCategories(): List<Category> {
         val response = directusApiService.getCategories()
         if (response.isSuccessful) {
-            return response.body()?.map {
+            return response.body()?.data?.map {
                 Category(
                     id = it.id,
                     name = it.name,

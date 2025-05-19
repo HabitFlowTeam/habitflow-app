@@ -1,5 +1,6 @@
 package com.example.habitflow_app.core.network
 
+import com.example.habitflow_app.domain.models.CategoriesResponse
 import com.example.habitflow_app.domain.models.Habit
 import com.example.habitflow_app.features.authentication.data.dto.LoginRequest
 import com.example.habitflow_app.features.authentication.data.dto.LoginResponse
@@ -106,7 +107,7 @@ interface DirectusApiService {
      * @return List of Category objects with id, name and description
      */
     @GET("items/categories")
-    suspend fun getCategories(): Response<List<CategoryResponse>>
+    suspend fun getCategories(): Response<CategoriesResponse>
 
     /* Gamification Endpoints */
     // TODO: Add gamification-related endpoints as needed

@@ -41,3 +41,13 @@ data class Category(
     val name: String,
     val description: String
 )
+
+data class CategoriesResponse(
+    val data: List<CategoryResponse>
+)
+
+data class CategoryResponse(
+    val id: String,
+    val name: String,
+    val description: String
+)
