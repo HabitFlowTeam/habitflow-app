@@ -20,13 +20,15 @@ VALUES
     ('f31a5698-2a4d-4818-8a0b-e7f843b9ec14', 'Sábado', 'SA'),
     ('82a4b1c9-72a8-4e91-aaa4-2c92d30b810f', 'Domingo', 'DO');
 
--- Inserción de datos en la tabla directus_roles
+-- Script de migración para versión anterior de Directus (sin tabla directus_policies)
+
+-- Primero mantenemos la inserción de roles que sigue siendo compatible
 INSERT INTO directus_roles (id, name)
 VALUES
     ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'ADMIN'),
     ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'USER');
 
--- Inserción de datos en la tabla directus_users
+-- Inserción de usuarios (compatible con ambas versiones)
 INSERT INTO directus_users (id, email, password, role)
 VALUES
     ('05e8c0f7-6433-4e23-ab06-36a67c7e23a3', 'admin@ejemplo.com', '$argon2id$v=19$m=64,t=3,p=4$bjJxemdpaTZhamYwMDAwMA$mQp7+d3cVuwTx71lb6TrqiZU/lB3Ph8l4K5okmS5f9oeWPzk/lzR6jAJ2ozWuxhIGSQ6iy3O8tnLRB7QcZ0O0g', 'a21cfc5d-3f01-4e45-8e93-dd0d440af562'),
@@ -36,7 +38,7 @@ VALUES
     ('b4a7c8d9-e0f1-4a5b-9c8d-7e6f5a4b3c2d', 'miguel_gonzalez@ejemplo.com', '$argon2id$v=19$m=64,t=3,p=4$bjJxemdpaTZhamYwMDAwMA$mQp7+d3cVuwTx71lb6TrqiZU/lB3Ph8l4K5okmS5f9oeWPzk/lzR6jAJ2ozWuxhIGSQ6iy3O8tnLRB7QcZ0O0g', '5e8b7092-6ee2-47df-b24a-b3c9f733a9c4'),
     ('c8d9e0f1-a2b3-4c5d-6e7f-8a9b0c1d2e3f', 'pablo_pineda@ejemplo.com', '$argon2id$v=19$m=64,t=3,p=4$bjJxemdpaTZhamYwMDAwMA$mQp7+d3cVuwTx71lb6TrqiZU/lB3Ph8l4K5okmS5f9oeWPzk/lzR6jAJ2ozWuxhIGSQ6iy3O8tnLRB7QcZ0O0g', '5e8b7092-6ee2-47df-b24a-b3c9f733a9c4');
 
--- Inserción de datos en la tabla directus_users
+-- Inserción de perfiles (compatible con ambas versiones)
 INSERT INTO profiles (id, full_name, username, streak, best_streak, avatar_url, created_at)
 VALUES
     ('05e8c0f7-6433-4e23-ab06-36a67c7e23a3', 'Administrador', 'admin', 15, 20, 'https://randomuser.me/api/portraits/men/22.jpg', '2024-01-15 08:30:00'),
@@ -46,44 +48,55 @@ VALUES
     ('b4a7c8d9-e0f1-4a5b-9c8d-7e6f5a4b3c2d', 'Miguel Gonzalez', 'miguel_gonzalez', 22, 30, 'https://randomuser.me/api/portraits/men/15.jpg', '2023-10-18 16:50:00'),
     ('c8d9e0f1-a2b3-4c5d-6e7f-8a9b0c1d2e3f', 'Pablo Pineda', 'pablo_pineda', 9, 14, 'https://randomuser.me/api/portraits/men/19.jpg', '2024-01-30 12:10:00');
 
-
--- Inserción de la política ACCESS_USER
-INSERT INTO directus_policies (id, name, description, app_access)
+-- Permisos para usuarios públicos (sin autenticar)
+INSERT INTO directus_permissions (role, collection, action, fields, permissions)
 VALUES
-    ('2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e', 'ACCESS_USER', 'Limited access to users', true);
+    ((SELECT id FROM directus_roles WHERE name = 'Public'), 'directus_users', 'create', '*', '{}'),
+    ((SELECT id FROM directus_roles WHERE name = 'Public'), 'directus_users', 'delete', '*', '{}'),
+    ((SELECT id FROM directus_roles WHERE name = 'Public'), 'profiles', 'create', '*', '{}'),
+    ((SELECT id FROM directus_roles WHERE name = 'Public'), 'habits', 'read', '*', '{}');
 
--- Inserción de la política ACCESS_ADMIN
-INSERT INTO directus_policies (id, name, description, admin_access, app_access)
-VALUES
-    ('f9a8b7c6-d5e4-4f3a-9b2c-1a0e8d7f6c5b', 'ACCESS_ADMIN', 'Unlimited access to users', true, true);
+-- Permisos para el rol ADMIN (a21cfc5d-3f01-4e45-8e93-dd0d440af562)
+-- Configuramos al administrador con acceso completo al sistema
+UPDATE directus_roles 
+SET admin_access = true, app_access = true
+WHERE id = 'a21cfc5d-3f01-4e45-8e93-dd0d440af562';
 
--- Inserción de permisos en policies
-INSERT INTO directus_permissions (collection, action, fields, permissions, validation, policy)
+-- En algunas versiones anteriores, la configuración admin_access = true otorga todos los permisos
+-- Sin embargo, para mayor seguridad, añadimos permisos explícitos también
+INSERT INTO directus_permissions (role, collection, action, fields, permissions)
 VALUES
-    ('directus_users', 'create', '*', '{}', '{}', (SELECT id FROM directus_policies WHERE name LIKE '%public_label%')), -- Creación de usuario a publico
-    ('directus_users', 'delete', '*', '{}', '{}', (SELECT id FROM directus_policies WHERE name LIKE '%public_label%')), -- Eliminación de usuario a publico
-    ('profiles', 'create', '*', '{}', '{}', (SELECT id FROM directus_policies WHERE name LIKE '%public_label%')), -- Creación de perfil a publico
-    ('profiles', 'read', '*', '{}', '{}', '2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e'), -- Leer perfil a ACCESS_USER
-    ('profiles', 'update', '*', '{}', '{}', '2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e'), -- Actualizar perfil a ACCESS_USER
-    ('profiles', 'delete', '*', '{}', '{}', '2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e'), -- Eliminar perfil a ACCESS_USER
-    ('profiles', 'read', '*', '{}', '{}', 'f9a8b7c6-d5e4-4f3a-9b2c-1a0e8d7f6c5b'), -- Leer perfil a ACCESS_ADMIN
-    ('profiles', 'update', '*', '{}', '{}', 'f9a8b7c6-d5e4-4f3a-9b2c-1a0e8d7f6c5b'), -- Actualizar perfil a ACCESS_ADMIN
-    ('profiles', 'delete', '*', '{}', '{}', 'f9a8b7c6-d5e4-4f3a-9b2c-1a0e8d7f6c5b'), -- Eliminar perfil a ACCESS_ADMIN
-    ('habits', 'read', '*', '{}', '{}', (SELECT id FROM directus_policies WHERE name LIKE '%public_label%')), -- obtener habitos a publico
-    ('habits', 'read', '*', '{}', '{}', '2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e'), -- Leer habito a ACCESS_USER
-    ('habits', 'create', '*', '{}', '{}', '2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e'), -- Crear habito a ACCESS_USER
-    ('habits', 'update', '*', '{}', '{}', '2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e'), -- Actualizar habito a ACCESS_USER
-    ('habits', 'delete', '*', '{}', '{}', '2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e'), -- Eliminar habito a ACCESS_USER
-    ('habits', 'read', '*', '{}', '{}', 'f9a8b7c6-d5e4-4f3a-9b2c-1a0e8d7f6c5b'), -- Leer habito a ACCESS_ADMIN
-    ('habits', 'create', '*', '{}', '{}', 'f9a8b7c6-d5e4-4f3a-9b2c-1a0e8d7f6c5b'), -- Crear habito a ACCESS_ADMIN
-    ('habits', 'update', '*', '{}', '{}', 'f9a8b7c6-d5e4-4f3a-9b2c-1a0e8d7f6c5b'), -- Actualizar habito a ACCESS_ADMIN
-    ('habits', 'delete', '*', '{}', '{}', 'f9a8b7c6-d5e4-4f3a-9b2c-1a0e8d7f6c5b'); -- Eliminar habito a ACCESS_ADMIN
+    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'profiles', 'read', '*', '{}'),
+    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'profiles', 'create', '*', '{}'),
+    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'profiles', 'update', '*', '{}'),
+    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'profiles', 'delete', '*', '{}'),
+    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'habits', 'read', '*', '{}'),
+    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'habits', 'create', '*', '{}'),
+    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'habits', 'update', '*', '{}'),
+    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'habits', 'delete', '*', '{}'),
+    -- Añadimos permiso para la vista user_habit_calendar_view (sin filtro para admins)
+    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'user_habit_calendar_view', 'read', '*', '{}');
 
--- Inserción de politicas con sus roles
-INSERT INTO directus_access(id, role, policy)
+
+-- Permisos para el rol USER (5e8b7092-6ee2-47df-b24a-b3c9f733a9c4)
+-- Configuramos el acceso básico para usuarios normales
+UPDATE directus_roles 
+SET admin_access = false, app_access = true
+WHERE id = '5e8b7092-6ee2-47df-b24a-b3c9f733a9c4';
+
+-- Añadimos permisos específicos para el rol USER
+INSERT INTO directus_permissions (role, collection, action, fields, permissions)
 VALUES
-    ('3f2a1b4c-5d6e-7f8a-9b0c-1d2e3f4a5b6c', 'a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'f9a8b7c6-d5e4-4f3a-9b2c-1a0e8d7f6c5b'), -- Administrador
-    ('4a5b6c7d-8e9f-0a1b-2c3d-4e5f6a7b8c9d', '5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', '2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e'); -- Usuario
+    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'profiles', 'read', '*', '{}'),
+    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'profiles', 'create', '*', '{}'),
+    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'profiles', 'update', '*', '{}'),
+    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'profiles', 'delete', '*', '{}'),
+    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'habits', 'read', '*', '{}'),
+    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'habits', 'create', '*', '{}'),
+    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'habits', 'update', '*', '{}'),
+    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'habits', 'delete', '*', '{}'),
+    -- Permiso para leer la vista user_habit_calendar_view con filtro para el usuario actual
+    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'user_habit_calendar_view', 'read', '*', '{"_and":[{"user_id":{"_eq":"$CURRENT_USER"}}]}');
 
 -- Inserción de artículos
 INSERT INTO articles (id, title, content, image_url, is_deleted, created_at, user_id, category_id)
@@ -189,3 +202,5 @@ VALUES
     ('c7d8e9f0-a1b2-3c4d-5e6f-7a8b9c0d1e2f', TRUE, '2024-04-20', '6f7a8b9c-0d1e-2f3a-4b5c-6d7e8f9a0b1c'), -- Diario gratitud: Sábado pasado
     ('d8e9f0a1-b2c3-4d5e-6f7a-8b9c0d1e2f3a', TRUE, '2024-04-21', '6f7a8b9c-0d1e-2f3a-4b5c-6d7e8f9a0b1c'), -- Diario gratitud: Domingo pasado
     ('e9f0a1b2-c3d4-5e6f-7a8b-9c0d1e2f3a4b', TRUE, '2024-04-15', '7a8b9c0d-1e2f-3a4b-5c6d-7e8f9a0b1c2d'); -- Ahorrar: Lunes pasado
+
+
