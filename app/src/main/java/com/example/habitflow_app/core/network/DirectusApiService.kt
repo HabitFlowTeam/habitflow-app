@@ -1,12 +1,12 @@
 package com.example.habitflow_app.core.network
 
-import com.example.habitflow_app.domain.models.CategoriesResponse
 import com.example.habitflow_app.domain.models.Habit
 import com.example.habitflow_app.features.authentication.data.dto.LoginRequest
 import com.example.habitflow_app.features.authentication.data.dto.LoginResponse
 import com.example.habitflow_app.features.authentication.data.dto.RegisterUserRequest
 import com.example.habitflow_app.features.authentication.data.dto.CreateProfileRequest
 import com.example.habitflow_app.features.authentication.data.dto.PasswordResetRequest
+import com.example.habitflow_app.features.category.data.dto.CategoriesResponse
 import com.example.habitflow_app.features.habits.data.dto.CreateHabitRequest
 import com.example.habitflow_app.features.habits.data.dto.HabitApiRequest
 import com.example.habitflow_app.features.habits.data.dto.HabitDayApiRequest
@@ -32,6 +32,9 @@ import retrofit2.http.Query
  * All methods are suspend functions to support coroutine-based asynchronous execution.
  */
 interface DirectusApiService {
+
+    data class ListResponse<T>(val data: List<T>)
+    data class SingleResponse<T>(val data: T)
 
     /* Authentication Endpoints */
 
@@ -87,7 +90,7 @@ interface DirectusApiService {
 
     @GET("items/profiles/{id}")
     suspend fun getProfile(@Path("id") userId: String): Response<ProfileResponse>
-    data class ProfileResponse(val data: ProfileDTO)
+    data class ProfileResponse(val data: ProfileDTO)}
 
     @GET("items/habits")
     suspend fun getHabits(@Query("filter[user_id][_eq]") userId: String): Response<List<Habit>>
@@ -112,20 +115,82 @@ interface DirectusApiService {
         @Body request: Map<String, Boolean> = mapOf("is_deleted" to true)
     ): Response<Habit>
 
-    /**
-     * Retrieves all habit categories from the Directus system.
-     *
-     * @return List of Category objects with id, name and description
-     */
-    @GET("items/categories")
-    suspend fun getCategories(): Response<CategoriesResponse>
-
     /* Gamification Endpoints */
-    // TODO: Add gamification-related endpoints as needed
+
+    /**
+     * Retrieves the global leaderboard ranking sorted by streak in descending order.
+     *
+     * This endpoint returns profile information including id, full name, streak count, and avatar URL
+     * for the top users with the highest streaks.
+     *
+     * @param sort Sorting criteria (default: "-streak" for descending order by streak)
+     * @param limit Maximum number of results to return (default: 10)
+     * @param fields Comma-separated list of fields to include in the response
+     * @return Retrofit Response containing the leaderboard data wrapped in LeaderboardResponse
+     */
+    @GET("items/profiles")
+    suspend fun getGlobalRanking(
+        @Query("sort") sort: String = "-streak",
+        @Query("limit") limit: Int = 10,
+        @Query("fields") fields: String = "id,full_name,streak,avatar_url"
+    ): Response<LeaderboardResponse>
+
+    /**
+     * Retrieves the category-specific leaderboard ranking for habits.
+     *
+     * This endpoint returns user IDs and streak counts for habits matching the specified category,
+     * filtered to exclude deleted habits and sorted by streak in descending order.
+     *
+     * @param categoryName Exact name of the category to filter by
+     * @param isDeleted Filter for deleted habits (default: false)
+     * @param sort Sorting criteria (default: "-streak" for descending order by streak)
+     * @param limit Maximum number of results to return (default: 10)
+     * @param fields Comma-separated list of fields to include in the response
+     * @return Retrofit Response containing habit ranking data wrapped in HabitRankingResponse
+     */
+    @GET("items/habits")
+    suspend fun getCategoryRanking(
+        @Query("filter[category_id][name][_eq]") categoryName: String,
+        @Query("filter[is_deleted][_eq]") isDeleted: Boolean = false,
+        @Query("sort") sort: String = "-streak",
+        @Query("limit") limit: Int = 10,
+        @Query("fields") fields: String = "user_id,streak"
+    ): Response<HabitRankingResponse>
+
+    /**
+     * Retrieves profile information for multiple users by their IDs.
+     *
+     * This endpoint is typically used to fetch additional user details (full name, avatar)
+     * after obtaining user IDs from the category ranking endpoint.
+     *
+     * @param userIds Comma-separated list of user IDs to retrieve
+     * @param fields Comma-separated list of fields to include in the response
+     * @return Retrofit Response containing profile data wrapped in ProfileRankingResponse
+     */
+    @GET("items/profiles")
+    suspend fun getProfileRanking(
+        @Query("filter[id][_in]") userIds: String,
+        @Query("fields") fields: String = "id,full_name,avatar_url"
+    ): Response<ProfileRankingResponse>
 
     /* Habits Endpoints */
     // TODO: Add habits-related endpoints as needed
 
     /* Profile Endpoints */
     // TODO: Add user profile-related endpoints as needed
+
+    /* Category Endpoint */
+    /**
+     * Retrieves all available habit categories with their names.
+     *
+     * This endpoint returns a list of all categories stored in the system,
+     * containing only their names for lightweight listing purposes.
+     * Results are sorted alphabetically by category name in ascending order.
+     *
+     * @param fields Comma-separated list of fields to include (default: "name")
+     * @param sort Sorting criteria (default: "name" for alphabetical order)
+     * @return Retrofit Response containing the list of categories
+     */
+    @GET("items/categories")
+    suspend fun getCategories(): Response<CategoriesResponse>
 }
