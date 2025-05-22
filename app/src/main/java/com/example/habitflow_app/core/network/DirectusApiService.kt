@@ -6,7 +6,10 @@ import com.example.habitflow_app.features.authentication.data.dto.LoginResponse
 import com.example.habitflow_app.features.authentication.data.dto.RegisterUserRequest
 import com.example.habitflow_app.features.authentication.data.dto.CreateProfileRequest
 import com.example.habitflow_app.features.authentication.data.dto.PasswordResetRequest
+import com.example.habitflow_app.features.habits.data.dto.HabitCreateRequest
+import com.example.habitflow_app.features.habits.data.dto.HabitDayCreateRequest
 import com.example.habitflow_app.features.habits.data.dto.HabitRequest
+import com.example.habitflow_app.features.habits.data.dto.HabitTrackingCreateRequest
 import com.example.habitflow_app.features.habits.data.dto.HabitUpdateRequest
 import retrofit2.Response
 import retrofit2.http.Body
@@ -87,9 +90,17 @@ interface DirectusApiService {
     @GET("items/habits")
     suspend fun getHabits(@Query("filter[user_id][_eq]") userId: String): Response<List<Habit>>
 
-    @POST
-    suspend fun createHabit(@Body habitDTO: HabitRequest): Response<Habit>
+    //endpoints to create an habit
+    @POST("items/habits")
+    suspend fun createHabit(@Body habitDTO: HabitCreateRequest): Response<Habit>
 
+    @POST("items/habits_days")
+    suspend fun createHabitDay(@Body request: HabitDayCreateRequest): Response<Unit>
+
+    @POST("items/habits_tracking")
+    suspend fun createHabitTracking(@Body request: HabitTrackingCreateRequest): Response<Unit>
+
+    //...
     @PATCH("items/habits/{habit_id}")
     suspend fun updateHabit(@Path("habit_id") habitId: String, @Body request: HabitUpdateRequest): Response<Habit>
 
