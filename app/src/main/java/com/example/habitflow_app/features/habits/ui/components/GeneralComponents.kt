@@ -94,13 +94,13 @@ fun DaysSelector(
     onDaySelected: (String, Boolean) -> Unit
 ) {
     val days = listOf(
-        "L" to "1", // Lunes
-        "M" to "2", // Martes
-        "M" to "3", // Miércoles
-        "J" to "4", // Jueves
-        "V" to "5", // Viernes
-        "S" to "6", // Sábado
-        "D" to "7"  // Domingo
+        "L" to "d3b15c58-711f-40d9-9f4b-06d0d6e925d1", // Lunes
+        "M" to "b9b3995e-c6a5-46c7-bf8a-f1c1c2e65dd6", // Martes
+        "M" to "4afe91c2-9851-4af7-b282-39a543989ea3", // Miércoles
+        "J" to "ea5e7c7a-182c-4b49-8b2d-2162cd138384", // Jueves
+        "V" to "22f2bf21-fcbd-473f-98d2-96ba47fabe16", // Viernes
+        "S" to "f31a5698-2a4d-4818-8a0b-e7f843b9ec14", // Sábado
+        "D" to "82a4b1c9-72a8-4e91-aaa4-2c92d30b810f"  // Domingo
     )
 
     Column(modifier = Modifier.padding(top = 8.dp)) {

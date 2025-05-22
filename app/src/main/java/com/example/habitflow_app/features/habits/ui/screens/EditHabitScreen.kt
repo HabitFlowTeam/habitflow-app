@@ -11,7 +11,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.habitflow_app.features.habits.data.dto.HabitDayCreateRequest
 import com.example.habitflow_app.features.habits.ui.components.*
 import com.example.habitflow_app.features.habits.ui.viewmodel.HabitsViewModel
 import java.time.LocalTime
@@ -23,6 +22,7 @@ fun EditHabitScreen(
     viewModel: HabitsViewModel,
     habitId: String
 ) {
+    /*
     val habits = viewModel.habitsState.collectAsState()
     val habit = habits.value.find { it.id == habitId }
 
@@ -167,4 +167,5 @@ fun EditHabitScreen(
             }
         }
     }
+ */
 }

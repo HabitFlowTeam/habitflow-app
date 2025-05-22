@@ -13,8 +13,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.habitflow_app.features.habits.ui.components.*
+import com.example.habitflow_app.features.habits.ui.viewmodel.HabitCreationEvent
 import com.example.habitflow_app.features.habits.ui.viewmodel.HabitsViewModel
 import java.time.LocalTime
 
@@ -22,25 +24,22 @@ import java.time.LocalTime
 @Composable
 fun CreateHabitScreen(
     navController: NavController,
-    viewModel: HabitsViewModel
+    viewModel: HabitsViewModel = hiltViewModel()
 ) {
-    var habitName by remember { mutableStateOf("") }
+    val state by viewModel.uiState.collectAsState()
+
     var isDailySelected by remember { mutableStateOf(true) }
-    var selectedDays by remember { mutableStateOf<List<String>>(emptyList()) }
-    var notificationsEnabled by remember { mutableStateOf(false) }
-    var reminderTime by remember { mutableStateOf<LocalTime?>(LocalTime.of(8, 0)) }
-
-    val isLoading = viewModel.isLoading.collectAsState()
-    val error = viewModel.error.collectAsState()
-
-    var isSubmitting by remember { mutableStateOf(false) }
-
-    var selectedCategoryId by remember { mutableStateOf<String?>(null) }
-    val categories by viewModel.categories.collectAsState()
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        if (viewModel.habitsState.value.isEmpty()) {
-            viewModel.loadHabits()
+        if (state.categories.isEmpty() && !state.isLoadingCategories) {
+            viewModel.onEvent(HabitCreationEvent.RetryLoadCategories)
+        }
+    }
+
+    LaunchedEffect(state.isSuccess) {
+        if (state.isSuccess) {
+            navController.popBackStack()
         }
     }
 
@@ -68,7 +67,7 @@ fun CreateHabitScreen(
             )
         }
     ) { paddingValues ->
-        if (isLoading.value) {
+        if (state.isLoadingCategories) {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -84,8 +83,8 @@ fun CreateHabitScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 HabitNameField(
-                    name = habitName,
-                    onNameChange = { habitName = it }
+                    name = state.name,
+                    onNameChange = { viewModel.onEvent(HabitCreationEvent.NameChanged(it)) }
                 )
 
                 Card(
@@ -96,11 +95,9 @@ fun CreateHabitScreen(
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         CategorySelector(
-                            categories = categories,
-                            selectedCategoryId = selectedCategoryId,
-                            onCategorySelected = { categoryId ->
-                                selectedCategoryId = categoryId
-                            }
+                            categories = state.categories,
+                            selectedCategoryId = state.categoryId,
+                            onCategorySelected = { viewModel.onEvent(HabitCreationEvent.CategoryChanged(it)) }
                         )
                     }
                 }
@@ -124,13 +121,14 @@ fun CreateHabitScreen(
 
                         if (!isDailySelected) {
                             DaysSelector(
-                                selectedDays = selectedDays,
+                                selectedDays = state.selectedDays,
                                 onDaySelected = { dayId, isSelected ->
-                                    selectedDays = if (isSelected) {
-                                        selectedDays + dayId
+                                    val newDays = if (isSelected) {
+                                        state.selectedDays + dayId
                                     } else {
-                                        selectedDays - dayId
+                                        state.selectedDays - dayId
                                     }
+                                    viewModel.onEvent(HabitCreationEvent.DaysChanged(newDays))
                                 }
                             )
                         }
@@ -150,23 +148,18 @@ fun CreateHabitScreen(
                         modifier = Modifier.padding(16.dp)
                     ) {
                         ReminderSection(
-                            isEnabled = notificationsEnabled,
-                            onEnabledChange = { notificationsEnabled = it },
-                            reminderTime = reminderTime,
-                            onTimeChange = { reminderTime = it }
+                            isEnabled = state.notificationsEnabled,
+                            onEnabledChange = { viewModel.onEvent(HabitCreationEvent.NotificationsToggled(it)) },
+                            reminderTime = state.reminderTime,
+                            onTimeChange = { viewModel.onEvent(HabitCreationEvent.ReminderTimeChanged(it)) }
                         )
                     }
                 }
 
                 Spacer(modifier = Modifier.weight(1f))
 
-                if (error.value != null) {
-                    Text(
-                        text = error.value ?: "",
-                        color = Color.Red,
-                        fontSize = 14.sp,
-                        modifier = Modifier.padding(horizontal = 16.dp)
-                    )
+                state.error?.let {
+                    Text(it, color = Color.Red, fontSize = 14.sp)
                 }
 
                 Column(
@@ -175,26 +168,7 @@ fun CreateHabitScreen(
                         .padding(16.dp)
                 ) {
                     HabitActionButtons(
-                        onSave = {
-                            if (!isSubmitting && habitName.isNotBlank() && selectedCategoryId != null) {
-                                isSubmitting = true
-
-                                val daysToSave = if (isDailySelected) {
-                                    listOf("1", "2", "3", "4", "5", "6", "7")
-                                } else {
-                                    selectedDays
-                                }
-
-                                viewModel.createHabit(
-                                    name = habitName,
-                                    categoryId = selectedCategoryId!!,
-                                    selectedDays = daysToSave,
-                                    reminderTime = if (notificationsEnabled) reminderTime else null
-                                )
-
-                                navController.popBackStack()
-                            }
-                        }
+                        onSave = { viewModel.onEvent(HabitCreationEvent.Submit) }
                     )
                 }
             }

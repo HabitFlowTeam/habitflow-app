@@ -3,6 +3,7 @@ package com.example.habitflow_app.domain.repositories
 import com.example.habitflow_app.domain.models.Category
 import com.example.habitflow_app.domain.models.Habit
 import com.example.habitflow_app.features.habits.data.dto.CreateHabitRequest
+import com.example.habitflow_app.features.habits.data.dto.HabitDayUpdateRequest
 import com.example.habitflow_app.features.habits.data.dto.HabitResponse
 import com.example.habitflow_app.features.habits.data.dto.HabitUpdateRequest
 

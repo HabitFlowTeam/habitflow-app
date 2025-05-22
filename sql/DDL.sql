@@ -11,14 +11,16 @@ DELETE FROM directus_users WHERE id NOT IN (SELECT id FROM directus_users WHERE 
 DELETE FROM directus_roles WHERE id NOT IN (SELECT id FROM directus_roles WHERE name = 'Administrator');
 DROP TABLE IF EXISTS week_days CASCADE;
 
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 CREATE TABLE categories (
-    id          UUID PRIMARY KEY,
+    id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name        VARCHAR(100) NOT NULL,
     description VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE week_days (
-    id           UUID PRIMARY KEY,
+    id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name         VARCHAR(50) NOT NULL,
     abbreviation VARCHAR(10) NOT NULL
 );
@@ -35,7 +37,7 @@ CREATE TABLE profiles (
 );
 
 CREATE TABLE articles (
-    id          UUID PRIMARY KEY,
+    id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     title       VARCHAR(255) NOT NULL,
     content     TEXT NOT NULL,
     image_url   VARCHAR(255),
@@ -64,14 +66,14 @@ CREATE TABLE articles_saved (
 );
 
 CREATE TABLE habits (
-    id                   UUID PRIMARY KEY,
+    id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name                 VARCHAR(100) NOT NULL,
     streak               INTEGER NOT NULL DEFAULT 0,
     notifications_enable BOOLEAN NOT NULL DEFAULT FALSE,
     reminder_time        TIME,
     is_deleted           BOOLEAN NOT NULL DEFAULT FALSE,
     created_at           TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    expiration_date      DATE NOT NULL,
+    expiration_date DATE NOT NULL DEFAULT (CURRENT_DATE + INTERVAL '1 year'),
     category_id          UUID NOT NULL,
     user_id              UUID NOT NULL,
     FOREIGN KEY (category_id) REFERENCES categories(id),
@@ -87,7 +89,7 @@ CREATE TABLE habits_days (
 );
 
 CREATE TABLE habits_tracking (
-    id            UUID PRIMARY KEY,
+    id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     is_checked    BOOLEAN NOT NULL DEFAULT FALSE,
     tracking_date DATE NOT NULL,
     habit_id      UUID NOT NULL,
