@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 echo "$(date '+%Y-%m-%d %H:%M:%S') Esperando que Directus esté completamente inicializado..."
 
@@ -56,6 +56,7 @@ COLLECTIONS=(
   "habits"
   "habits_days"
   "habits_tracking"
+  "user_habit_calendar_view"
 )
 
 # Plantilla de meta para activar colecciones (basada en tu ejemplo de "articles")

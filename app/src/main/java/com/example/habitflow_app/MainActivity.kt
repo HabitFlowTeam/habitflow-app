@@ -38,6 +38,8 @@ class MainActivity : ComponentActivity() {
                         navController.navigate(NavDestinations.MAIN) {
                             popUpTo(NavDestinations.LOGIN) { inclusive = true }
                         }
+                    } else {
+                        localDataStore.clearAccessToken()
                     }
                 }
 
