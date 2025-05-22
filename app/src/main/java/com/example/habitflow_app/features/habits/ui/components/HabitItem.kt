@@ -1,7 +1,10 @@
 package com.example.habitflow_app.features.habits.ui.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -9,14 +12,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -36,13 +41,13 @@ import com.example.habitflow_app.core.ui.theme.Zinc500
 @Preview(showBackground = true)
 @Composable
 fun HabitItemPreview() {
-        HabitItem(
-            name = "Meditación",
-            days = "Lunes, Jueves, Viernes",
-            streak = 5,
-            isChecked = false,
-            onCheckedChange = {}
-        )
+    HabitItem(
+        name = "Meditación",
+        days = "Lunes, Jueves, Viernes",
+        streak = 5,
+        isChecked = true,
+        onCheckedChange = {}
+    )
 }
 
 /**
@@ -62,11 +67,13 @@ fun HabitItem(
     streak: Int,
     isChecked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {}
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .clickable(onClick = onClick)
             .border(
                 width = 2.dp,
                 color = Zinc400,
@@ -126,14 +133,28 @@ fun HabitItem(
             }
         }
 
-        // Checkbox
-        Checkbox(
-            checked = isChecked,
-            onCheckedChange = onCheckedChange,
-            colors = CheckboxDefaults.colors(
-                checkedColor = Green200,
-                uncheckedColor = Zinc400
-            )
-        )
+        // Custom circle with checkmark
+        Box(
+            modifier = Modifier
+                .size(24.dp)
+                .border(
+                    width = 2.dp,
+                    color = if (isChecked) Green200 else Zinc400,
+                    shape = CircleShape
+                )
+                .clickable { onCheckedChange(!isChecked) }
+                .background(
+                    if (isChecked) Green200.copy(alpha = 0.2f) else Color.Transparent,
+                    shape = CircleShape
+                ), contentAlignment = Alignment.Center
+        ) {
+            if (isChecked) {
+                Icon(
+                    imageVector = Icons.Default.Check,
+                    contentDescription = "Completado",
+                    tint = Green200,
+                    modifier = Modifier.size(18.dp)
+                )
+            }}
     }
 }

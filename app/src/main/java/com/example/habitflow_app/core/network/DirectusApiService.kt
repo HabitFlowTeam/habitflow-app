@@ -1,5 +1,6 @@
 package com.example.habitflow_app.core.network
 
+import com.example.habitflow_app.domain.models.CategoriesResponse
 import com.example.habitflow_app.domain.models.Habit
 import com.example.habitflow_app.features.authentication.data.dto.LoginRequest
 import com.example.habitflow_app.features.authentication.data.dto.LoginResponse
@@ -109,6 +110,14 @@ interface DirectusApiService {
         @Path("habit_id") habitId: String,
         @Body request: Map<String, Boolean> = mapOf("is_deleted" to true)
     ): Response<Habit>
+
+    /**
+     * Retrieves all habit categories from the Directus system.
+     *
+     * @return List of Category objects with id, name and description
+     */
+    @GET("items/categories")
+    suspend fun getCategories(): Response<CategoriesResponse>
 
     /* Gamification Endpoints */
     // TODO: Add gamification-related endpoints as needed

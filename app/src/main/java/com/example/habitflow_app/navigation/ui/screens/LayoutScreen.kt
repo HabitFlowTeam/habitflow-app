@@ -15,7 +15,7 @@ import com.example.habitflow_app.R
 import com.example.habitflow_app.core.ui.components.BottomNavigationBar
 import com.example.habitflow_app.features.articles.ui.screens.ArticlesMainScreen
 import com.example.habitflow_app.features.gamification.ui.screens.StatsMainScreen
-import com.example.habitflow_app.features.habits.ui.screens.HabitsMainScreen
+import com.example.habitflow_app.features.habits.ui.screens.HabitsScreen
 import com.example.habitflow_app.features.habits.ui.screens.HomeScreen
 import com.example.habitflow_app.navigation.NavDestinations
 import com.example.habitflow_app.navigation.ui.components.BottomNavItem
@@ -54,7 +54,14 @@ fun LayoutScreen(
             ) {
                 composable(NavDestinations.HOME) { HomeScreen() }
                 composable(NavDestinations.ARTICLES) { ArticlesMainScreen() }
-                composable(NavDestinations.HABITS) { HabitsMainScreen() }
+                composable(NavDestinations.HABITS) {
+                    HabitsScreen(
+                        navController = navController,
+                        onHabitClick = { habitId ->
+                            navController.navigate(NavDestinations.editHabitRoute(habitId))
+                        }
+                    )
+                }
                 composable(NavDestinations.GAMIFICATION) { StatsMainScreen() }
             }
         }

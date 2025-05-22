@@ -1,5 +1,6 @@
 package com.example.habitflow_app.features.habits.data.repositories
 
+import com.example.habitflow_app.domain.models.Category
 import com.example.habitflow_app.domain.models.Habit
 import com.example.habitflow_app.domain.repositories.HabitsRepository
 import com.example.habitflow_app.features.habits.data.datasources.HabitsDataSource
@@ -26,5 +27,9 @@ class HabitsRepositoryImpl @Inject constructor(
 
     override suspend fun softDeleteHabit(habitId: String): Boolean {
         return habitsDataSource.softDeleteHabit(habitId)
+    }
+
+    override suspend fun getCategories(): List<Category> {
+        return habitsDataSource.getCategories()
     }
 }

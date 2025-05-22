@@ -2,6 +2,7 @@ package com.example.habitflow_app.features.habits.data.datasources
 
 import com.example.habitflow_app.core.network.DirectusApiService
 import com.example.habitflow_app.core.utils.ExtractInfoToken
+import com.example.habitflow_app.domain.models.Category
 import com.example.habitflow_app.domain.models.Habit
 import com.example.habitflow_app.domain.repositories.AuthRepository
 import com.example.habitflow_app.features.habits.data.dto.CreateHabitRequest
@@ -112,6 +113,21 @@ class HabitsDataSource @Inject constructor(
             return response.body()?.isDeleted == true
         } else {
             throw Exception("Failed to delete habit: ${response.errorBody()?.string()}")
+        }
+    }
+
+    suspend fun getCategories(): List<Category> {
+        val response = directusApiService.getCategories()
+        if (response.isSuccessful) {
+            return response.body()?.data?.map {
+                Category(
+                    id = it.id,
+                    name = it.name,
+                    description = it.description
+                )
+            } ?: emptyList()
+        } else {
+            throw Exception("Failed to fetch categories: ${response.errorBody()?.string()}")
         }
     }
 

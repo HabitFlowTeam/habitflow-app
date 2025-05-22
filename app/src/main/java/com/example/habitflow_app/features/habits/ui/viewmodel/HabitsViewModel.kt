@@ -2,6 +2,8 @@ package com.example.habitflow_app.features.habits.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.habitflow_app.domain.models.Category
+import com.example.habitflow_app.domain.repositories.HabitsRepository
 import com.example.habitflow_app.domain.usecases.CreateHabitUseCase
 import com.example.habitflow_app.features.habits.data.dto.CreateHabitRequest
 import com.example.habitflow_app.features.habits.data.dto.HabitResponse
@@ -16,12 +18,42 @@ import javax.inject.Inject
 @HiltViewModel
 class HabitsViewModel @Inject constructor(
     private val createHabitUseCase: CreateHabitUseCase,
+    private val habitsRepository: HabitsRepository,
     private val habitValidator: HabitFormValidator
 ) : ViewModel() {
+
 
     // Estado inicial
     private val _uiState = MutableStateFlow(HabitCreationUiState())
     val uiState: StateFlow<HabitCreationUiState> = _uiState
+
+    init {
+        loadCategories()
+    }
+
+    // Cargar categorías al inicializar
+    private fun loadCategories() {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                isLoadingCategories = true,
+                categoriesError = null
+            )
+
+            try {
+                val categories = habitsRepository.getCategories() // Llamada directa al repositorio
+                _uiState.value = _uiState.value.copy(
+                    categories = categories,
+                    isLoadingCategories = false,
+                    categoryId = categories.firstOrNull()?.id ?: "" // Auto-selección primera categoría
+                )
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    categoriesError = e.message ?: "Error al cargar categorías",
+                    isLoadingCategories = false
+                )
+            }
+        }
+    }
 
     // Manejador de eventos
     fun onEvent(event: HabitCreationEvent) {
@@ -61,7 +93,20 @@ class HabitsViewModel @Inject constructor(
                 )
             }
 
-            HabitCreationEvent.Submit -> validateAndCreateHabit()
+            HabitCreationEvent.Submit -> {
+                validateAndCreateHabit()
+            }
+
+            HabitCreationEvent.RetryLoadCategories -> {
+                loadCategories()
+            }
+
+            HabitCreationEvent.ClearError -> {
+                _uiState.value = _uiState.value.copy(
+                    error = null,
+                    categoriesError = null
+                )
+            }
         }
     }
 
@@ -131,6 +176,9 @@ data class HabitCreationUiState(
     val selectedDays: List<String> = emptyList(),
     val reminderTime: LocalTime? = null,
     val notificationsEnabled: Boolean = false,
+    val categories: List<Category> = emptyList(),
+    val isLoadingCategories: Boolean = false,
+    val categoriesError: String? = null,
     val nameError: String? = null,
     val categoryError: String? = null,
     val daysError: String? = null,
@@ -149,6 +197,8 @@ sealed class HabitCreationEvent {
     data class ReminderTimeChanged(val value: LocalTime?) : HabitCreationEvent()
     data class NotificationsToggled(val isEnabled: Boolean) : HabitCreationEvent()
     object Submit : HabitCreationEvent()
+    object RetryLoadCategories : HabitCreationEvent()
+    object ClearError : HabitCreationEvent()
 }
 
 // Modelo de respuesta
