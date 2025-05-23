@@ -31,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.habitflow_app.core.ui.theme.HabitflowAppTheme
+import com.example.habitflow_app.domain.models.DayStatus
 import java.time.LocalDate
 import java.time.format.TextStyle
 import java.util.Locale
@@ -56,13 +57,6 @@ fun HorizontalCalendarPreview() {
             modifier = Modifier.padding(16.dp)
         )
     }
-}
-
-sealed class DayStatus {
-    object Completed : DayStatus()
-    object Partial : DayStatus()
-    object Failed : DayStatus()
-    object Future : DayStatus()
 }
 
 /**
