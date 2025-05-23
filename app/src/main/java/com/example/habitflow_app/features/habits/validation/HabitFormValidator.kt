@@ -4,7 +4,8 @@ class HabitFormValidator {
     fun validateForm(
         name: String,
         categoryId: String,
-        selectedDays: List<String>
+        selectedDays: List<String>,
+        isDailySelected: Boolean
     ): Map<String, ValidationResult> {
         val results = mutableMapOf<String, ValidationResult>()
 
@@ -39,6 +40,13 @@ class HabitFormValidator {
             )
         } else {
             results["days"] = ValidationResult(isValid = true)
+        }
+
+        if (!isDailySelected && selectedDays.isEmpty()) {
+            results["days"] = ValidationResult(
+                isValid = false,
+                errorMessage = "Debes seleccionar al menos un día"
+            )
         }
 
         return results

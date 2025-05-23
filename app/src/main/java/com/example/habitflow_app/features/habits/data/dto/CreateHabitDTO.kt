@@ -9,6 +9,8 @@ data class CreateHabitRequest(
     val categoryId: String,
     val selectedDays: List<String>,
     val reminderTime: LocalTime?,
+    val notificationsEnabled: Boolean,
+    val isDailySelected: Boolean = false,
     val initialTracking: Boolean = true
 )
 

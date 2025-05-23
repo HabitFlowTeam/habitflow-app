@@ -1,5 +1,6 @@
 package com.example.habitflow_app.features.habits.data.datasources
 
+import android.util.Log
 import com.example.habitflow_app.core.network.DirectusApiService
 import com.example.habitflow_app.core.utils.ExtractInfoToken
 import com.example.habitflow_app.domain.models.Category
@@ -11,6 +12,7 @@ import com.example.habitflow_app.features.habits.data.dto.HabitDayApiRequest
 import com.example.habitflow_app.features.habits.data.dto.HabitResponse
 import com.example.habitflow_app.features.habits.data.dto.HabitTrackingApiRequest
 import com.example.habitflow_app.features.habits.data.dto.HabitUpdateRequest
+import org.json.JSONObject
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -33,15 +35,18 @@ class HabitsDataSource @Inject constructor(
         // 1. Autenticación y obtención de userId
         val userId = getAuthenticatedUserId()
 
-        // 2. Crear hábito principal
+        Log.d("FLOW", "Step 1 - Start")
         val habitId = createHabitInApi(request, userId)
+        Log.d("FLOW", "Step 2 - Habit created: $habitId")
 
         // 3. Crear días asociados
-        val createdDays = createHabitDaysInApi(habitId, request.selectedDays)
+        createHabitDaysInApi(habitId, request.selectedDays)
+        Log.d("FLOW", "Step 3 - Days created")
 
         // 4. Crear tracking inicial
         if (request.initialTracking) {
             createInitialTrackingInApi(habitId)
+            Log.d("FLOW", "Step 4 - Tracking created")
         }
 
         // Devolvemos los datos del hábito creado
@@ -65,21 +70,36 @@ class HabitsDataSource @Inject constructor(
                 userId = userId,
                 categoryId = request.categoryId,
                 reminderTime = request.reminderTime?.toString(),
-                notificationsEnabled = request.reminderTime != null
+                notificationsEnabled = request.notificationsEnabled
             )
         )
+
         if (!response.isSuccessful) {
             throw Exception("Error creating habit: ${response.errorBody()?.string()}")
         }
-        return response.body()?.id ?: throw Exception("No habit ID received")
+
+        val responseBody = response.body()?.string()
+        return try {
+            JSONObject(responseBody ?: "").getJSONObject("data").getString("id").also {
+                Log.d("API", "Extracted habit ID: $it")
+            }
+        } catch (e: Exception) {
+            Log.e("API", "Failed to parse response: $responseBody", e)
+            throw Exception("Failed to parse habit ID from response")
+        }
     }
 
     private suspend fun createHabitDaysInApi(habitId: String, days: List<String>) {
         val results = days.map { dayId ->
-            directusApiService.createHabitDay(
-                HabitDayApiRequest(habitId, dayId)
-            ).isSuccessful
+            val response = directusApiService.createHabitDay(HabitDayApiRequest(habitId, dayId))
+
+            if (!response.isSuccessful) {
+                Log.d(">>>", "error in createHabitDaysInApi ")
+            }
+
+            response.isSuccessful
         }
+
         if (results.any { !it }) {
             throw Exception("Failed to create some habit days")
         }

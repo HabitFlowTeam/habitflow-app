@@ -20,6 +20,7 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import com.example.habitflow_app.features.profile.data.dto.ProfileDTO
+import okhttp3.ResponseBody
 import retrofit2.http.GET
 import retrofit2.http.PATCH
 import retrofit2.http.POST
@@ -100,10 +101,10 @@ interface DirectusApiService {
 
     //endpoints to create an habit
     @POST("items/habits")
-    suspend fun createHabit(@Body habitDTO: HabitApiRequest): Response<Habit>
+    suspend fun createHabit(@Body habitDTO: HabitApiRequest): Response<ResponseBody>
 
     @POST("items/habits_days")
-    suspend fun createHabitDay(@Body request: HabitDayApiRequest): Response<Unit>
+    suspend fun createHabitDay(@Body request: HabitDayApiRequest): Response<ResponseBody>
 
     @POST("items/habits_tracking")
     suspend fun createHabitTracking(@Body request: HabitTrackingApiRequest): Response<Unit>

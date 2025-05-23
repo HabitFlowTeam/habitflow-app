@@ -2,6 +2,8 @@ package com.example.habitflow_app.features.habits.ui.screens
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
@@ -30,6 +32,7 @@ fun CreateHabitScreen(
 
     var isDailySelected by remember { mutableStateOf(true) }
     var showDeleteDialog by remember { mutableStateOf(false) }
+    val scrollState = rememberScrollState()
 
     LaunchedEffect(Unit) {
         if (state.categories.isEmpty() && !state.isLoadingCategories) {
@@ -77,6 +80,7 @@ fun CreateHabitScreen(
         } else {
             Column(
                 modifier = Modifier
+                    .verticalScroll(scrollState)
                     .fillMaxSize()
                     .padding(paddingValues)
                     .padding(horizontal = 16.dp),
@@ -156,7 +160,7 @@ fun CreateHabitScreen(
                     }
                 }
 
-                Spacer(modifier = Modifier.weight(1f))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 state.error?.let {
                     Text(it, color = Color.Red, fontSize = 14.sp)

@@ -93,6 +93,13 @@ class HabitsViewModel @Inject constructor(
                 )
             }
 
+            is HabitCreationEvent.FrequencyChanged -> {
+                _uiState.value = _uiState.value.copy(
+                    isDailySelected = event.isDaily,
+                    daysError = if (event.isDaily) null else _uiState.value.daysError
+                )
+            }
+
             HabitCreationEvent.Submit -> {
                 validateAndCreateHabit()
             }
@@ -126,6 +133,7 @@ class HabitsViewModel @Inject constructor(
             name = _uiState.value.name,
             categoryId = _uiState.value.categoryId,
             selectedDays = _uiState.value.selectedDays,
+            isDailySelected = _uiState.value.isDailySelected,
         )
 
         // Verificar si hay errores
@@ -144,11 +152,27 @@ class HabitsViewModel @Inject constructor(
         if (!hasErrors) {
             viewModelScope.launch {
                 try {
+                    val daysToSend = if (_uiState.value.isDailySelected) {
+                        // Todos los días si es diario
+                        listOf(
+                            "d3b15c58-711f-40d9-9f4b-06d0d6e925d1", // Lunes
+                            "b9b3995e-c6a5-46c7-bf8a-f1c1c2e65dd6", // Martes
+                            "4afe91c2-9851-4af7-b282-39a543989ea3", // Miércoles
+                            "ea5e7c7a-182c-4b49-8b2d-2162cd138384", // Jueves
+                            "22f2bf21-fcbd-473f-98d2-96ba47fabe16", // Viernes
+                            "f31a5698-2a4d-4818-8a0b-e7f843b9ec14", // Sábado
+                            "82a4b1c9-72a8-4e91-aaa4-2c92d30b810f"  // Domingo
+                        )
+                    } else {
+                        _uiState.value.selectedDays
+                    }
+
                     val response = createHabitUseCase(
                         CreateHabitRequest(
                             name = _uiState.value.name,
                             categoryId = _uiState.value.categoryId,
                             selectedDays = _uiState.value.selectedDays,
+                            notificationsEnabled = _uiState.value.notificationsEnabled,
                             reminderTime = if (_uiState.value.notificationsEnabled) _uiState.value.reminderTime else null
                         )
                     )
@@ -186,7 +210,8 @@ data class HabitCreationUiState(
     val isLoading: Boolean = false,
     val isSuccess: Boolean = false,
     val error: String? = null,
-    val createdHabit: HabitResponse? = null
+    val createdHabit: HabitResponse? = null,
+    val isDailySelected: Boolean = true,
 )
 
 // Eventos
@@ -196,6 +221,7 @@ sealed class HabitCreationEvent {
     data class DaysChanged(val value: List<String>) : HabitCreationEvent()
     data class ReminderTimeChanged(val value: LocalTime?) : HabitCreationEvent()
     data class NotificationsToggled(val isEnabled: Boolean) : HabitCreationEvent()
+    data class FrequencyChanged(val isDaily: Boolean) : HabitCreationEvent()
     object Submit : HabitCreationEvent()
     object RetryLoadCategories : HabitCreationEvent()
     object ClearError : HabitCreationEvent()
