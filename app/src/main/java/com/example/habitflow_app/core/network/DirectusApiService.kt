@@ -1,5 +1,6 @@
 package com.example.habitflow_app.core.network
 
+import com.example.habitflow_app.features.articles.data.dto.ProfileArticlesResponse
 import com.example.habitflow_app.features.authentication.data.dto.LoginRequest
 import com.example.habitflow_app.features.authentication.data.dto.LoginResponse
 import com.example.habitflow_app.features.authentication.data.dto.RegisterUserRequest
@@ -145,6 +146,22 @@ interface DirectusApiService {
 
     /* Habits Endpoints */
     // TODO: Add habits-related endpoints as needed
+
+    /* Articles Endpoints */
+
+    /**
+     * Obtiene los artículos de un usuario junto con la información de likes por artículo usando la vista USER_ARTICLES_VIEW.
+     *
+     * @param userId ID del usuario cuyos artículos se desean obtener
+     * @param fields Campos a retornar (por defecto: id,title,image_url,user_id,liked_by_user_id)
+     * @return Respuesta con la lista de artículos y la información de likes
+     */
+    @GET("items/USER_ARTICLES_VIEW")
+    suspend fun getUserArticles(
+        @Query("filter[user_id][_eq]") userId: String,
+        @Query("fields") fields: String = "id,title,image_url,user_id,liked_by_user_id"
+    ): Response<ProfileArticlesResponse>
+
 
     /* Profile Endpoints */
     // TODO: Add user profile-related endpoints as needed
