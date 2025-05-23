@@ -7,6 +7,9 @@ import com.example.habitflow_app.features.authentication.data.dto.RegisterUserRe
 import com.example.habitflow_app.features.authentication.data.dto.CreateProfileRequest
 import com.example.habitflow_app.features.authentication.data.dto.PasswordResetRequest
 import com.example.habitflow_app.features.category.data.dto.CategoriesResponse
+import com.example.habitflow_app.features.gamification.data.dto.HabitRankingResponse
+import com.example.habitflow_app.features.gamification.data.dto.LeaderboardResponse
+import com.example.habitflow_app.features.gamification.data.dto.ProfileRankingResponse
 import com.example.habitflow_app.features.habits.data.dto.CreateHabitRequest
 import com.example.habitflow_app.features.habits.data.dto.HabitApiRequest
 import com.example.habitflow_app.features.habits.data.dto.HabitDayApiRequest
@@ -90,7 +93,7 @@ interface DirectusApiService {
 
     @GET("items/profiles/{id}")
     suspend fun getProfile(@Path("id") userId: String): Response<ProfileResponse>
-    data class ProfileResponse(val data: ProfileDTO)}
+    data class ProfileResponse(val data: ProfileDTO)
 
     @GET("items/habits")
     suspend fun getHabits(@Query("filter[user_id][_eq]") userId: String): Response<List<Habit>>

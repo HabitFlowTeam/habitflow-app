@@ -26,7 +26,7 @@ import com.example.habitflow_app.core.ui.theme.*
  *
  * @param rank The user's current rank in the leaderboard.
  * @param name The name of the user to display.
- * @param points The total points or streak value to display.
+ * @param streak The total points or streak value to display.
  * @param imageUrl Optional URL for the user's avatar image. If null, the first letter of the name is used.
  * @param modifier Modifier to customize layout and appearance.
  * @param isHighlighted Whether the item should be visually highlighted (e.g., for current user).
@@ -35,7 +35,7 @@ import com.example.habitflow_app.core.ui.theme.*
 fun LeaderboardItem(
     rank: Int,
     name: String,
-    points: Int,
+    streak: Int,
     imageUrl: String? = null,
     modifier: Modifier = Modifier,
     isHighlighted: Boolean = false
@@ -92,7 +92,7 @@ fun LeaderboardItem(
             Text(
                 text = name,
                 style = AppTypography.bodyMedium.copy(fontWeight = FontWeight.Medium),
-                color = Zinc700
+                color = Black
             )
         }
 
@@ -108,9 +108,9 @@ fun LeaderboardItem(
             Spacer(modifier = Modifier.width(4.dp))
 
             Text(
-                text = "$points",
+                text = "$streak",
                 style = AppTypography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-                color = Zinc800
+                color = Black
             )
         }
     }
@@ -124,11 +124,11 @@ fun LeaderboardItemPreview() {
         LeaderboardItem(
             rank = 1,
             name = "Laura M.",
-            points = 210,
+            streak = 210,
             imageUrl = null,
             isHighlighted = true
         )
         Spacer(modifier = Modifier.height(8.dp))
-        LeaderboardItem(rank = 2, name = "Carlos R.", points = 180, imageUrl = null)
+        LeaderboardItem(rank = 2, name = "Carlos R.", streak = 180, imageUrl = null)
     }
 }

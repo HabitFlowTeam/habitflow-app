@@ -36,12 +36,6 @@ data class HabitTracking(
     val habitId: String
 )
 
-data class Category(
-    val id: String,
-    val name: String,
-    val description: String
-)
-
 data class CategoriesResponse(
     val data: List<CategoryResponse>
 )
