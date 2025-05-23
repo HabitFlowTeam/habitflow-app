@@ -81,11 +81,13 @@ CREATE TABLE habits (
 );
 
 CREATE TABLE habits_days (
+    id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     habit_id    UUID NOT NULL,
     week_day_id UUID NOT NULL,
-    PRIMARY KEY (habit_id, week_day_id),
+    created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (habit_id) REFERENCES habits(id) ON DELETE CASCADE,
-    FOREIGN KEY (week_day_id) REFERENCES week_days(id)
+    FOREIGN KEY (week_day_id) REFERENCES week_days(id),
+    CONSTRAINT habits_days_unique UNIQUE (habit_id, week_day_id)
 );
 
 CREATE TABLE habits_tracking (
