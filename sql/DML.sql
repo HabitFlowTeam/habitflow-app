@@ -81,7 +81,7 @@ VALUES
     ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'habits_days', 'delete', '*', '{}'),
     ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'habits_tracking', 'read', '*', '{}'),
     ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'habits_tracking', 'create', '*', '{}'),
-    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'habits_tracking', 'update', '*', '{}');
+    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'habits_tracking', 'update', '*', '{}'),
 
     -- Añadimos permiso para la vista user_habit_calendar_view (sin filtro para admins)
     ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'user_habit_calendar_view', 'read', '*', '{}');
@@ -111,7 +111,7 @@ VALUES
     ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'habits_days', 'delete', '*', '{}'),
     ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'habits_tracking', 'read', '*', '{}'),
     ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'habits_tracking', 'create', '*', '{}'),
-    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'habits_tracking', 'update', '*', '{}');
+    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'habits_tracking', 'update', '*', '{}'),
 
     -- Permiso para leer la vista user_habit_calendar_view con filtro para el usuario actual
     ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'user_habit_calendar_view', 'read', '*', '{"_and":[{"user_id":{"_eq":"$CURRENT_USER"}}]}');
