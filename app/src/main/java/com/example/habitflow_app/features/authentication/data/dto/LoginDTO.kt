@@ -19,6 +19,5 @@ data class LoginResponse(
 @Serializable
 data class LoginResponseData(
     val access_token: String,
-    val refresh_token: String,
-    val expires: Int
+    val refresh_token: String
 )

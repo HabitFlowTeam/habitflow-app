@@ -1,19 +1,20 @@
 package com.example.habitflow_app.core.network
 
-import com.example.habitflow_app.domain.models.Habit
+import com.example.habitflow_app.features.articles.data.dto.ProfileArticlesResponse
 import com.example.habitflow_app.features.authentication.data.dto.LoginRequest
 import com.example.habitflow_app.features.authentication.data.dto.LoginResponse
 import com.example.habitflow_app.features.authentication.data.dto.RegisterUserRequest
 import com.example.habitflow_app.features.authentication.data.dto.CreateProfileRequest
 import com.example.habitflow_app.features.authentication.data.dto.PasswordResetRequest
-import com.example.habitflow_app.features.habits.data.dto.HabitRequest
-import com.example.habitflow_app.features.habits.data.dto.HabitUpdateRequest
+import com.example.habitflow_app.features.category.data.dto.CategoriesResponse
+import com.example.habitflow_app.features.gamification.data.dto.HabitRankingResponse
+import com.example.habitflow_app.features.gamification.data.dto.LeaderboardResponse
+import com.example.habitflow_app.features.gamification.data.dto.ProfileRankingResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import com.example.habitflow_app.features.profile.data.dto.ProfileDTO
 import retrofit2.http.GET
-import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -82,29 +83,101 @@ interface DirectusApiService {
 
     @GET("items/profiles/{id}")
     suspend fun getProfile(@Path("id") userId: String): Response<ProfileResponse>
+
     data class ProfileResponse(val data: ProfileDTO)
 
-    @GET("items/habits")
-    suspend fun getHabits(@Query("filter[user_id][_eq]") userId: String): Response<List<Habit>>
-
-    @POST
-    suspend fun createHabit(@Body habitDTO: HabitRequest): Response<Habit>
-
-    @PATCH("items/habits/{habit_id}")
-    suspend fun updateHabit(@Path("habit_id") habitId: String, @Body request: HabitUpdateRequest): Response<Habit>
-
-    @PATCH("items/habits/{habit_id}")
-    suspend fun softDeleteHabit(
-        @Path("habit_id") habitId: String,
-        @Body request: Map<String, Boolean> = mapOf("is_deleted" to true)
-    ): Response<Habit>
-
     /* Gamification Endpoints */
-    // TODO: Add gamification-related endpoints as needed
+
+    /**
+     * Retrieves the global leaderboard ranking sorted by streak in descending order.
+     *
+     * This endpoint returns profile information including id, full name, streak count, and avatar URL
+     * for the top users with the highest streaks.
+     *
+     * @param sort Sorting criteria (default: "-streak" for descending order by streak)
+     * @param limit Maximum number of results to return (default: 10)
+     * @param fields Comma-separated list of fields to include in the response
+     * @return Retrofit Response containing the leaderboard data wrapped in LeaderboardResponse
+     */
+    @GET("items/profiles")
+    suspend fun getGlobalRanking(
+        @Query("sort") sort: String = "-streak",
+        @Query("limit") limit: Int = 10,
+        @Query("fields") fields: String = "id,full_name,streak,avatar_url"
+    ): Response<LeaderboardResponse>
+
+    /**
+     * Retrieves the category-specific leaderboard ranking for habits.
+     *
+     * This endpoint returns user IDs and streak counts for habits matching the specified category,
+     * filtered to exclude deleted habits and sorted by streak in descending order.
+     *
+     * @param categoryName Exact name of the category to filter by
+     * @param isDeleted Filter for deleted habits (default: false)
+     * @param sort Sorting criteria (default: "-streak" for descending order by streak)
+     * @param limit Maximum number of results to return (default: 10)
+     * @param fields Comma-separated list of fields to include in the response
+     * @return Retrofit Response containing habit ranking data wrapped in HabitRankingResponse
+     */
+    @GET("items/habits")
+    suspend fun getCategoryRanking(
+        @Query("filter[category_id][name][_eq]") categoryName: String,
+        @Query("filter[is_deleted][_eq]") isDeleted: Boolean = false,
+        @Query("sort") sort: String = "-streak",
+        @Query("limit") limit: Int = 10,
+        @Query("fields") fields: String = "user_id,streak"
+    ): Response<HabitRankingResponse>
+
+    /**
+     * Retrieves profile information for multiple users by their IDs.
+     *
+     * This endpoint is typically used to fetch additional user details (full name, avatar)
+     * after obtaining user IDs from the category ranking endpoint.
+     *
+     * @param userIds Comma-separated list of user IDs to retrieve
+     * @param fields Comma-separated list of fields to include in the response
+     * @return Retrofit Response containing profile data wrapped in ProfileRankingResponse
+     */
+    @GET("items/profiles")
+    suspend fun getProfileRanking(
+        @Query("filter[id][_in]") userIds: String,
+        @Query("fields") fields: String = "id,full_name,avatar_url"
+    ): Response<ProfileRankingResponse>
 
     /* Habits Endpoints */
     // TODO: Add habits-related endpoints as needed
 
+    /* Articles Endpoints */
+
+    /**
+     * Obtiene los artículos de un usuario junto con la información de likes por artículo usando la vista USER_ARTICLES_VIEW.
+     *
+     * @param userId ID del usuario cuyos artículos se desean obtener
+     * @param fields Campos a retornar (por defecto: id,title,image_url,user_id,liked_by_user_id)
+     * @return Respuesta con la lista de artículos y la información de likes
+     */
+    @GET("items/user_articles_view")
+    suspend fun getUserArticles(
+        @Query("filter[user_id][_eq]") userId: String,
+        @Query("fields") fields: String = "title,image_url,likes_count"
+    ): Response<ProfileArticlesResponse>
+
+
     /* Profile Endpoints */
     // TODO: Add user profile-related endpoints as needed
+
+    /* Category Endpoint */
+    /**
+     * Retrieves all available habit categories with their names.
+     *
+     * This endpoint returns a list of all categories stored in the system,
+     * containing only their names for lightweight listing purposes.
+     * Results are sorted alphabetically by category name in ascending order.
+     *
+     * @param fields Comma-separated list of fields to include (default: "name")
+     * @param sort Sorting criteria (default: "name" for alphabetical order)
+     * @return Retrofit Response containing the list of categories
+     */
+    @GET("items/categories")
+    suspend fun getCategories(): Response<CategoriesResponse>
 }

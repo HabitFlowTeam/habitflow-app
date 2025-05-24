@@ -23,6 +23,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.habitflow_app.core.ui.theme.Background
 import com.example.habitflow_app.navigation.NavDestinations
+import com.example.habitflow_app.features.articles.ui.viewmodel.ArticleViewModel
+import kotlin.collections.isNotEmpty
+import kotlin.collections.sortedByDescending
 
 /**
  * A composable function that displays the profile screen, including the top app bar,
@@ -31,14 +34,23 @@ import com.example.habitflow_app.navigation.NavDestinations
 @Composable
 fun ProfileScreen(
     navController: NavController = rememberNavController(),
-    viewModel: ProfileViewModel = hiltViewModel()
+    viewModel: ProfileViewModel = hiltViewModel(),
+    articleViewModel: ArticleViewModel = hiltViewModel()
 ) {
     val profile by viewModel.profileState.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
+    val profileArticles by articleViewModel.profileArticles.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.loadProfile()
+    }
+
+    LaunchedEffect(profile?.id) {
+        if (profile?.id != null) {
+            print("Loading articles for user ID: ${profile!!.id}")
+            articleViewModel.loadUserArticles(profile!!.id)
+        }
     }
 
     Column(
@@ -111,17 +123,18 @@ fun ProfileScreen(
                     Text("Cerrar sesión", color = MaterialTheme.colorScheme.onPrimary)
                 }
 
-                // List of articles
-                MyArticleItem(
-                    title = "Meditación matutina en 1 minuto",
-                    likes = 24
-                )
-
-                MyArticleItem(
-                    title = "Cómo mantener una rutina de ejercicio",
-                    likes = 18
-                )
+                if (profileArticles.isNotEmpty()) {
+                    profileArticles.sortedByDescending { it.likes }.take(2)
+                        .forEach { article ->
+                            MyArticleItem(
+                                title = article.title,
+                                likes = article.likes,
+                                imageUrl = article.imageUrl
+                            )
+                        }
+                }
             }
         }
     }
 }
+

@@ -14,7 +14,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.habitflow_app.R
 import com.example.habitflow_app.core.ui.components.BottomNavigationBar
 import com.example.habitflow_app.features.articles.ui.screens.ArticlesMainScreen
-import com.example.habitflow_app.features.gamification.ui.screens.StatsMainScreen
+import com.example.habitflow_app.features.gamification.ui.screens.StatsScreen
 import com.example.habitflow_app.features.habits.ui.screens.HabitsScreen
 import com.example.habitflow_app.features.habits.ui.screens.HomeScreen
 import com.example.habitflow_app.navigation.NavDestinations
@@ -55,7 +55,7 @@ fun LayoutScreen(
                 composable(NavDestinations.HOME) { HomeScreen() }
                 composable(NavDestinations.ARTICLES) { ArticlesMainScreen() }
                 composable(NavDestinations.HABITS) { HabitsScreen() }
-                composable(NavDestinations.GAMIFICATION) { StatsMainScreen() }
+                composable(NavDestinations.GAMIFICATION) { StatsScreen() }
             }
         }
         BottomNavigationBar(
