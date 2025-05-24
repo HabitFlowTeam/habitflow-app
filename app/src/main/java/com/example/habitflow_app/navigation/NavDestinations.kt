@@ -13,4 +13,9 @@ object NavDestinations {
     const val GAMIFICATION = "gamification"
     const val MAIN = "main"
     const val FORGOT_PASSWORD = "forgot_password"
+    const val CREATE_HABIT = "create_habit"
+    const val EDIT_HABIT = "edit_habit/{habitId}"
+
+    // Helper function to create edit habit route
+    fun editHabitRoute(habitId: String) = "edit_habit/$habitId"
 }

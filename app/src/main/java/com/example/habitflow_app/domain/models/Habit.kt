@@ -35,3 +35,13 @@ data class HabitTracking(
     val trackingDate: LocalDate,
     val habitId: String
 )
+
+data class CategoriesResponse(
+    val data: List<CategoryResponse>
+)
+
+data class CategoryResponse(
+    val id: String,
+    val name: String,
+    val description: String
+)

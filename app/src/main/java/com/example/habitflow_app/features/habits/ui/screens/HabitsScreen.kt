@@ -15,10 +15,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.habitflow_app.domain.models.Habit
 import com.example.habitflow_app.domain.models.HabitTracking
 import com.example.habitflow_app.features.habits.ui.components.DailyProgressBar
 import com.example.habitflow_app.features.habits.ui.components.HabitItem
+import com.example.habitflow_app.navigation.NavDestinations
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.TextStyle
@@ -27,10 +30,12 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HabitsScreen(
+    navController: NavController,
     todayHabits: List<Pair<Habit, HabitTracking>> = emptyList(), // Habits to complete today
     otherHabits: List<Pair<Habit, HabitTracking>> = emptyList(), // Habits not scheduled for today
     onHabitCheckedChange: (String, Boolean) -> Unit = { _, _ -> }, // Callback when checkbox state changes
-    onNewHabitClick: () -> Unit = {} // Callback for new habit button
+    onNewHabitClick: () -> Unit = {}, // Callback for new habit button
+    onHabitClick: (String) -> Unit = { _ -> }
 ) {
     // Count completed habits for today
     val completedHabits = todayHabits.count { it.second.isChecked }
@@ -76,9 +81,10 @@ fun HabitsScreen(
                     title = "Para Hoy",
                     habits = todayHabits,
                     onHabitCheckedChange = onHabitCheckedChange,
+                    onHabitClick = onHabitClick,
                     rightContent = {
                         Button(
-                            onClick = onNewHabitClick,
+                            onClick = { navController.navigate(NavDestinations.CREATE_HABIT) },
                             contentPadding = PaddingValues(horizontal = 12.dp),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Color.Black,
@@ -101,7 +107,8 @@ fun HabitsScreen(
                 HabitsSection(
                     title = "Otros Hábitos",
                     habits = otherHabits,
-                    onHabitCheckedChange = onHabitCheckedChange
+                    onHabitCheckedChange = onHabitCheckedChange,
+                    onHabitClick = onHabitClick
                 )
             }
         }
@@ -113,7 +120,8 @@ fun HabitsSection(
     title: String, // Section title
     habits: List<Pair<Habit, HabitTracking>>, // Habits list
     onHabitCheckedChange: (String, Boolean) -> Unit, // Checkbox callback
-    rightContent: @Composable (() -> Unit)? = null // Optional trailing content (e.g. button)
+    onHabitClick: ((String) -> Unit)? = null,
+    rightContent: @Composable (() -> Unit)? = null, // Optional trailing content (e.g. button)
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -146,7 +154,9 @@ fun HabitsSection(
                 isChecked = tracking.isChecked,
                 onCheckedChange = { checked ->
                     onHabitCheckedChange(habit.id, checked)
-                })
+                },
+                onClick = { onHabitClick?.invoke(habit.id) }
+            )
         }
     }
 }
@@ -167,6 +177,7 @@ private fun getHabitDaysText(habitId: String): String {
 @Composable
 fun HabitsScreenPreview() {
     MaterialTheme {
+        val navController = rememberNavController()
         val today = LocalDate.now()
 
         // Sample habits
@@ -230,8 +241,12 @@ fun HabitsScreenPreview() {
         val otherHabits = listOf(habits[3] to habitTrackings[3])
 
         HabitsScreen(
+            navController = navController,
             todayHabits = todayHabits,
-            otherHabits = otherHabits
+            otherHabits = otherHabits,
+            onHabitClick = { habitId ->
+                navController.navigate(NavDestinations.editHabitRoute(habitId))
+            }
         )
     }
 }
