@@ -11,10 +11,8 @@ import com.example.habitflow_app.features.category.data.dto.CategoriesResponse
 import com.example.habitflow_app.features.gamification.data.dto.HabitRankingResponse
 import com.example.habitflow_app.features.gamification.data.dto.LeaderboardResponse
 import com.example.habitflow_app.features.gamification.data.dto.ProfileRankingResponse
-import com.example.habitflow_app.features.habits.data.dto.CreateHabitRequest
 import com.example.habitflow_app.features.habits.data.dto.HabitApiRequest
 import com.example.habitflow_app.features.habits.data.dto.HabitDayApiRequest
-import com.example.habitflow_app.features.habits.data.dto.HabitDayUpdateRequest
 import com.example.habitflow_app.features.habits.data.dto.HabitTrackingApiRequest
 import com.example.habitflow_app.features.habits.data.dto.HabitUpdateRequest
 import retrofit2.Response
@@ -116,6 +114,24 @@ interface DirectusApiService {
         @Path("habit_id") habitId: String,
         @Body request: Map<String, Boolean> = mapOf("is_deleted" to true)
     ): Response<Habit>
+
+    @GET("items/user_habit_tracking_view")
+    suspend fun getCompletedHabitsTracking(
+        @Query("filter[user_id][_eq]") userId: String,
+        @Query("filter[is_checked][_eq]") isChecked: Boolean = true
+    ): Response<CompletedHabitsTrackingResponse>
+
+    data class CompletedHabitsTrackingResponse(
+        val data: List<UserHabitTrackingViewDTO>
+    )
+
+    data class UserHabitTrackingViewDTO(
+        val tracking_id: String?,
+        val habit_id: String?,
+        val user_id: String?,
+        val is_checked: Boolean?,
+        val tracking_date: String?
+    )
 
     /* Gamification Endpoints */
 

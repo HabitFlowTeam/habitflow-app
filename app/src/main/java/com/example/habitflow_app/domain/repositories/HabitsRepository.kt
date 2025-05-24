@@ -13,4 +13,6 @@ interface HabitsRepository {
     suspend fun updateHabit(habitId: String, request: HabitUpdateRequest): Habit
     suspend fun softDeleteHabit(habitId: String): Boolean
     suspend fun getCategories(): List<Category>
+    suspend fun getCompletedHabitsCount(userId: String): Int
 }
+

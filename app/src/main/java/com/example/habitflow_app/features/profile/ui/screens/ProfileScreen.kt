@@ -41,6 +41,7 @@ fun ProfileScreen(
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
     val profileArticles by articleViewModel.profileArticles.collectAsState()
+    val completedHabitsCount by viewModel.completedHabitsCount.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.loadProfile()
@@ -102,7 +103,7 @@ fun ProfileScreen(
                 ProfileStats(
                     currentStreak = profile!!.streak,
                     bestStreak = profile!!.bestStreak,
-                    completedHabits = 100
+                    completedHabits = completedHabitsCount
                 )
 
                 // Logout button

@@ -32,4 +32,9 @@ class HabitsRepositoryImpl @Inject constructor(
     override suspend fun getCategories(): List<Category> {
         return habitsDataSource.getCategories()
     }
+
+    override suspend fun getCompletedHabitsCount(userId: String): Int {
+        return habitsDataSource.getCompletedHabitsCount(userId)
+    }
 }
+
