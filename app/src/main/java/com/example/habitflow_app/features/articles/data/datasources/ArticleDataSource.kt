@@ -26,8 +26,8 @@ class ArticleDataSource @Inject constructor(
             articles.map { dto ->
                 ProfileArticle(
                     title = dto.title,
-                    imageUrl = dto.imageUrl,
-                    likes = dto.likes,
+                    imageUrl = dto.image_url,
+                    likes = dto.likes_count,
                 )
             }
         } catch (e: Exception) {

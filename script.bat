@@ -19,12 +19,17 @@ if "%USER_HABIT_CALENDAR_VIEW_FILE%"=="" set USER_HABIT_CALENDAR_VIEW_FILE=sql\U
 set DML_FILE=%6
 if "%DML_FILE%"=="" set DML_FILE=sql\DML.sql
 
+set USER_ARTICLES_VIEW_FILE=%5
+if "%USER_ARTICLES_VIEW_FILE%"=="" set USER_ARTICLES_VIEW_FILE=sql\USER_ARTICLES_VIEW.sql
+
 :: Copiar archivos SQL al contenedor
 docker cp "%DDL_FILE%" "%CONTAINER_NAME%:/DDL.sql"
 docker cp "%USER_HABIT_CALENDAR_VIEW_FILE%" "%CONTAINER_NAME%:/USER_HABIT_CALENDAR_VIEW.sql"
 docker cp "%DML_FILE%" "%CONTAINER_NAME%:/DML.sql"
+docker cp "%USER_ARTICLES_VIEW_FILE%" "%CONTAINER_NAME%:/USER_ARTICLES_VIEW.sql"
 
 :: Ejecutar los scripts SQL
 docker exec -it "%CONTAINER_NAME%" psql -U "%DB_USER%" -d "%DB_NAME%" -f /DDL.sql
 docker exec -it "%CONTAINER_NAME%" psql -U "%DB_USER%" -d "%DB_NAME%" -f /USER_HABIT_CALENDAR_VIEW.sql
 docker exec -it "%CONTAINER_NAME%" psql -U "%DB_USER%" -d "%DB_NAME%" -f /DML.sql
+docker exec -it "%CONTAINER_NAME%" psql -U "%DB_USER%" -d "%DB_NAME%" -f /USER_ARTICLES_VIEW.sql

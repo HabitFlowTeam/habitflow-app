@@ -41,11 +41,14 @@ fun ProfileScreen(
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
     val profileArticles by articleViewModel.profileArticles.collectAsState()
-    val articlesLoading by articleViewModel.isLoading.collectAsState()
-    val articlesError by articleViewModel.error.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.loadProfile()
+    }
 
     LaunchedEffect(profile?.id) {
         if (profile?.id != null) {
+            print("Loading articles for user ID: ${profile!!.id}")
             articleViewModel.loadUserArticles(profile!!.id)
         }
     }
@@ -120,28 +123,15 @@ fun ProfileScreen(
                     Text("Cerrar sesión", color = MaterialTheme.colorScheme.onPrimary)
                 }
 
-                // Artículos del usuario
-                when {
-                    articlesLoading -> {
-                        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                            CircularProgressIndicator()
+                if (profileArticles.isNotEmpty()) {
+                    profileArticles.sortedByDescending { it.likes }.take(2)
+                        .forEach { article ->
+                            MyArticleItem(
+                                title = article.title,
+                                likes = article.likes,
+                                imageUrl = article.imageUrl
+                            )
                         }
-                    }
-                    articlesError != null -> {
-                        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                            Text(text = articlesError!!, color = Red500)
-                        }
-                    }
-                    profileArticles.isNotEmpty() -> {
-                        profileArticles.sortedByDescending { it.likes }
-                            .take(2)
-                            .forEach { article ->
-                                MyArticleItem(
-                                    title = article.title,
-                                    likes = article.likes
-                                )
-                            }
-                    }
                 }
             }
         }

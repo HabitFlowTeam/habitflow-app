@@ -9,9 +9,7 @@ data class ProfileArticlesResponse(
 
 @Serializable
 data class ProfileArticlesDTO(
-    val id: String,
     val title: String,
-    val imageUrl: String?,
-    val likes: Int,
-    val userId: String
+    val image_url: String?,
+    val likes_count: Int
 )

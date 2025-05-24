@@ -156,10 +156,10 @@ interface DirectusApiService {
      * @param fields Campos a retornar (por defecto: id,title,image_url,user_id,liked_by_user_id)
      * @return Respuesta con la lista de artículos y la información de likes
      */
-    @GET("items/USER_ARTICLES_VIEW")
+    @GET("items/user_articles_view")
     suspend fun getUserArticles(
         @Query("filter[user_id][_eq]") userId: String,
-        @Query("fields") fields: String = "id,title,image_url,user_id,liked_by_user_id"
+        @Query("fields") fields: String = "title,image_url,likes_count"
     ): Response<ProfileArticlesResponse>
 
 
