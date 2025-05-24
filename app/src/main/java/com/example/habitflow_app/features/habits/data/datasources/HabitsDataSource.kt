@@ -151,4 +151,14 @@ class HabitsDataSource @Inject constructor(
         }
     }
 
+    suspend fun getCompletedHabitsCount(userId: String): Int {
+        val response = directusApiService.getCompletedHabitsTracking(userId)
+        if (response.isSuccessful) {
+            return response.body()?.data?.size ?: 0
+        } else {
+            throw Exception("Error al obtener hábitos completados")
+        }
+    }
+
 }
+

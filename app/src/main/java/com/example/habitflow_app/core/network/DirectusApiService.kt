@@ -119,6 +119,24 @@ interface DirectusApiService {
         @Body request: Map<String, Boolean> = mapOf("is_deleted" to true)
     ): Response<Habit>
 
+    @GET("items/user_habit_tracking_view")
+    suspend fun getCompletedHabitsTracking(
+        @Query("filter[user_id][_eq]") userId: String,
+        @Query("filter[is_checked][_eq]") isChecked: Boolean = true
+    ): Response<CompletedHabitsTrackingResponse>
+
+    data class CompletedHabitsTrackingResponse(
+        val data: List<UserHabitTrackingViewDTO>
+    )
+
+    data class UserHabitTrackingViewDTO(
+        val tracking_id: String?,
+        val habit_id: String?,
+        val user_id: String?,
+        val is_checked: Boolean?,
+        val tracking_date: String?
+    )
+
     /* Gamification Endpoints */
 
     /**
