@@ -33,20 +33,17 @@ class HabitFormValidator {
         }
 
         // Validar días seleccionados
-        if (selectedDays.isEmpty()) {
-            results["days"] = ValidationResult(
-                isValid = false,
-                errorMessage = "Selecciona al menos un día"
-            )
-        } else {
+        if (isDailySelected) {
             results["days"] = ValidationResult(isValid = true)
-        }
-
-        if (!isDailySelected && selectedDays.isEmpty()) {
-            results["days"] = ValidationResult(
-                isValid = false,
-                errorMessage = "Debes seleccionar al menos un día"
-            )
+        } else {
+            if (selectedDays.isEmpty()) {
+                results["days"] = ValidationResult(
+                    isValid = false,
+                    errorMessage = "Debes seleccionar al menos un día"
+                )
+            } else {
+                results["days"] = ValidationResult(isValid = true)
+            }
         }
 
         return results

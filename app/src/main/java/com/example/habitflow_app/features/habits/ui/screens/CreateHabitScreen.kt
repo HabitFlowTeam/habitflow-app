@@ -20,7 +20,6 @@ import androidx.navigation.NavController
 import com.example.habitflow_app.features.habits.ui.components.*
 import com.example.habitflow_app.features.habits.ui.viewmodel.HabitCreationEvent
 import com.example.habitflow_app.features.habits.ui.viewmodel.HabitsViewModel
-import java.time.LocalTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -29,8 +28,6 @@ fun CreateHabitScreen(
     viewModel: HabitsViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
-
-    var isDailySelected by remember { mutableStateOf(true) }
     var showDeleteDialog by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
 
@@ -119,11 +116,13 @@ fun CreateHabitScreen(
                         modifier = Modifier.padding(16.dp)
                     ) {
                         FrequencySelector(
-                            isDailySelected = isDailySelected,
-                            onFrequencySelected = { isDailySelected = it }
+                            isDailySelected = state.isDailySelected,
+                            onFrequencySelected = { isDaily ->
+                                viewModel.onEvent(HabitCreationEvent.FrequencyChanged(isDaily))
+                            }
                         )
 
-                        if (!isDailySelected) {
+                        if (!state.isDailySelected) {
                             DaysSelector(
                                 selectedDays = state.selectedDays,
                                 onDaySelected = { dayId, isSelected ->
