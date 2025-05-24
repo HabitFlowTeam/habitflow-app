@@ -43,7 +43,6 @@ fun FrequencySelector(
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
-
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier

@@ -96,6 +96,7 @@ class HabitsViewModel @Inject constructor(
             is HabitCreationEvent.FrequencyChanged -> {
                 _uiState.value = _uiState.value.copy(
                     isDailySelected = event.isDaily,
+                    selectedDays = if (event.isDaily) emptyList() else _uiState.value.selectedDays,
                     daysError = if (event.isDaily) null else _uiState.value.daysError
                 )
             }
@@ -171,7 +172,7 @@ class HabitsViewModel @Inject constructor(
                         CreateHabitRequest(
                             name = _uiState.value.name,
                             categoryId = _uiState.value.categoryId,
-                            selectedDays = _uiState.value.selectedDays,
+                            selectedDays = daysToSend,
                             notificationsEnabled = _uiState.value.notificationsEnabled,
                             reminderTime = if (_uiState.value.notificationsEnabled) _uiState.value.reminderTime else null
                         )
