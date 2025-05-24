@@ -11,6 +11,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * ViewModel for managing and exposing article-related UI state.
+ *
+ * This ViewModel interacts with the use case to retrieve the top liked articles for a user,
+ * and exposes state flows for the UI to observe articles, loading, and error states.
+ *
+ * @property getUserTopLikedArticlesUseCase Use case to fetch top liked articles for a user
+ */
 @HiltViewModel
 class ArticleViewModel @Inject constructor(
     private val getUserTopLikedArticlesUseCase: GetUserTopLikedArticlesUseCase
@@ -27,6 +35,11 @@ class ArticleViewModel @Inject constructor(
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
 
+    /**
+     * Loads the top liked articles for the specified user and updates the UI state.
+     *
+     * @param userId The ID of the user whose articles are to be loaded
+     */
     fun loadUserArticles(userId: String) {
         _isLoading.value = true
         viewModelScope.launch {
