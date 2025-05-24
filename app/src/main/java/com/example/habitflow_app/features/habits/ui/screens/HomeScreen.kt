@@ -79,20 +79,15 @@ fun CalendarSection(
 
     Log.e("Calendar data: ", "$calendarData")
 
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-    ) {
-        Calendar(
-            currentDate = currentDate,
-            dayStatuses = calendarData,
-            onDateRangeChanged = { startDate, endDate ->
-                viewModel.onDateRangeChanged(startDate, endDate)
-            },
-            modifier = Modifier.fillMaxWidth()
-        )
-    }
+    Calendar(
+        currentDate = currentDate,
+        dayStatuses = calendarData,
+        onDateRangeChanged = { startDate, endDate ->
+            viewModel.onDateRangeChanged(startDate, endDate)
+        },
+        modifier = Modifier.fillMaxWidth()
+    )
+
 }
 
 /**

@@ -3,6 +3,7 @@ package com.example.habitflow_app.features.habits.ui.components
 import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -90,8 +91,9 @@ fun Calendar(
     // Use derivedStateOf to avoid unnecessary recompositions
     val isCurrentWeek by remember {
         derivedStateOf {
-            centerDate.isEqual(today) ||
-                    (centerDate.isAfter(today.minusDays(3)) && centerDate.isBefore(today.plusDays(4)))
+            centerDate.isEqual(today) || (centerDate.isAfter(today.minusDays(3)) && centerDate.isBefore(
+                today.plusDays(4)
+            ))
         }
     }
 
@@ -110,8 +112,7 @@ fun Calendar(
                     date = date,
                     dayNumber = date.dayOfMonth,
                     dayName = date.dayOfWeek.getDisplayName(TextStyle.SHORT, spanishLocale)
-                        .replace(".", "")
-                        .replaceFirstChar { it.uppercase() },
+                        .replace(".", "").replaceFirstChar { it.uppercase() },
                     isToday = date == today,
                     isPast = date.isBefore(today),
                     status = dayStatuses[date] ?: DayStatus.Future
@@ -127,8 +128,7 @@ fun Calendar(
                 detectDragGestures(
                     onDragEnd = {
                         accumulatedDrag = 0f
-                    }
-                ) { _, dragAmount ->
+                    }) { _, dragAmount ->
                     accumulatedDrag += dragAmount.x
                     val threshold = 150f // Increase threshold for less sensitivity
 
@@ -170,13 +170,12 @@ fun Calendar(
 @Composable
 private fun CalendarTitle(isCurrentWeek: Boolean) {
     Text(
-        text = if (isCurrentWeek) "Hoy" else "Calendario",
+        text = if (isCurrentWeek) "Semana actual" else "Calendario",
         style = MaterialTheme.typography.titleLarge.copy(
-            fontWeight = FontWeight.Bold,
-            fontSize = 18.sp
+            fontWeight = FontWeight.Bold
         ),
         color = MaterialTheme.colorScheme.onSurface,
-        modifier = Modifier.padding(bottom = 8.dp)
+        modifier = Modifier.padding(bottom = 12.dp)
     )
 }
 
@@ -187,8 +186,7 @@ private fun CalendarTitle(isCurrentWeek: Boolean) {
 @Composable
 private fun DayNamesRow(daysInfo: List<DayInfo>) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceEvenly
+        modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         daysInfo.forEach { dayInfo ->
             Text(
@@ -205,8 +203,7 @@ private fun DayNamesRow(daysInfo: List<DayInfo>) {
 @Composable
 private fun DayCirclesRow(daysInfo: List<DayInfo>) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceEvenly
+        modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         daysInfo.forEach { dayInfo ->
             DayCircle(dayInfo = dayInfo)
@@ -264,12 +261,16 @@ private fun DayCircle(dayInfo: DayInfo) {
         modifier = Modifier
             .size(40.dp)
             .clip(CircleShape)
-            .background(dayStyle.backgroundColor),
-        contentAlignment = Alignment.Center
+            .background(dayStyle.backgroundColor)
+            .border(
+                width = if (dayInfo.isToday) 2.dp else 0.dp,
+                color = if (dayInfo.isToday) getStatusContentColor(dayInfo.status) else Color.Transparent,
+                shape = CircleShape
+            ),
+        contentAlignment = Alignment.Center,
     ) {
         DayContent(
-            dayInfo = dayInfo,
-            dayStyle = dayStyle
+            dayInfo = dayInfo, dayStyle = dayStyle
         )
     }
 }
@@ -291,32 +292,20 @@ private fun calculateDayStyle(dayInfo: DayInfo): DayStyle {
     return when {
         dayInfo.isToday -> DayStyle(
             icon = null,
-            backgroundColor = when (dayInfo.status) {
-                is DayStatus.Completed -> Color(0xFF4CAF50).copy(alpha = 0.2f)
-                is DayStatus.Partial -> Color(0xFFFF9800).copy(alpha = 0.2f)
-                is DayStatus.Failed -> Color(0xFFF44336).copy(alpha = 0.2f)
-                is DayStatus.NoHabits -> Color(0xFF9E9E9E).copy(alpha = 0.1f)
-                else -> Color.Transparent
-            },
-            contentColor = Color(0xFF1976D2) // Material Blue 700
+            backgroundColor = getStatusBackgroundColor(dayInfo.status),
+            contentColor = getStatusContentColor(
+                dayInfo.status,
+                Color(0xFF1976D2)
+            ), // Material Blue 700
         )
 
         dayInfo.isPast -> DayStyle(
             icon = null,
-            backgroundColor = when (dayInfo.status) {
-                is DayStatus.Completed -> Color(0xFF4CAF50).copy(alpha = 0.2f)
-                is DayStatus.Partial -> Color(0xFFFF9800).copy(alpha = 0.2f)
-                is DayStatus.Failed -> Color(0xFFF44336).copy(alpha = 0.2f)
-                is DayStatus.NoHabits -> Color(0xFF9E9E9E).copy(alpha = 0.1f)
-                else -> Color.Transparent
-            },
-            contentColor = when (dayInfo.status) {
-                is DayStatus.Completed -> Color(0xFF4CAF50)
-                is DayStatus.Partial -> Color(0xFFFF9800)
-                is DayStatus.Failed -> Color(0xFFF44336)
-                is DayStatus.NoHabits -> Color(0xFF9E9E9E).copy(alpha = 0.6f)
-                else -> Color(0xFF757575)
-            }
+            backgroundColor = getStatusBackgroundColor(
+                dayInfo.status,
+                Color(0xFF1976D2).copy(alpha = 0.2f)
+            ),
+            contentColor = getStatusContentColor(dayInfo.status)
         )
 
         else -> DayStyle(
@@ -324,5 +313,32 @@ private fun calculateDayStyle(dayInfo: DayInfo): DayStyle {
             backgroundColor = Color(0xFF9E9E9E).copy(alpha = 0.2f),
             contentColor = Color(0xFF757575) // Material Grey 600
         )
+    }
+}
+
+// Pure function for getting status color (does not recompose)
+private fun getStatusContentColor(
+    status: DayStatus,
+    defaultColor: Color = Color(0xFF757575)
+): Color {
+    return when (status) {
+        DayStatus.Completed -> Color(0xFF4CAF50)
+        DayStatus.Partial -> Color(0xFFFF9800)
+        DayStatus.Failed -> Color(0xFFF44336)
+        DayStatus.NoHabits -> Color(0xFF9E9E9E).copy(alpha = 0.6f)
+        else -> defaultColor
+    }
+}
+
+fun getStatusBackgroundColor(
+    status: DayStatus,
+    defaultColor: Color = Color.Transparent
+): Color {
+    return when (status) {
+        DayStatus.Completed -> Color(0xFF4CAF50).copy(alpha = 0.2f)
+        DayStatus.Partial -> Color(0xFFFF9800).copy(alpha = 0.2f)
+        DayStatus.Failed -> Color(0xFFF44336).copy(alpha = 0.2f)
+        DayStatus.NoHabits -> Color(0xFF9E9E9E).copy(alpha = 0.1f)
+        else -> defaultColor
     }
 }
