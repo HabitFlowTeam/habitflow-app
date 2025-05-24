@@ -1,9 +1,11 @@
 package com.example.habitflow_app.features.habits.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -14,16 +16,19 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.habitflow_app.core.ui.theme.HabitflowAppTheme
-import com.example.habitflow_app.domain.models.DayStatus
 import com.example.habitflow_app.features.articles.ui.components.ArticleCard
 import com.example.habitflow_app.features.habits.ui.components.Calendar
 import com.example.habitflow_app.features.habits.ui.components.HabitItem
-import java.time.LocalDate
+import com.example.habitflow_app.features.habits.ui.viewmodel.CalendarViewModelImpl
 
 /**
  * HomeScreen is the main screen of the application.
@@ -61,22 +66,33 @@ fun HomeScreen(
  * Section that displays the calendar with habit status by day.
  */
 @Composable
-private fun CalendarSection() {
-    val today = LocalDate.now()
-    val dayStatuses = mapOf(
-        today.minusDays(3) to DayStatus.Partial,
-        today.minusDays(2) to DayStatus.Failed,
-        today.minusDays(1) to DayStatus.Completed,
-        today to DayStatus.Completed,
-        today.plusDays(1) to DayStatus.Future,
-        today.plusDays(2) to DayStatus.Future,
-        today.plusDays(3) to DayStatus.Future
-    )
+fun CalendarSection(
+    viewModel: CalendarViewModelImpl = hiltViewModel()
+) {
+    val calendarData by viewModel.calendarData.collectAsState()
+    val currentDate by viewModel.currentDate.collectAsState()
 
-    Calendar(
-        currentDate = today,
-        dayStatuses = dayStatuses
-    )
+    // Load initial data
+    LaunchedEffect(Unit) {
+        viewModel.loadInitialData()
+    }
+
+    Log.e("Calendar data: ", "$calendarData")
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        Calendar(
+            currentDate = currentDate,
+            dayStatuses = calendarData,
+            onDateRangeChanged = { startDate, endDate ->
+                viewModel.onDateRangeChanged(startDate, endDate)
+            },
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
 }
 
 /**
