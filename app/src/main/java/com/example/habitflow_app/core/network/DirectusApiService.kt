@@ -150,11 +150,11 @@ interface DirectusApiService {
     /* Articles Endpoints */
 
     /**
-     * Obtiene los artículos de un usuario junto con la información de likes por artículo usando la vista USER_ARTICLES_VIEW.
+     * Retrieves a user's articles along with like information per article using the USER_ARTICLES_VIEW view.
      *
-     * @param userId ID del usuario cuyos artículos se desean obtener
-     * @param fields Campos a retornar (por defecto: id,title,image_url,user_id,liked_by_user_id)
-     * @return Respuesta con la lista de artículos y la información de likes
+     * @param userId ID of the user whose articles are to be retrieved
+     * @param fields Fields to return (default: title, image_url, likes_count)
+     * @return Response containing the list of articles and like information
      */
     @GET("items/user_articles_view")
     suspend fun getUserArticles(
