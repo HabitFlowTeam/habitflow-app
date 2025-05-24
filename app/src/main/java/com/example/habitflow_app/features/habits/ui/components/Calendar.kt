@@ -16,6 +16,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -150,8 +153,16 @@ fun Calendar(
             },
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Title (only recomposes if isCurrentWeek changes)
-        CalendarTitle(isCurrentWeek = isCurrentWeek)
+        // Title and Back to Today Button
+        CalendarHeader(
+            isCurrentWeek = isCurrentWeek,
+            onBackToToday = {
+                centerDate = today
+                val startDate = today.minusDays(3)
+                val endDate = today.plusDays(3)
+                onDateRangeChanged?.invoke(startDate, endDate)
+            }
+        )
 
         // Names of days
         DayNamesRow(daysInfo = daysInfo)
@@ -168,15 +179,44 @@ fun Calendar(
 }
 
 @Composable
-private fun CalendarTitle(isCurrentWeek: Boolean) {
-    Text(
-        text = if (isCurrentWeek) "Semana actual" else "Calendario",
-        style = MaterialTheme.typography.titleLarge.copy(
-            fontWeight = FontWeight.Bold
-        ),
-        color = MaterialTheme.colorScheme.onSurface,
-        modifier = Modifier.padding(bottom = 12.dp)
-    )
+private fun CalendarHeader(
+    isCurrentWeek: Boolean,
+    onBackToToday: () -> Unit
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        if (isCurrentWeek) {
+            // Title only when in the current week
+            Text(
+                text = "Semana actual",
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontWeight = FontWeight.Bold
+                ),
+                color = MaterialTheme.colorScheme.onSurface,
+                textAlign = TextAlign.Center
+            )
+        } else {
+            // Only button when not in the current week
+            Button(
+                onClick = onBackToToday,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+                    contentColor = MaterialTheme.colorScheme.primary
+                ),
+                shape = RoundedCornerShape(14.dp),
+                modifier = Modifier.height(36.dp)
+            ) {
+                Text(
+                    text = "Volver a la semana actual",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(12.dp))
+    }
 }
 
 /**
