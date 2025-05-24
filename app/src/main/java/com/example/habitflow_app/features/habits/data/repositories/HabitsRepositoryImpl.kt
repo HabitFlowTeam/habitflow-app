@@ -1,9 +1,12 @@
 package com.example.habitflow_app.features.habits.data.repositories
 
+import com.example.habitflow_app.domain.models.Category
 import com.example.habitflow_app.domain.models.Habit
 import com.example.habitflow_app.domain.repositories.HabitsRepository
 import com.example.habitflow_app.features.habits.data.datasources.HabitsDataSource
-import com.example.habitflow_app.features.habits.data.dto.HabitRequest
+import com.example.habitflow_app.features.habits.data.dto.CreateHabitRequest
+
+import com.example.habitflow_app.features.habits.data.dto.HabitResponse
 import com.example.habitflow_app.features.habits.data.dto.HabitUpdateRequest
 import javax.inject.Inject
 
@@ -14,7 +17,7 @@ class HabitsRepositoryImpl @Inject constructor(
         return habitsDataSource.getHabits(userId)
     }
 
-    override suspend fun createHabit(request: HabitRequest): Habit {
+    override suspend fun createCompleteHabit(request: CreateHabitRequest): HabitResponse {
         return habitsDataSource.createHabit(request)
     }
 
@@ -24,5 +27,9 @@ class HabitsRepositoryImpl @Inject constructor(
 
     override suspend fun softDeleteHabit(habitId: String): Boolean {
         return habitsDataSource.softDeleteHabit(habitId)
+    }
+
+    override suspend fun getCategories(): List<Category> {
+        return habitsDataSource.getCategories()
     }
 }

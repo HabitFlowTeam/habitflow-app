@@ -54,10 +54,19 @@ fun LayoutScreen(
             ) {
                 composable(NavDestinations.HOME) { HomeScreen() }
                 composable(NavDestinations.ARTICLES) { ArticlesMainScreen() }
-                composable(NavDestinations.HABITS) { HabitsScreen() }
+                composable(NavDestinations.HABITS) {
+                    HabitsScreen(
+                        navController = navController,
+                        onHabitClick = { habitId ->
+                            navController.navigate(NavDestinations.editHabitRoute(habitId))
+                        }
+                    )
+                }
                 composable(NavDestinations.GAMIFICATION) { StatsScreen() }
             }
         }
+
+
         BottomNavigationBar(
             items = bottomNavItem,
             navController = barNavController

@@ -19,9 +19,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.habitflow_app.core.ui.theme.HabitflowAppTheme
+import com.example.habitflow_app.domain.models.DayStatus
 import com.example.habitflow_app.features.articles.ui.components.ArticleCard
 import com.example.habitflow_app.features.habits.ui.components.Calendar
-import com.example.habitflow_app.features.habits.ui.components.DayStatus
 import com.example.habitflow_app.features.habits.ui.components.HabitItem
 import java.time.LocalDate
 

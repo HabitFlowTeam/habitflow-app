@@ -1,5 +1,6 @@
 package com.example.habitflow_app.core.network
 
+import com.example.habitflow_app.domain.models.Habit
 import com.example.habitflow_app.features.articles.data.dto.ProfileArticlesResponse
 import com.example.habitflow_app.features.authentication.data.dto.LoginRequest
 import com.example.habitflow_app.features.authentication.data.dto.LoginResponse
@@ -10,11 +11,19 @@ import com.example.habitflow_app.features.category.data.dto.CategoriesResponse
 import com.example.habitflow_app.features.gamification.data.dto.HabitRankingResponse
 import com.example.habitflow_app.features.gamification.data.dto.LeaderboardResponse
 import com.example.habitflow_app.features.gamification.data.dto.ProfileRankingResponse
+import com.example.habitflow_app.features.habits.data.dto.CreateHabitRequest
+import com.example.habitflow_app.features.habits.data.dto.HabitApiRequest
+import com.example.habitflow_app.features.habits.data.dto.HabitDayApiRequest
+import com.example.habitflow_app.features.habits.data.dto.HabitDayUpdateRequest
+import com.example.habitflow_app.features.habits.data.dto.HabitTrackingApiRequest
+import com.example.habitflow_app.features.habits.data.dto.HabitUpdateRequest
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import com.example.habitflow_app.features.profile.data.dto.ProfileDTO
+import okhttp3.ResponseBody
 import retrofit2.http.GET
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -28,6 +37,9 @@ import retrofit2.http.Query
  * All methods are suspend functions to support coroutine-based asynchronous execution.
  */
 interface DirectusApiService {
+
+    data class ListResponse<T>(val data: List<T>)
+    data class SingleResponse<T>(val data: T)
 
     /* Authentication Endpoints */
 
@@ -83,8 +95,30 @@ interface DirectusApiService {
 
     @GET("items/profiles/{id}")
     suspend fun getProfile(@Path("id") userId: String): Response<ProfileResponse>
-
     data class ProfileResponse(val data: ProfileDTO)
+
+    @GET("items/habits")
+    suspend fun getHabits(@Query("filter[user_id][_eq]") userId: String): Response<List<Habit>>
+
+    //endpoints to create an habit
+    @POST("items/habits")
+    suspend fun createHabit(@Body habitDTO: HabitApiRequest): Response<ResponseBody>
+
+    @POST("items/habits_days")
+    suspend fun createHabitDay(@Body request: HabitDayApiRequest): Response<ResponseBody>
+
+    @POST("items/habits_tracking")
+    suspend fun createHabitTracking(@Body request: HabitTrackingApiRequest): Response<Unit>
+
+    //...
+    @PATCH("items/habits/{habit_id}")
+    suspend fun updateHabit(@Path("habit_id") habitId: String, @Body request: HabitUpdateRequest): Response<Habit>
+
+    @PATCH("items/habits/{habit_id}")
+    suspend fun softDeleteHabit(
+        @Path("habit_id") habitId: String,
+        @Body request: Map<String, Boolean> = mapOf("is_deleted" to true)
+    ): Response<Habit>
 
     /* Gamification Endpoints */
 
