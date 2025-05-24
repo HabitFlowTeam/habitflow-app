@@ -94,6 +94,8 @@ VALUES
     ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'user_habit_calendar_view', 'read', '*', '{}'),
     -- Añadimos permiso para la vista user_articles_view (sin filtro para admins)
     ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'user_articles_view', 'read', '*', '{}');
+    -- Permiso para leer la vista user_habit_tracking_view con filtro para el usuario actual
+    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'user_habit_tracking_view', 'read', '*', '{"_and":[{"user_id":{"_eq":"$CURRENT_USER"}}]}');
 
 
 -- Permisos para el rol USER (5e8b7092-6ee2-47df-b24a-b3c9f733a9c4)
@@ -133,6 +135,8 @@ VALUES
     ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'user_habit_calendar_view', 'read', '*', '{"_and":[{"user_id":{"_eq":"$CURRENT_USER"}}]}'),
     -- Permiso para leer la vista user_articles_view con filtro para el usuario actual
     ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'user_articles_view', 'read', '*', '{"_and":[{"user_id":{"_eq":"$CURRENT_USER"}}]}');
+    -- Permiso para leer la vista user_habit_tracking_view con filtro para el usuario actual
+    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'user_habit_tracking_view', 'read', '*', '{"_and":[{"user_id":{"_eq":"$CURRENT_USER"}}]}');
 
 -- Inserción de artículos
 INSERT INTO articles (id, title, content, image_url, is_deleted, created_at, user_id, category_id)
