@@ -242,3 +242,102 @@ VALUES
     ('e9f0a1b2-c3d4-5e6f-7a8b-9c0d1e2f3a4b', TRUE, '2024-04-15', '7a8b9c0d-1e2f-3a4b-5c6d-7e8f9a0b1c2d'); -- Ahorrar: Lunes pasado
 
 
+-- Inserción de hábitos para el usuario esteban_gaviria@ejemplo.com
+INSERT INTO habits (id, name, streak, notifications_enable, reminder_time, is_deleted, created_at, expiration_date, category_id, user_id)
+VALUES
+    ('8f9a0b1c-2d3e-4f5a-6b7c-8d9e0f1a2b3c', 'Hacer ejercicio matutino', 12, TRUE, '07:00:00', FALSE, '2025-04-01 06:30:00', '2025-10-01', '3e7c78bc-e145-4c2d-aa36-58b97f68a6d3', 'a3dc5f62-78f7-4215-b78a-cf75a6348067'),
+    ('9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d', 'Leer antes de dormir', 7, TRUE, '21:30:00', FALSE, '2025-04-15 20:00:00', '2025-11-15', 'b5a9f41d-31a6-4f11-b80f-7d2764c0a75b', 'a3dc5f62-78f7-4215-b78a-cf75a6348067'),
+    ('0b1c2d3e-4f5a-6b7c-8d9e-0f1a2b3c4d5e', 'Meditar 15 minutos', 5, TRUE, '08:30:00', FALSE, '2025-05-01 07:45:00', '2025-12-01', '7d7cfd2a-86a3-4879-aa4f-2e5413b3538b', 'a3dc5f62-78f7-4215-b78a-cf75a6348067'),
+    ('1c2d3e4f-5a6b-7c8d-9e0f-1a2b3c4d5e6f', 'Tomar vitaminas', 3, FALSE, NULL, FALSE, '2025-05-10 12:00:00', '2025-08-10', '1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed', 'a3dc5f62-78f7-4215-b78a-cf75a6348067'),
+    ('2d3e4f5a-6b7c-8d9e-0f1a-2b3c4d5e6f7a', 'Escribir en diario', 15, TRUE, '22:00:00', FALSE, '2025-03-20 21:30:00', '2025-09-20', 'b5a9f41d-31a6-4f11-b80f-7d2764c0a75b', 'a3dc5f62-78f7-4215-b78a-cf75a6348067');
+
+
+-- Inserción en habits_days para programar los días de la semana
+INSERT INTO habits_days (habit_id, week_day_id)
+VALUES
+    -- Ejercicio matutino: Lunes, Miércoles, Viernes
+    ('8f9a0b1c-2d3e-4f5a-6b7c-8d9e0f1a2b3c', 'd3b15c58-711f-40d9-9f4b-06d0d6e925d1'), -- Lunes
+    ('8f9a0b1c-2d3e-4f5a-6b7c-8d9e0f1a2b3c', '4afe91c2-9851-4af7-b282-39a543989ea3'), -- Miércoles
+    ('8f9a0b1c-2d3e-4f5a-6b7c-8d9e0f1a2b3c', '22f2bf21-fcbd-473f-98d2-96ba47fabe16'), -- Viernes
+    
+    -- Leer antes de dormir: Todos los días
+    ('9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d', 'd3b15c58-711f-40d9-9f4b-06d0d6e925d1'), -- Lunes
+    ('9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d', 'b9b3995e-c6a5-46c7-bf8a-f1c1c2e65dd6'), -- Martes
+    ('9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d', '4afe91c2-9851-4af7-b282-39a543989ea3'), -- Miércoles
+    ('9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d', 'ea5e7c7a-182c-4b49-8b2d-2162cd138384'), -- Jueves
+    ('9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d', '22f2bf21-fcbd-473f-98d2-96ba47fabe16'), -- Viernes
+    ('9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d', 'f31a5698-2a4d-4818-8a0b-e7f843b9ec14'), -- Sábado
+    ('9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d', '82a4b1c9-72a8-4e91-aaa4-2c92d30b810f'), -- Domingo
+    
+    -- Meditar: Martes, Jueves, Sábado
+    ('0b1c2d3e-4f5a-6b7c-8d9e-0f1a2b3c4d5e', 'b9b3995e-c6a5-46c7-bf8a-f1c1c2e65dd6'), -- Martes
+    ('0b1c2d3e-4f5a-6b7c-8d9e-0f1a2b3c4d5e', 'ea5e7c7a-182c-4b49-8b2d-2162cd138384'), -- Jueves
+    ('0b1c2d3e-4f5a-6b7c-8d9e-0f1a2b3c4d5e', 'f31a5698-2a4d-4818-8a0b-e7f843b9ec14'), -- Sábado
+    
+    -- Tomar vitaminas: Lunes a Viernes
+    ('1c2d3e4f-5a6b-7c8d-9e0f-1a2b3c4d5e6f', 'd3b15c58-711f-40d9-9f4b-06d0d6e925d1'), -- Lunes
+    ('1c2d3e4f-5a6b-7c8d-9e0f-1a2b3c4d5e6f', 'b9b3995e-c6a5-46c7-bf8a-f1c1c2e65dd6'), -- Martes
+    ('1c2d3e4f-5a6b-7c8d-9e0f-1a2b3c4d5e6f', '4afe91c2-9851-4af7-b282-39a543989ea3'), -- Miércoles
+    ('1c2d3e4f-5a6b-7c8d-9e0f-1a2b3c4d5e6f', 'ea5e7c7a-182c-4b49-8b2d-2162cd138384'), -- Jueves
+    ('1c2d3e4f-5a6b-7c8d-9e0f-1a2b3c4d5e6f', '22f2bf21-fcbd-473f-98d2-96ba47fabe16'), -- Viernes
+    
+    -- Escribir en diario: Domingo
+    ('2d3e4f5a-6b7c-8d9e-0f1a-2b3c4d5e6f7a', '82a4b1c9-72a8-4e91-aaa4-2c92d30b810f'); -- Domingo
+
+-- Inserción de seguimiento de hábitos (basado en fecha actual: 24 de mayo de 2025)
+-- Esto crea diferentes escenarios: días completados, parciales, ninguno y sin hábitos
+INSERT INTO habits_tracking (id, is_checked, tracking_date, habit_id)
+VALUES
+    -- Semana del 19-25 de mayo de 2025 (semana actual)
+    
+    -- Lunes 19 mayo 2025 - DÍA COMPLETADO (todos los hábitos programados)
+    ('3e4f5a6b-7c8d-9e0f-1a2b-3c4d5e6f7a8b', TRUE, '2025-05-19', '8f9a0b1c-2d3e-4f5a-6b7c-8d9e0f1a2b3c'), -- Ejercicio ✓
+    ('4f5a6b7c-8d9e-0f1a-2b3c-4d5e6f7a8b9c', TRUE, '2025-05-19', '9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d'), -- Leer ✓
+    ('5a6b7c8d-9e0f-1a2b-3c4d-5e6f7a8b9c0d', TRUE, '2025-05-19', '1c2d3e4f-5a6b-7c8d-9e0f-1a2b3c4d5e6f'), -- Vitaminas ✓
+    
+    -- Martes 20 mayo 2025 - DÍA PARCIAL (algunos hábitos completados)
+    ('6b7c8d9e-0f1a-2b3c-4d5e-6f7a8b9c0d1e', TRUE, '2025-05-20', '9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d'), -- Leer ✓
+    ('7c8d9e0f-1a2b-3c4d-5e6f-7a8b9c0d1e2f', TRUE, '2025-05-20', '0b1c2d3e-4f5a-6b7c-8d9e-0f1a2b3c4d5e'), -- Meditar ✓
+    ('8d9e0f1a-2b3c-4d5e-6f7a-8b9c0d1e2f3a', FALSE, '2025-05-20', '1c2d3e4f-5a6b-7c8d-9e0f-1a2b3c4d5e6f'), -- Vitaminas ✗
+    
+    -- Miércoles 21 mayo 2025 - DÍA NINGUNO (ningún hábito completado)
+    ('9e0f1a2b-3c4d-5e6f-7a8b-9c0d1e2f3a4b', FALSE, '2025-05-21', '8f9a0b1c-2d3e-4f5a-6b7c-8d9e0f1a2b3c'), -- Ejercicio ✗
+    ('0f1a2b3c-4d5e-6f7a-8b9c-0d1e2f3a4b5c', FALSE, '2025-05-21', '9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d'), -- Leer ✗
+    ('1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d', FALSE, '2025-05-21', '1c2d3e4f-5a6b-7c8d-9e0f-1a2b3c4d5e6f'), -- Vitaminas ✗
+    
+    -- Jueves 22 mayo 2025 - DÍA COMPLETADO
+    ('2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e', TRUE, '2025-05-22', '9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d'), -- Leer ✓
+    ('3c4d5e6f-7a8b-9c0d-1e2f-3a4b5c6d7e8f', TRUE, '2025-05-22', '0b1c2d3e-4f5a-6b7c-8d9e-0f1a2b3c4d5e'), -- Meditar ✓
+    ('4d5e6f7a-8b9c-0d1e-2f3a-4b5c6d7e8f9a', TRUE, '2025-05-22', '1c2d3e4f-5a6b-7c8d-9e0f-1a2b3c4d5e6f'), -- Vitaminas ✓
+    
+    -- Viernes 23 mayo 2025 - DÍA PARCIAL
+    ('5e6f7a8b-9c0d-1e2f-3a4b-5c6d7e8f9a0b', TRUE, '2025-05-23', '8f9a0b1c-2d3e-4f5a-6b7c-8d9e0f1a2b3c'), -- Ejercicio ✓
+    ('6f7a8b9c-0d1e-2f3a-4b5c-6d7e8f9a0b1c', FALSE, '2025-05-23', '9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d'), -- Leer ✗
+    ('7a8b9c0d-1e2f-3a4b-5c6d-7e8f9a0b1c2d', TRUE, '2025-05-23', '1c2d3e4f-5a6b-7c8d-9e0f-1a2b3c4d5e6f'), -- Vitaminas ✓
+    
+    -- Sábado 24 mayo 2025 (hoy) - DÍA COMPLETADO
+    ('8b9c0d1e-2f3a-4b5c-6d7e-8f9a0b1c2d3e', TRUE, '2025-05-24', '9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d'), -- Leer ✓
+    ('9c0d1e2f-3a4b-5c6d-7e8f-9a0b1c2d3e4f', TRUE, '2025-05-24', '0b1c2d3e-4f5a-6b7c-8d9e-0f1a2b3c4d5e'), -- Meditar ✓
+    
+    -- Domingo 25 mayo 2025 (mañana) - Sin registros aún, pero hay hábitos programados
+    -- (No hay inserts para este día para mostrar el estado "sin registros pero con hábitos")
+    
+    -- Semana anterior (12-18 mayo 2025) - Para mostrar histórico
+    
+    -- Lunes 12 mayo 2025 - DÍA COMPLETADO
+    ('0d1e2f3a-4b5c-6d7e-8f9a-0b1c2d3e4f5a', TRUE, '2025-05-12', '8f9a0b1c-2d3e-4f5a-6b7c-8d9e0f1a2b3c'), -- Ejercicio ✓
+    ('1e2f3a4b-5c6d-7e8f-9a0b-1c2d3e4f5a6b', TRUE, '2025-05-12', '9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d'), -- Leer ✓
+    ('2f3a4b5c-6d7e-8f9a-0b1c-2d3e4f5a6b7c', TRUE, '2025-05-12', '1c2d3e4f-5a6b-7c8d-9e0f-1a2b3c4d5e6f'), -- Vitaminas ✓
+    
+    -- Domingo 18 mayo 2025 - DÍA COMPLETADO (solo diario programado)
+    ('3a4b5c6d-7e8f-9a0b-1c2d-3e4f5a6b7c8d', TRUE, '2025-05-18', '9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d'), -- Leer ✓
+    ('4b5c6d7e-8f9a-0b1c-2d3e-4f5a6b7c8d9e', TRUE, '2025-05-18', '2d3e4f5a-6b7c-8d9e-0f1a-2b3c4d5e6f7a'), -- Diario ✓
+    
+    -- Días sin hábitos programados para mostrar estado "no hábitos"
+    -- (Los días sin entries en habits_days mostrarán automáticamente "no hábitos")
+    
+    -- Algunos días más antiguos para mostrar variedad
+    -- 5 mayo 2025 (domingo anterior) - PARCIAL
+    ('5c6d7e8f-9a0b-1c2d-3e4f-5a6b7c8d9e0f', TRUE, '2025-05-05', '9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d'), -- Leer ✓
+    ('6d7e8f9a-0b1c-2d3e-4f5a-6b7c8d9e0f1a', FALSE, '2025-05-05', '2d3e4f5a-6b7c-8d9e-0f1a-2b3c4d5e6f7a'); -- Diario ✗
+
