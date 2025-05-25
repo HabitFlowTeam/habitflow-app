@@ -212,8 +212,8 @@ private fun HabitsSection(
                         onCheckedChange = { checked ->
                             habit.onCheckedChange(checked)
                         },
-                        onClick = { /* Opcional: navegar a detalles del hábito */ },
-                        isCheckable = true, // Los hábitos de hoy SÍ se pueden marcar
+                        onClick = { /* Navigate to habit details */ },
+                        isCheckable = true,
                         modifier = Modifier.padding(bottom = 12.dp)
                     )
                 }
