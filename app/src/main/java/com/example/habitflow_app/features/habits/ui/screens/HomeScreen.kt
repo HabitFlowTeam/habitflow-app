@@ -119,9 +119,11 @@ private fun ArticlesSection(
             isLoading -> {
                 Text("Cargando artículos...")
             }
+
             error != null -> {
                 Text("Error: $error")
             }
+
             else -> {
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -171,44 +173,12 @@ private fun HabitsSection() {
     }
 }
 
-// Data classes for examples
-data class ArticleData(
-    val authorName: String,
-    val authorImageUrl: String?,
-    val title: String,
-    val description: String
-)
-
 data class HabitData(
     val name: String,
     val days: String,
     val streak: Int,
     val isCompleted: Boolean
 )
-
-// Sample data for preview
-private fun getSampleArticles(): List<ArticleData> {
-    return listOf(
-        ArticleData(
-            authorName = "John Cooper",
-            authorImageUrl = null,
-            title = "Como crear una rutina matutina",
-            description = "Empieza el día bien con estas técnicas probadas..."
-        ),
-        ArticleData(
-            authorName = "Sarah Wilson",
-            authorImageUrl = null,
-            title = "Mindfulness diario",
-            description = "Técnicas sencillas de meditación para reducir el estrés..."
-        ),
-        ArticleData(
-            authorName = "Miguel Rodríguez",
-            authorImageUrl = null,
-            title = "Hábitos para dormir mejor",
-            description = "Mejora la calidad de tu sueño con estos consejos..."
-        )
-    )
-}
 
 private fun getSampleHabits(): List<HabitData> {
     return listOf(

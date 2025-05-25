@@ -1,5 +1,5 @@
 -- =======================================================
--- TRIGGER PARA CREAR ENTRADAS DIARIAS DE HABITS_TRACKING
+-- TRIGGER MEJORADO PARA CREAR ENTRADAS DIARIAS DE HABITS_TRACKING
 -- =======================================================
 
 -- Función que crea las entradas diarias de tracking para hábitos activos
@@ -17,33 +17,28 @@ BEGIN
         current_day_of_week := 7;
     END IF;
     
-    -- Obtener el ID del día de la semana actual
-    -- Asumiendo que en week_days tienes los días ordenados: Lunes=1, Martes=2, etc.
-    SELECT id INTO current_week_day_id 
-    FROM week_days 
-    WHERE id = (
-        SELECT id 
-        FROM week_days 
-        ORDER BY name 
-        OFFSET (current_day_of_week - 1) 
-        LIMIT 1
-    );
+    RAISE NOTICE 'Día de la semana calculado: % (1=Lunes, 7=Domingo)', current_day_of_week;
     
-    -- Si no se puede determinar el día, usar una consulta alternativa
+    -- Buscar el ID del día de la semana actual usando tus datos exactos
+    SELECT id INTO current_week_day_id
+    FROM week_days
+    WHERE CASE 
+        WHEN current_day_of_week = 1 THEN name = 'Lunes' OR abbreviation = 'LU'
+        WHEN current_day_of_week = 2 THEN name = 'Martes' OR abbreviation = 'MA'
+        WHEN current_day_of_week = 3 THEN name = 'Miércoles' OR abbreviation = 'MI'
+        WHEN current_day_of_week = 4 THEN name = 'Jueves' OR abbreviation = 'JU'
+        WHEN current_day_of_week = 5 THEN name = 'Viernes' OR abbreviation = 'VI'
+        WHEN current_day_of_week = 6 THEN name = 'Sábado' OR abbreviation = 'SA'
+        WHEN current_day_of_week = 7 THEN name = 'Domingo' OR abbreviation = 'DO'
+    END
+    LIMIT 1;
+    
     IF current_week_day_id IS NULL THEN
-        SELECT id INTO current_week_day_id
-        FROM week_days
-        WHERE CASE 
-            WHEN current_day_of_week = 1 THEN name ILIKE '%lunes%' OR abbreviation ILIKE 'L%'
-            WHEN current_day_of_week = 2 THEN name ILIKE '%martes%' OR abbreviation ILIKE 'M%'
-            WHEN current_day_of_week = 3 THEN name ILIKE '%miércoles%' OR abbreviation ILIKE 'X%'
-            WHEN current_day_of_week = 4 THEN name ILIKE '%jueves%' OR abbreviation ILIKE 'J%'
-            WHEN current_day_of_week = 5 THEN name ILIKE '%viernes%' OR abbreviation ILIKE 'V%'
-            WHEN current_day_of_week = 6 THEN name ILIKE '%sábado%' OR abbreviation ILIKE 'S%'
-            WHEN current_day_of_week = 7 THEN name ILIKE '%domingo%' OR abbreviation ILIKE 'D%'
-        END
-        LIMIT 1;
+        RAISE WARNING 'No se pudo determinar el ID del día de la semana para el día %', current_day_of_week;
+        RETURN;
     END IF;
+    
+    RAISE NOTICE 'ID del día de la semana encontrado: %', current_week_day_id;
     
     -- Insertar entradas de tracking para hábitos activos del día actual
     INSERT INTO habits_tracking (habit_id, tracking_date, is_checked)
@@ -67,7 +62,81 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Crear la función que será llamada por el cron job
+-- NUEVA FUNCIÓN: Crear entrada de tracking para un hábito específico si corresponde al día actual
+CREATE OR REPLACE FUNCTION create_today_habit_tracking(p_habit_id UUID)
+RETURNS void AS $$
+DECLARE
+    current_day_of_week INTEGER;
+    current_week_day_id UUID;
+    habit_exists BOOLEAN := FALSE;
+BEGIN
+    -- Verificar si el hábito existe y está activo
+    SELECT EXISTS(
+        SELECT 1 FROM habits 
+        WHERE id = p_habit_id 
+          AND is_deleted = FALSE 
+          AND expiration_date >= CURRENT_DATE
+    ) INTO habit_exists;
+    
+    IF NOT habit_exists THEN
+        RAISE NOTICE 'Hábito % no existe o no está activo', p_habit_id;
+        RETURN;
+    END IF;
+    
+    -- Obtener el día de la semana actual (1=Lunes, 7=Domingo)
+    current_day_of_week := EXTRACT(DOW FROM CURRENT_DATE);
+    
+    -- Ajustar para que Lunes sea 1 y Domingo sea 7 (PostgreSQL usa 0=Domingo)
+    IF current_day_of_week = 0 THEN
+        current_day_of_week := 7;
+    END IF;
+    
+    -- Buscar el ID del día de la semana actual
+    SELECT id INTO current_week_day_id
+    FROM week_days
+    WHERE CASE 
+        WHEN current_day_of_week = 1 THEN name = 'Lunes' OR abbreviation = 'LU'
+        WHEN current_day_of_week = 2 THEN name = 'Martes' OR abbreviation = 'MA'
+        WHEN current_day_of_week = 3 THEN name = 'Miércoles' OR abbreviation = 'MI'
+        WHEN current_day_of_week = 4 THEN name = 'Jueves' OR abbreviation = 'JU'
+        WHEN current_day_of_week = 5 THEN name = 'Viernes' OR abbreviation = 'VI'
+        WHEN current_day_of_week = 6 THEN name = 'Sábado' OR abbreviation = 'SA'
+        WHEN current_day_of_week = 7 THEN name = 'Domingo' OR abbreviation = 'DO'
+    END
+    LIMIT 1;
+    
+    IF current_week_day_id IS NULL THEN
+        RAISE WARNING 'No se pudo determinar el ID del día de la semana para el día %', current_day_of_week;
+        RETURN;
+    END IF;
+    
+    -- Verificar si el hábito debe ejecutarse hoy y crear entrada si no existe
+    INSERT INTO habits_tracking (habit_id, tracking_date, is_checked)
+    SELECT p_habit_id, CURRENT_DATE, FALSE
+    WHERE EXISTS (
+        SELECT 1 
+        FROM habits_days hd 
+        WHERE hd.habit_id = p_habit_id 
+          AND hd.week_day_id = current_week_day_id
+    )
+    AND NOT EXISTS (
+        SELECT 1 
+        FROM habits_tracking ht 
+        WHERE ht.habit_id = p_habit_id 
+          AND ht.tracking_date = CURRENT_DATE
+    );
+    
+    -- Log para debugging
+    IF FOUND THEN
+        RAISE NOTICE 'Entrada de tracking creada para hábito % en fecha %', p_habit_id, CURRENT_DATE;
+    ELSE
+        RAISE NOTICE 'No se creó entrada para hábito % - ya existe o no corresponde a hoy', p_habit_id;
+    END IF;
+                 
+END;
+$$ LANGUAGE plpgsql;
+
+-- Crear la función que será llamada por el cron job (mantener la original)
 CREATE OR REPLACE FUNCTION scheduled_daily_habit_tracking()
 RETURNS void AS $$
 BEGIN
@@ -87,7 +156,7 @@ INSERT INTO daily_scheduler (last_execution_date, task_name)
 VALUES (CURRENT_DATE - INTERVAL '1 day', 'daily_habits_tracking')
 ON CONFLICT (task_name) DO NOTHING;
 
--- Función trigger que verifica si es un nuevo día
+-- Función trigger que verifica si es un nuevo día (mantener la original)
 CREATE OR REPLACE FUNCTION check_and_create_daily_tracking()
 RETURNS TRIGGER AS $$
 DECLARE
@@ -114,21 +183,79 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Crear triggers solo si no existen (evitar errores en re-ejecuciones)
+-- NUEVA FUNCIÓN TRIGGER: Para crear entrada del día actual cuando se crea/actualiza un hábito
+CREATE OR REPLACE FUNCTION trigger_create_today_habit_tracking()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Si es INSERT (nuevo hábito) y está activo
+    IF TG_OP = 'INSERT' THEN
+        IF NEW.is_deleted = FALSE AND NEW.expiration_date >= CURRENT_DATE THEN
+            PERFORM create_today_habit_tracking(NEW.id);
+        END IF;
+        RETURN NEW;
+    END IF;
+    
+    -- Si es UPDATE y cambió el estado de activo o la fecha de expiración
+    IF TG_OP = 'UPDATE' THEN
+        -- Si el hábito se activó o cambió su fecha de expiración
+        IF (OLD.is_deleted = TRUE AND NEW.is_deleted = FALSE) OR
+           (OLD.expiration_date < CURRENT_DATE AND NEW.expiration_date >= CURRENT_DATE) THEN
+            PERFORM create_today_habit_tracking(NEW.id);
+        END IF;
+        RETURN NEW;
+    END IF;
+    
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- NUEVA FUNCIÓN TRIGGER: Para crear entrada del día actual cuando se asigna un día a un hábito
+CREATE OR REPLACE FUNCTION trigger_create_today_habit_day_tracking()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Solo en INSERT (nueva asignación de día)
+    IF TG_OP = 'INSERT' THEN
+        PERFORM create_today_habit_tracking(NEW.habit_id);
+        RETURN NEW;
+    END IF;
+    
+    -- En UPDATE, verificar si cambió el día de la semana
+    IF TG_OP = 'UPDATE' AND OLD.week_day_id != NEW.week_day_id THEN
+        PERFORM create_today_habit_tracking(NEW.habit_id);
+        RETURN NEW;
+    END IF;
+    
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Crear triggers existentes (mantener los originales)
 DROP TRIGGER IF EXISTS daily_habits_check_trigger ON habits;
 CREATE TRIGGER daily_habits_check_trigger
     AFTER INSERT OR UPDATE ON habits
     FOR EACH ROW
     EXECUTE FUNCTION check_and_create_daily_tracking();
 
--- También crear un trigger en habits_tracking para verificar diariamente
 DROP TRIGGER IF EXISTS daily_habits_tracking_check_trigger ON habits_tracking;
 CREATE TRIGGER daily_habits_tracking_check_trigger
     BEFORE INSERT ON habits_tracking
     FOR EACH ROW
     EXECUTE FUNCTION check_and_create_daily_tracking();
 
--- OPCIÓN MANUAL: Función para ejecutar manualmente si lo prefieres
+-- NUEVOS TRIGGERS: Para crear entradas del día actual automáticamente
+DROP TRIGGER IF EXISTS habits_create_today_tracking_trigger ON habits;
+CREATE TRIGGER habits_create_today_tracking_trigger
+    AFTER INSERT OR UPDATE ON habits
+    FOR EACH ROW
+    EXECUTE FUNCTION trigger_create_today_habit_tracking();
+
+DROP TRIGGER IF EXISTS habits_days_create_today_tracking_trigger ON habits_days;
+CREATE TRIGGER habits_days_create_today_tracking_trigger
+    AFTER INSERT OR UPDATE ON habits_days
+    FOR EACH ROW
+    EXECUTE FUNCTION trigger_create_today_habit_day_tracking();
+
+-- OPCIÓN MANUAL: Función para ejecutar manualmente si lo prefieres (mantener la original)
 CREATE OR REPLACE FUNCTION execute_daily_habit_creation()
 RETURNS TEXT AS $$
 BEGIN
@@ -137,7 +264,18 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Para ejecutar manualmente: SELECT execute_daily_habit_creation();
+-- NUEVA FUNCIÓN MANUAL: Para crear entrada de un hábito específico para hoy
+CREATE OR REPLACE FUNCTION execute_today_habit_creation(p_habit_id UUID)
+RETURNS TEXT AS $$
+BEGIN
+    PERFORM create_today_habit_tracking(p_habit_id);
+    RETURN 'Entrada de tracking verificada/creada para hábito ' || p_habit_id || ' en fecha ' || CURRENT_DATE;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Para ejecutar manualmente: 
+-- SELECT execute_daily_habit_creation(); -- Todos los hábitos del día
+-- SELECT execute_today_habit_creation('uuid-del-habito'); -- Un hábito específico
 
 -- COMENTARIO: Si tienes pg_cron disponible, puedes usar:
 -- SELECT cron.schedule('daily-habits-tracking', '1 0 * * *', 'SELECT scheduled_daily_habit_tracking();');

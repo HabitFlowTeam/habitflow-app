@@ -1,5 +1,6 @@
 package com.example.habitflow_app.core.network
 
+import com.example.habitflow_app.features.habits.data.dto.HabitsResponse
 import com.example.habitflow_app.domain.models.Habit
 import com.example.habitflow_app.features.articles.data.dto.ProfileArticlesResponse
 import com.example.habitflow_app.features.articles.data.dto.RankedArticlesResponse
@@ -15,6 +16,7 @@ import com.example.habitflow_app.features.gamification.data.dto.ProfileRankingRe
 import com.example.habitflow_app.features.habits.data.dto.HabitApiRequest
 import com.example.habitflow_app.features.habits.data.dto.HabitDayApiRequest
 import com.example.habitflow_app.features.habits.data.dto.HabitTrackingApiRequest
+import com.example.habitflow_app.features.habits.data.dto.HabitTrackingResponseDto
 import com.example.habitflow_app.features.habits.data.dto.HabitUpdateRequest
 import com.example.habitflow_app.features.profile.data.dto.ProfileDTO
 import okhttp3.ResponseBody
@@ -94,8 +96,14 @@ interface DirectusApiService {
 
     data class ProfileResponse(val data: ProfileDTO)
 
-    @GET("items/habits")
-    suspend fun getHabits(@Query("filter[user_id][_eq]") userId: String): Response<List<Habit>>
+    @GET("items/active_user_habits")
+    suspend fun getUserHabits(): HabitsResponse
+
+    @PATCH("items/habits_tracking/{habit_tracking_id}")
+    suspend fun changeHabitCheck(
+        @Path("habit_tracking_id") habitTrackingId: String,
+        @Body request: Map<String, Boolean> = mapOf("is_checked" to false)
+    ): Response<HabitTrackingResponseDto>
 
     //endpoints to create an habit
     @POST("items/habits")
@@ -105,9 +113,8 @@ interface DirectusApiService {
     suspend fun createHabitDay(@Body request: HabitDayApiRequest): Response<ResponseBody>
 
     @POST("items/habits_tracking")
-    suspend fun createHabitTracking(@Body request: HabitTrackingApiRequest): Response<Unit>
+    suspend fun createHabitTracking(@Body request: HabitTrackingApiRequest): Response<HabitTrackingResponseDto>
 
-    //...
     @PATCH("items/habits/{habit_id}")
     suspend fun updateHabit(
         @Path("habit_id") habitId: String,

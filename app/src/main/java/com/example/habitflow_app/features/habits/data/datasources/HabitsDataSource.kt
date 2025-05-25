@@ -1,5 +1,6 @@
 package com.example.habitflow_app.features.habits.data.datasources
 
+import com.example.habitflow_app.features.habits.data.dto.ActiveHabitDto
 import android.util.Log
 import com.example.habitflow_app.core.network.DirectusApiService
 import com.example.habitflow_app.core.utils.ExtractInfoToken
@@ -11,6 +12,7 @@ import com.example.habitflow_app.features.habits.data.dto.HabitApiRequest
 import com.example.habitflow_app.features.habits.data.dto.HabitDayApiRequest
 import com.example.habitflow_app.features.habits.data.dto.HabitResponse
 import com.example.habitflow_app.features.habits.data.dto.HabitTrackingApiRequest
+import com.example.habitflow_app.features.habits.data.dto.HabitTrackingResponseDto
 import com.example.habitflow_app.features.habits.data.dto.HabitUpdateRequest
 import org.json.JSONObject
 import java.time.LocalDate
@@ -21,35 +23,39 @@ class HabitsDataSource @Inject constructor(
     private val authRepository: AuthRepository,
     private val tokenExtractor: ExtractInfoToken
 ) {
-    suspend fun getHabits(userId: String): List<Habit> {
-        val response = directusApiService.getHabits(userId)
-        if (response.isSuccessful) {
-            return response.body() ?: throw IllegalStateException("Response body is null")
-        }
-        else {
-            throw Exception("Falló algo en algun lado jaja")
-        }
+    suspend fun getUserHabits(): List<ActiveHabitDto> {
+        val response = directusApiService.getUserHabits()
+        return response.habits
+    }
+
+    suspend fun changeHabitCheck(
+        habitId: String,
+        isChecked: Boolean
+    ): HabitTrackingResponseDto {
+        val response =
+            directusApiService.changeHabitCheck(habitId, mapOf("is_checked" to isChecked))
+        return response.body() ?: throw Exception("Empty response")
     }
 
     suspend fun createHabit(request: CreateHabitRequest): HabitResponse {
-        // 1. Autenticación y obtención de userId
+        // 1. Authentication and obtaining userId
         val userId = getAuthenticatedUserId()
 
         Log.d("FLOW", "Step 1 - Start")
         val habitId = createHabitInApi(request, userId)
         Log.d("FLOW", "Step 2 - Habit created: $habitId")
 
-        // 3. Crear días asociados
+        // 3. Create associated days
         createHabitDaysInApi(habitId, request.selectedDays)
         Log.d("FLOW", "Step 3 - Days created")
 
-        // 4. Crear tracking inicial
+        // 4. Create initial tracking
         if (request.initialTracking) {
-            createInitialTrackingInApi(habitId)
+            createHabitTracking(habitId)
             Log.d("FLOW", "Step 4 - Tracking created")
         }
 
-        // Devolvemos los datos del hábito creado
+        // We return the data of the created habit
         return HabitResponse(
             name = request.name,
             categoryId = request.categoryId,
@@ -105,16 +111,22 @@ class HabitsDataSource @Inject constructor(
         }
     }
 
-    private suspend fun createInitialTrackingInApi(habitId: String) {
+    suspend fun createHabitTracking(
+        habitId: String,
+        isChecked: Boolean = false // Default to false for initial tracking
+    ): HabitTrackingResponseDto {
         val response = directusApiService.createHabitTracking(
             HabitTrackingApiRequest(
-                isChecked = false,
+                isChecked = isChecked,
                 trackingDate = LocalDate.now().toString(),
                 habitId = habitId
             )
         )
-        if (!response.isSuccessful) {
-            throw Exception("Failed to create initial tracking")
+
+        if (response.isSuccessful) {
+            return response.body() ?: throw Exception("Empty response")
+        } else {
+            throw Exception("Failed to create habit tracking: ${response.errorBody()?.string()}")
         }
     }
 
@@ -156,7 +168,7 @@ class HabitsDataSource @Inject constructor(
         if (response.isSuccessful) {
             return response.body()?.data?.size ?: 0
         } else {
-            throw Exception("Error al obtener hábitos completados")
+            throw Exception("Error getting completed habits")
         }
     }
 

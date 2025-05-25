@@ -1,0 +1,122 @@
+package com.example.habitflow_app.features.habits.ui.viewmodel
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.habitflow_app.domain.repositories.HabitsRepository
+import com.example.habitflow_app.features.habits.data.dto.ActiveHabitDto
+import dagger.hilt.android.lifecycle.HiltViewModel
+import jakarta.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+
+@HiltViewModel
+class ListHabitsViewModel @Inject constructor(
+    private val habitsRepository: HabitsRepository
+) : ViewModel() {
+
+    private val _uiState = MutableStateFlow(HabitsUiState())
+    val uiState: StateFlow<HabitsUiState> = _uiState.asStateFlow()
+
+    init {
+        loadHabits()
+    }
+
+    fun loadHabits() {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
+            try {
+                val habits = habitsRepository.getUserHabits()
+                val habitUiModels = habits.map { habit ->
+                    habit.toUiModel(viewModel = this@ListHabitsViewModel)
+                }
+                _uiState.value = _uiState.value.copy(
+                    habits = habitUiModels,
+                    isLoading = false
+                )
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    errorMessage = "Error al cargar los hábitos: ${e.message}"
+                )
+            }
+        }
+    }
+
+    fun updateHabitStatus(habitId: String, isChecked: Boolean) {
+        viewModelScope.launch {
+            try {
+                // Find the current habit to get its habitTrackingId
+                val currentHabit = _uiState.value.habits.find { it.id == habitId }
+                val habitTrackingId = currentHabit?.habitTrackingId
+
+                // Call the repository with the appropriate ID
+                val habitTracking = if (habitTrackingId != null) {
+                    // Update existing tracking record
+                    habitsRepository.updateHabitTrackingCheck(habitTrackingId, isChecked)
+                } else {
+                    // Create new tracking record
+                    habitsRepository.createHabitTracking(habitId, isChecked)
+                }
+
+                val currentHabits = _uiState.value.habits
+                val updatedHabits = currentHabits.map { habit ->
+                    if (habit.id == habitId) {
+                        habit.copy(
+                            habitTrackingId = habitTracking.id,
+                            isChecked = habitTracking.isChecked
+                        )
+                    } else {
+                        habit
+                    }
+                }
+                _uiState.value = _uiState.value.copy(habits = updatedHabits)
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    errorMessage = "Error updating habit: ${e.message}"
+                )
+            }
+        }
+    }
+
+    private fun formatScheduledDays(scheduledDays: List<String>): String {
+        return when {
+            scheduledDays.size == 7 -> "Todos los días"
+            scheduledDays.isEmpty() -> "Sin días programados"
+            else -> scheduledDays.joinToString(", ")
+        }
+    }
+
+    private fun ActiveHabitDto.toUiModel(
+        viewModel: ListHabitsViewModel
+    ): HabitUiModel {
+        return HabitUiModel(
+            id = this.id,
+            name = this.name,
+            days = formatScheduledDays(this.scheduledDays),
+            streak = this.streak,
+            isChecked = this.isCheckedToday,
+            habitTrackingId = this.habitTrackingId,
+            onCheckedChange = { isChecked ->
+                viewModel.updateHabitStatus(this.id, isChecked)
+            }
+        )
+    }
+}
+
+data class HabitsUiState(
+    val habits: List<HabitUiModel> = emptyList(),
+    val isLoading: Boolean = false,
+    val errorMessage: String? = null
+)
+
+data class HabitUiModel(
+    val id: String,
+    val name: String,
+    val days: String, // Days formatted as string for display in UI
+    val habitTrackingId: String?,
+    val streak: Int,
+    val isChecked: Boolean,
+    val onCheckedChange: (Boolean) -> Unit = {}
+)

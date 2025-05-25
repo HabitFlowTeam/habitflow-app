@@ -18,7 +18,12 @@ SELECT
          AND ht.is_checked = TRUE 
          LIMIT 1),
         FALSE
-    ) AS is_checked_today
+    ) AS is_checked_today,
+    (SELECT ht.id 
+     FROM habits_tracking ht 
+     WHERE ht.habit_id = h.id 
+     AND ht.tracking_date = CURRENT_DATE 
+     LIMIT 1) AS habit_tracking_id
 FROM habits h
 WHERE 
     h.expiration_date >= CURRENT_DATE
