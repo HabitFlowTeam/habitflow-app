@@ -29,12 +29,45 @@ class HabitsDataSource @Inject constructor(
     }
 
     suspend fun changeHabitCheck(
-        habitId: String,
+        habitTrackingId: String,
         isChecked: Boolean
     ): HabitTrackingResponseDto {
-        val response =
-            directusApiService.changeHabitCheck(habitId, mapOf("is_checked" to isChecked))
-        return response.body() ?: throw Exception("Empty response")
+        Log.d(
+            "HabitsDataSource",
+            "changeHabitCheck called with trackingId: $habitTrackingId, isChecked: $isChecked"
+        )
+
+        try {
+            val requestBody = mapOf("is_checked" to isChecked)
+
+            val response = directusApiService.changeHabitCheck(
+                habitTrackingId = habitTrackingId,
+                request = requestBody
+            )
+
+            Log.d("HabitsDataSource", "Response code: ${response.code()}")
+
+            if (response.isSuccessful) {
+                val responseBody = response.body()
+                if (responseBody != null) {
+                    Log.d("HabitsDataSource", "Response received: ${responseBody.data}")
+                    return responseBody.data
+                } else {
+                    Log.e("HabitsDataSource", "Response body is null")
+                    throw Exception("Empty response body from server")
+                }
+            } else {
+                val errorBody = response.errorBody()?.string()
+                Log.e(
+                    "HabitsDataSource",
+                    "API call failed. Code: ${response.code()}, Error: $errorBody"
+                )
+                throw Exception("Failed to update habit check: ${response.code()} - ${response.message()}")
+            }
+        } catch (e: Exception) {
+            Log.e("HabitsDataSource", "Exception in changeHabitCheck", e)
+            throw Exception("Network error while updating habit: ${e.message}", e)
+        }
     }
 
     suspend fun createHabit(request: CreateHabitRequest): HabitResponse {
@@ -124,7 +157,7 @@ class HabitsDataSource @Inject constructor(
         )
 
         if (response.isSuccessful) {
-            return response.body() ?: throw Exception("Empty response")
+            return response.body()?.data ?: throw Exception("Empty response")
         } else {
             throw Exception("Failed to create habit tracking: ${response.errorBody()?.string()}")
         }

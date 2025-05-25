@@ -68,9 +68,6 @@ fun HabitsScreen(
             HabitsContent(
                 navController = navController,
                 habits = uiState.habits,
-                onHabitCheckedChange = { habitId, isChecked ->
-                    habitsViewModel.updateHabitStatus(habitId, isChecked)
-                },
                 onHabitClick = onHabitClick
             )
         }
@@ -91,7 +88,6 @@ private fun LoadingState() {
 private fun HabitsContent(
     navController: NavController,
     habits: List<HabitUiModel>,
-    onHabitCheckedChange: (String, Boolean) -> Unit,
     onHabitClick: (String) -> Unit
 ) {
     // Separate today's habits from other habits
@@ -162,7 +158,6 @@ private fun HabitsContent(
                     HabitsSection(
                         title = "Para Hoy",
                         habits = todayHabits,
-                        onHabitCheckedChange = onHabitCheckedChange,
                         onHabitClick = onHabitClick,
                         isCheckable = true, // Today's habits CAN be marked
                         rightContent = {
@@ -192,7 +187,6 @@ private fun HabitsContent(
                         HabitsSection(
                             title = "Otros Hábitos",
                             habits = otherHabits,
-                            onHabitCheckedChange = onHabitCheckedChange,
                             onHabitClick = onHabitClick,
                             isCheckable = false // The other habits CANNOT be checked
                         )
@@ -207,7 +201,6 @@ private fun HabitsContent(
 fun HabitsSection(
     title: String,
     habits: List<HabitUiModel>,
-    onHabitCheckedChange: (String, Boolean) -> Unit,
     onHabitClick: ((String) -> Unit)? = null,
     rightContent: @Composable (() -> Unit)? = null,
     isCheckable: Boolean = true
@@ -256,7 +249,7 @@ fun HabitsSection(
                     isChecked = habit.isChecked,
                     onCheckedChange = { checked ->
                         if (isCheckable) {
-                            onHabitCheckedChange(habit.id, checked)
+                            habit.onCheckedChange(checked)
                         }
                     },
                     onClick = { onHabitClick?.invoke(habit.id) },

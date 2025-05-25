@@ -1,5 +1,6 @@
 package com.example.habitflow_app.features.habits.ui.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.habitflow_app.domain.repositories.HabitsRepository
@@ -45,20 +46,28 @@ class ListHabitsViewModel @Inject constructor(
     }
 
     fun updateHabitStatus(habitId: String, isChecked: Boolean) {
+        Log.d("HabitsViewModel", "updateHabitStatus called: habitId=$habitId, isChecked=$isChecked")
+
         viewModelScope.launch {
             try {
-                // Find the current habit to get its habitTrackingId
                 val currentHabit = _uiState.value.habits.find { it.id == habitId }
+                Log.d(
+                    "HabitsViewModel",
+                    "Current habit found: ${currentHabit?.name}, current isChecked: ${currentHabit?.isChecked}"
+                )
+
                 val habitTrackingId = currentHabit?.habitTrackingId
 
-                // Call the repository with the appropriate ID
                 val habitTracking = if (habitTrackingId != null) {
-                    // Update existing tracking record
                     habitsRepository.updateHabitTrackingCheck(habitTrackingId, isChecked)
                 } else {
-                    // Create new tracking record
                     habitsRepository.createHabitTracking(habitId, isChecked)
                 }
+
+                Log.d(
+                    "HabitsViewModel",
+                    "Database updated successfully: ${habitTracking.isChecked}"
+                )
 
                 val currentHabits = _uiState.value.habits
                 val updatedHabits = currentHabits.map { habit ->
@@ -71,8 +80,15 @@ class ListHabitsViewModel @Inject constructor(
                         habit
                     }
                 }
+
                 _uiState.value = _uiState.value.copy(habits = updatedHabits)
+                Log.d(
+                    "HabitsViewModel",
+                    "UI State updated, new habits count: ${updatedHabits.size}"
+                )
+
             } catch (e: Exception) {
+                Log.e("HabitsViewModel", "Error updating habit: ${e.message}", e)
                 _uiState.value = _uiState.value.copy(
                     errorMessage = "Error updating habit: ${e.message}"
                 )

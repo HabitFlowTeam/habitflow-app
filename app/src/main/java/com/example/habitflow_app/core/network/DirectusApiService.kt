@@ -19,6 +19,7 @@ import com.example.habitflow_app.features.habits.data.dto.HabitTrackingApiReques
 import com.example.habitflow_app.features.habits.data.dto.HabitTrackingResponseDto
 import com.example.habitflow_app.features.habits.data.dto.HabitUpdateRequest
 import com.example.habitflow_app.features.profile.data.dto.ProfileDTO
+import com.google.gson.annotations.SerializedName
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
@@ -38,6 +39,9 @@ import retrofit2.http.Query
  * All methods are suspend functions to support coroutine-based asynchronous execution.
  */
 interface DirectusApiService {
+    data class DirectusResponse<T>(
+        @SerializedName("data") val data: T
+    )
 
     /* Authentication Endpoints */
 
@@ -101,9 +105,13 @@ interface DirectusApiService {
 
     @PATCH("items/habits_tracking/{habit_tracking_id}")
     suspend fun changeHabitCheck(
-        @Path("habit_tracking_id") habitTrackingId: String,
-        @Body request: Map<String, Boolean> = mapOf("is_checked" to false)
-    ): Response<HabitTrackingResponseDto>
+        @Path("habit_tracking_id") habitTrackingId: String, @Body request: Map<String, Boolean>
+    ): Response<DirectusResponse<HabitTrackingResponseDto>>
+
+    @POST("items/habits_tracking")
+    suspend fun createHabitTracking(
+        @Body request: HabitTrackingApiRequest
+    ): Response<DirectusResponse<HabitTrackingResponseDto>>
 
     //endpoints to create an habit
     @POST("items/habits")
@@ -112,13 +120,9 @@ interface DirectusApiService {
     @POST("items/habits_days")
     suspend fun createHabitDay(@Body request: HabitDayApiRequest): Response<ResponseBody>
 
-    @POST("items/habits_tracking")
-    suspend fun createHabitTracking(@Body request: HabitTrackingApiRequest): Response<HabitTrackingResponseDto>
-
     @PATCH("items/habits/{habit_id}")
     suspend fun updateHabit(
-        @Path("habit_id") habitId: String,
-        @Body request: HabitUpdateRequest
+        @Path("habit_id") habitId: String, @Body request: HabitUpdateRequest
     ): Response<Habit>
 
     @PATCH("items/habits/{habit_id}")
@@ -245,4 +249,3 @@ interface DirectusApiService {
     @GET("items/categories")
     suspend fun getCategories(): Response<CategoriesResponse>
 }
-
