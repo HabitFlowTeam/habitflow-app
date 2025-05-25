@@ -1,15 +1,12 @@
 package com.example.habitflow_app.features.habits.ui.screens
 
-// Import statements for layout, UI elements, and models
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -19,7 +16,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -30,7 +26,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -38,13 +33,14 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.habitflow_app.features.habits.ui.components.DailyProgressBar
-import com.example.habitflow_app.features.habits.ui.components.HabitItem
+import com.example.habitflow_app.features.habits.ui.components.FullScreenLoadingState
+import com.example.habitflow_app.features.habits.ui.components.HabitsSection
+import com.example.habitflow_app.features.habits.ui.extensions.getCurrentDayName
+import com.example.habitflow_app.features.habits.ui.extensions.getOtherHabits
+import com.example.habitflow_app.features.habits.ui.extensions.getTodayHabits
 import com.example.habitflow_app.features.habits.ui.viewmodel.HabitUiModel
 import com.example.habitflow_app.features.habits.ui.viewmodel.ListHabitsViewModel
 import com.example.habitflow_app.navigation.NavDestinations
-import java.time.LocalDate
-import java.time.format.TextStyle
-import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,7 +57,7 @@ fun HabitsScreen(
 
     when {
         uiState.isLoading -> {
-            LoadingState()
+            FullScreenLoadingState()
         }
 
         else -> {
@@ -75,29 +71,14 @@ fun HabitsScreen(
 }
 
 @Composable
-private fun LoadingState() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        CircularProgressIndicator()
-    }
-}
-
-@Composable
 private fun HabitsContent(
     navController: NavController,
     habits: List<HabitUiModel>,
     onHabitClick: (String) -> Unit
 ) {
-    // Separate today's habits from other habits
-    val currentDay = LocalDate.now().dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault())
-    val todayHabits = habits.filter { habit ->
-        habit.isScheduledForToday()
-    }
-    val otherHabits = habits.filter { habit ->
-        !habit.isScheduledForToday()
-    }
+    // Use extension functions for filtering habits
+    val todayHabits = habits.getTodayHabits()
+    val otherHabits = habits.getOtherHabits()
 
     val completedHabits = todayHabits.count { it.isChecked }
     val totalHabits = todayHabits.size
@@ -132,7 +113,7 @@ private fun HabitsContent(
                     DailyProgressBar(
                         completedHabits = completedHabits,
                         totalHabits = totalHabits,
-                        dayOfWeek = currentDay,
+                        dayOfWeek = getCurrentDayName(),
                         modifier = Modifier.padding(top = 8.dp)
                     )
                 }
@@ -153,30 +134,17 @@ private fun HabitsContent(
                     }
                 }
             } else {
-                // Section for today's habits (checkable)
+                // Section for today's habits (checkable) using the reusable component
                 item {
                     HabitsSection(
                         title = "Para Hoy",
                         habits = todayHabits,
                         onHabitClick = onHabitClick,
-                        isCheckable = true, // Today's habits CAN be marked
+                        isCheckable = true,
                         rightContent = {
-                            Button(
-                                onClick = { navController.navigate(NavDestinations.CREATE_HABIT) },
-                                contentPadding = PaddingValues(horizontal = 12.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color.Black,
-                                    contentColor = Color.White
-                                )
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Add,
-                                    contentDescription = "Añadir hábito",
-                                    modifier = Modifier.size(16.dp)
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text("Nuevo hábito")
-                            }
+                            NewHabitButton(
+                                onClick = { navController.navigate(NavDestinations.CREATE_HABIT) }
+                            )
                         }
                     )
                 }
@@ -188,7 +156,7 @@ private fun HabitsContent(
                             title = "Otros Hábitos",
                             habits = otherHabits,
                             onHabitClick = onHabitClick,
-                            isCheckable = false // The other habits CANNOT be checked
+                            isCheckable = false
                         )
                     }
                 }
@@ -198,65 +166,22 @@ private fun HabitsContent(
 }
 
 @Composable
-fun HabitsSection(
-    title: String,
-    habits: List<HabitUiModel>,
-    onHabitClick: ((String) -> Unit)? = null,
-    rightContent: @Composable (() -> Unit)? = null,
-    isCheckable: Boolean = true
-) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+private fun NewHabitButton(onClick: () -> Unit) {
+    Button(
+        onClick = onClick,
+        contentPadding = PaddingValues(horizontal = 12.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color.Black,
+            contentColor = Color.White
+        )
     ) {
-        // Section title and optional right-aligned content
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = title,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
-            )
-
-            if (rightContent != null) {
-                rightContent()
-            }
-        }
-
-        Spacer(modifier = Modifier.height(4.dp))
-
-        // Display each habit as a HabitItem
-        if (habits.isEmpty()) {
-            Text(
-                text = "No hay hábitos en esta sección",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                fontSize = 14.sp,
-                color = Color.Gray,
-                fontStyle = FontStyle.Italic,
-                textAlign = TextAlign.Center
-            )
-        } else {
-            habits.forEach { habit ->
-                HabitItem(
-                    name = habit.name,
-                    days = habit.days,
-                    streak = habit.streak,
-                    isChecked = habit.isChecked,
-                    onCheckedChange = { checked ->
-                        if (isCheckable) {
-                            habit.onCheckedChange(checked)
-                        }
-                    },
-                    onClick = { onHabitClick?.invoke(habit.id) },
-                    isCheckable = isCheckable
-                )
-            }
-        }
+        Icon(
+            imageVector = Icons.Default.Add,
+            contentDescription = "Añadir hábito",
+            modifier = Modifier.size(16.dp)
+        )
+        Spacer(modifier = Modifier.width(4.dp))
+        Text("Nuevo hábito")
     }
 }
 
@@ -311,10 +236,4 @@ fun EmptyHabitsState(onNewHabitClick: () -> Unit) {
             Text("Crear mi primer hábito")
         }
     }
-}
-
-// Extension function to determine if a habit is scheduled for today
-private fun HabitUiModel.isScheduledForToday(): Boolean {
-    val currentDay = LocalDate.now().dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault())
-    return this.days.contains(currentDay, ignoreCase = true) || this.days == "Todos los días"
 }

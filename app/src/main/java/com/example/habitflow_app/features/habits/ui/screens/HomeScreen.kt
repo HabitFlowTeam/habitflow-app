@@ -20,23 +20,17 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.habitflow_app.features.articles.ui.components.ArticleCard
 import com.example.habitflow_app.features.articles.ui.viewmodel.ArticleViewModel
 import com.example.habitflow_app.features.habits.ui.components.Calendar
-import com.example.habitflow_app.features.habits.ui.components.HabitItem
+import com.example.habitflow_app.features.habits.ui.components.HabitsSection
+import com.example.habitflow_app.features.habits.ui.components.InlineLoadingText
+import com.example.habitflow_app.features.habits.ui.extensions.getTodayHabits
 import com.example.habitflow_app.features.habits.ui.viewmodel.CalendarViewModelImpl
-import com.example.habitflow_app.features.habits.ui.viewmodel.HabitUiModel
 import com.example.habitflow_app.features.habits.ui.viewmodel.ListHabitsViewModel
-import java.time.LocalDate
-import java.time.format.TextStyle
-import java.util.Locale
 
 /**
  * HomeScreen is the main screen of the application.
@@ -66,7 +60,7 @@ fun HomeScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         // Today's habits
-        HabitsSection()
+        TodayHabitsSection()
     }
 }
 
@@ -150,12 +144,13 @@ private fun ArticlesSection(
     }
 }
 
+
 /**
  * Section that displays habits scheduled for today.
- * Now using real data from the ViewModel instead of sample data.
+ * Now using the reusable HabitsSection component.
  */
 @Composable
-private fun HabitsSection(
+private fun TodayHabitsSection(
     habitsViewModel: ListHabitsViewModel = hiltViewModel()
 ) {
     val uiState by habitsViewModel.uiState.collectAsState()
@@ -165,64 +160,23 @@ private fun HabitsSection(
         habitsViewModel.loadHabits()
     }
 
-    // Filter only today's habits
-    val todayHabits = uiState.habits.filter { habit ->
-        habit.isScheduledForToday()
-    }
+    // Filter only today's habits using the extension function
+    val todayHabits = uiState.habits.getTodayHabits()
 
-    Column {
-        Text(
-            text = "Hábitos de hoy",
-            style = MaterialTheme.typography.titleLarge.copy(
-                fontWeight = FontWeight.Bold
-            ),
-            modifier = Modifier.padding(bottom = 12.dp)
-        )
+    when {
+        uiState.isLoading -> {
+            InlineLoadingText("Cargando hábitos...")
+        }
 
-        when {
-            uiState.isLoading -> {
-                Text(
-                    text = "Cargando hábitos...",
-                    fontSize = 14.sp,
-                    color = Color.Gray,
-                    fontStyle = FontStyle.Italic
-                )
-            }
-
-            todayHabits.isEmpty() -> {
-                Text(
-                    text = "No tienes hábitos programados para hoy",
-                    fontSize = 14.sp,
-                    color = Color.Gray,
-                    fontStyle = FontStyle.Italic,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 16.dp)
-                )
-            }
-
-            else -> {
-                todayHabits.forEach { habit ->
-                    HabitItem(
-                        name = habit.name,
-                        days = habit.days,
-                        streak = habit.streak,
-                        isChecked = habit.isChecked,
-                        onCheckedChange = { checked ->
-                            habit.onCheckedChange(checked)
-                        },
-                        onClick = { /* Navigate to habit details */ },
-                        isCheckable = true,
-                        modifier = Modifier.padding(bottom = 12.dp)
-                    )
-                }
-            }
+        else -> {
+            HabitsSection(
+                title = "Hábitos de hoy",
+                habits = todayHabits,
+                onHabitClick = { /* Navigate to habit details */ },
+                isCheckable = true,
+                emptyStateMessage = "No tienes hábitos programados para hoy",
+                useHomeStyle = true
+            )
         }
     }
-}
-
-private fun HabitUiModel.isScheduledForToday(): Boolean {
-    val currentDay = LocalDate.now().dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault())
-    return this.days.contains(currentDay, ignoreCase = true) || this.days == "Todos los días"
 }
