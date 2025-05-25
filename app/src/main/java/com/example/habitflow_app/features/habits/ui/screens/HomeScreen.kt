@@ -20,16 +20,23 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.habitflow_app.core.ui.theme.HabitflowAppTheme
 import com.example.habitflow_app.features.articles.ui.components.ArticleCard
 import com.example.habitflow_app.features.articles.ui.viewmodel.ArticleViewModel
 import com.example.habitflow_app.features.habits.ui.components.Calendar
 import com.example.habitflow_app.features.habits.ui.components.HabitItem
 import com.example.habitflow_app.features.habits.ui.viewmodel.CalendarViewModelImpl
+import com.example.habitflow_app.features.habits.ui.viewmodel.HabitUiModel
+import com.example.habitflow_app.features.habits.ui.viewmodel.ListHabitsViewModel
+import java.time.LocalDate
+import java.time.format.TextStyle
+import java.util.Locale
 
 /**
  * HomeScreen is the main screen of the application.
@@ -88,7 +95,6 @@ fun CalendarSection(
         },
         modifier = Modifier.fillMaxWidth()
     )
-
 }
 
 /**
@@ -146,9 +152,24 @@ private fun ArticlesSection(
 
 /**
  * Section that displays habits scheduled for today.
+ * Now using real data from the ViewModel instead of sample data.
  */
 @Composable
-private fun HabitsSection() {
+private fun HabitsSection(
+    habitsViewModel: ListHabitsViewModel = hiltViewModel()
+) {
+    val uiState by habitsViewModel.uiState.collectAsState()
+
+    // Load habits data
+    LaunchedEffect(Unit) {
+        habitsViewModel.loadHabits()
+    }
+
+    // Filter only today's habits
+    val todayHabits = uiState.habits.filter { habit ->
+        habit.isScheduledForToday()
+    }
+
     Column {
         Text(
             text = "Hábitos de hoy",
@@ -158,56 +179,50 @@ private fun HabitsSection() {
             modifier = Modifier.padding(bottom = 12.dp)
         )
 
-        // Example of today's habits
-        val habits = getSampleHabits()
-        habits.forEach { habit ->
-            HabitItem(
-                name = habit.name,
-                days = habit.days,
-                streak = habit.streak,
-                isChecked = habit.isCompleted,
-                onCheckedChange = { /* Update habit completion status */ },
-                modifier = Modifier.padding(bottom = 12.dp)
-            )
+        when {
+            uiState.isLoading -> {
+                Text(
+                    text = "Cargando hábitos...",
+                    fontSize = 14.sp,
+                    color = Color.Gray,
+                    fontStyle = FontStyle.Italic
+                )
+            }
+
+            todayHabits.isEmpty() -> {
+                Text(
+                    text = "No tienes hábitos programados para hoy",
+                    fontSize = 14.sp,
+                    color = Color.Gray,
+                    fontStyle = FontStyle.Italic,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp)
+                )
+            }
+
+            else -> {
+                todayHabits.forEach { habit ->
+                    HabitItem(
+                        name = habit.name,
+                        days = habit.days,
+                        streak = habit.streak,
+                        isChecked = habit.isChecked,
+                        onCheckedChange = { checked ->
+                            habit.onCheckedChange(checked)
+                        },
+                        onClick = { /* Opcional: navegar a detalles del hábito */ },
+                        isCheckable = true, // Los hábitos de hoy SÍ se pueden marcar
+                        modifier = Modifier.padding(bottom = 12.dp)
+                    )
+                }
+            }
         }
     }
 }
 
-data class HabitData(
-    val name: String,
-    val days: String,
-    val streak: Int,
-    val isCompleted: Boolean
-)
-
-private fun getSampleHabits(): List<HabitData> {
-    return listOf(
-        HabitData(
-            name = "Meditación",
-            days = "Todos los días",
-            streak = 5,
-            isCompleted = true
-        ),
-        HabitData(
-            name = "Ejercicio",
-            days = "Lu, Mi, Vi",
-            streak = 3,
-            isCompleted = true
-        ),
-        HabitData(
-            name = "Beber 2L de agua",
-            days = "Todos los días",
-            streak = 9,
-            isCompleted = false
-        )
-    )
+private fun HabitUiModel.isScheduledForToday(): Boolean {
+    val currentDay = LocalDate.now().dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault())
+    return this.days.contains(currentDay, ignoreCase = true) || this.days == "Todos los días"
 }
-
-@Preview(showBackground = true)
-@Composable
-fun HomeScreenPreview() {
-    HabitflowAppTheme {
-        HomeScreen()
-    }
-}
-
