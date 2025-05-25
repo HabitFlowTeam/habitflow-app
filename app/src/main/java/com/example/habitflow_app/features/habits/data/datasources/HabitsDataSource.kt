@@ -130,7 +130,7 @@ class HabitsDataSource @Inject constructor(
 
     suspend fun updateHabitDays(request: UpdateHabitDaysRequest): HabitUpdateResponse {
         // 1. Eliminar días existentes
-        directusApiService.deleteHabitDay(request.habitId)
+        directusApiService.deleteHabitDays(request.habitId)
 
         // 2. Crear nuevos días
         val createdCount = request.days.map { dayId ->

@@ -8,7 +8,6 @@ import com.example.habitflow_app.features.habits.data.dto.CreateHabitRequest
 import com.example.habitflow_app.features.habits.data.dto.HabitDayResponse
 
 import com.example.habitflow_app.features.habits.data.dto.HabitResponse
-import com.example.habitflow_app.features.habits.data.dto.HabitUpdateRequest
 import com.example.habitflow_app.features.habits.data.dto.HabitUpdateResponse
 import com.example.habitflow_app.features.habits.data.dto.UpdateHabitDaysRequest
 import javax.inject.Inject
