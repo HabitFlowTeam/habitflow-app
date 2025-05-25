@@ -1,5 +1,6 @@
 package com.example.habitflow_app.features.habits.ui.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -374,6 +375,39 @@ fun HabitNameField(
 }
 
 @Composable
+fun HabitEditActionButtons(
+    onSave: () -> Unit,
+    onDelete: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Button(
+            onClick = onDelete,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.White,
+                contentColor = Color.Red
+            ),
+            border = BorderStroke(1.dp, Color.Red)
+        ) {
+            Text("Eliminar")
+        }
+
+        Button(
+            onClick = onSave,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Black,
+                contentColor = Color.White
+            )
+        ) {
+            Text("Guardar cambios")
+        }
+    }
+}
+
+@Composable
 fun HabitActionButtons(
     onSave: () -> Unit,
     onDelete: (() -> Unit)? = null
@@ -405,33 +439,6 @@ fun HabitActionButtons(
             Text("Guardar hábito")
         }
     }
-}
-
-@Composable
-fun DeleteConfirmationDialog(
-    onConfirm: () -> Unit,
-    onDismiss: () -> Unit
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Eliminar hábito") },
-        text = { Text("¿Estás seguro de que quieres eliminar este hábito?") },
-        confirmButton = {
-            Button(
-                onClick = onConfirm,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Red
-                )
-            ) {
-                Text("Eliminar")
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Cancelar")
-            }
-        }
-    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
