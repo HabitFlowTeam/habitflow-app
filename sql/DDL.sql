@@ -10,6 +10,9 @@ DROP TABLE IF EXISTS profiles CASCADE;
 DELETE FROM directus_users WHERE id NOT IN (SELECT id FROM directus_users WHERE first_name = 'Admin');
 DELETE FROM directus_roles WHERE id NOT IN (SELECT id FROM directus_roles WHERE name = 'Administrator');
 DROP TABLE IF EXISTS week_days CASCADE;
+DROP TRIGGER IF EXISTS daily_habits_check_trigger ON habits;
+DROP TRIGGER IF EXISTS daily_habits_tracking_check_trigger ON habits_tracking;
+DROP TABLE IF EXISTS daily_scheduler CASCADE;
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 

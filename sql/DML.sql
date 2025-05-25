@@ -111,7 +111,7 @@ VALUES
     ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'profiles', 'create', '*', '{}'),
     ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'profiles', 'update', '*', '{}'),
     ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'profiles', 'delete', '*', '{}'),
-    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'habits', 'read', '*', '{}'),
+    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'habits', 'read', '*', '{"_and":[{"user_id":{"_eq":"$CURRENT_USER"}}]}'),
     ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'habits', 'create', '*', '{}'),
     ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'habits', 'update', '*', '{}'),
     ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'habits', 'delete', '*', '{}'),
