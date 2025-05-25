@@ -9,9 +9,11 @@ import com.example.habitflow_app.domain.repositories.AuthRepository
 import com.example.habitflow_app.features.habits.data.dto.CreateHabitRequest
 import com.example.habitflow_app.features.habits.data.dto.HabitApiRequest
 import com.example.habitflow_app.features.habits.data.dto.HabitDayApiRequest
+import com.example.habitflow_app.features.habits.data.dto.HabitDayResponse
 import com.example.habitflow_app.features.habits.data.dto.HabitResponse
 import com.example.habitflow_app.features.habits.data.dto.HabitTrackingApiRequest
-import com.example.habitflow_app.features.habits.data.dto.HabitUpdateRequest
+import com.example.habitflow_app.features.habits.data.dto.HabitUpdateResponse
+import com.example.habitflow_app.features.habits.data.dto.UpdateHabitDaysRequest
 import org.json.JSONObject
 import java.time.LocalDate
 import javax.inject.Inject
@@ -118,13 +120,29 @@ class HabitsDataSource @Inject constructor(
         }
     }
 
-    suspend fun updateHabit(habitId: String, request: HabitUpdateRequest): Habit {
-        val response = directusApiService.updateHabit(habitId, request)
-        if (response.isSuccessful) {
-            return response.body() ?: throw Exception("Empty response")
-        } else {
-            throw Exception("Failed to update habit: ${response.errorBody()?.string()}")
+    suspend fun getHabitDays(habitId: String): List<HabitDayResponse> {
+        val response = directusApiService.getHabitDays(habitId)
+        if (!response.isSuccessful) {
+            throw Exception("Error getting habit days: ${response.errorBody()?.string()}")
         }
+        return response.body() ?: emptyList()
+    }
+
+    suspend fun updateHabitDays(request: UpdateHabitDaysRequest): HabitUpdateResponse {
+        // 1. Eliminar días existentes
+        directusApiService.deleteHabitDay(request.habitId)
+
+        // 2. Crear nuevos días
+        val createdCount = request.days.map { dayId ->
+            directusApiService.createHabitDay(
+                HabitDayApiRequest(request.habitId, dayId)
+            ).isSuccessful
+        }.count { it }
+
+        return HabitUpdateResponse(
+            success = createdCount == request.days.size,
+            updatedCount = createdCount
+        )
     }
 
     suspend fun softDeleteHabit(habitId: String): Boolean {

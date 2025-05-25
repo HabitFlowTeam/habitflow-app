@@ -3,6 +3,7 @@ package com.example.habitflow_app.features.habits.di
 import com.example.habitflow_app.domain.repositories.HabitsRepository
 import com.example.habitflow_app.features.authentication.validation.RegisterFormValidator
 import com.example.habitflow_app.features.habits.data.repositories.HabitsRepositoryImpl
+import com.example.habitflow_app.features.habits.validation.EditHabitFormValidator
 import com.example.habitflow_app.features.habits.validation.HabitFormValidator
 import dagger.Module
 import dagger.Provides
@@ -23,5 +24,11 @@ object HabitsModule {
     @Singleton
     fun provideCreateHabitFormValidator(): HabitFormValidator {
         return HabitFormValidator()
+    }
+
+    @Provides
+    @Singleton
+    fun provideHabitEditFormValidator(): EditHabitFormValidator {
+        return EditHabitFormValidator()
     }
 }

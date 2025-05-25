@@ -13,9 +13,8 @@ import com.example.habitflow_app.features.gamification.data.dto.ProfileRankingRe
 import com.example.habitflow_app.features.habits.data.dto.CreateHabitRequest
 import com.example.habitflow_app.features.habits.data.dto.HabitApiRequest
 import com.example.habitflow_app.features.habits.data.dto.HabitDayApiRequest
-import com.example.habitflow_app.features.habits.data.dto.HabitDayUpdateRequest
+import com.example.habitflow_app.features.habits.data.dto.HabitDayResponse
 import com.example.habitflow_app.features.habits.data.dto.HabitTrackingApiRequest
-import com.example.habitflow_app.features.habits.data.dto.HabitUpdateRequest
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -96,23 +95,75 @@ interface DirectusApiService {
     suspend fun getProfile(@Path("id") userId: String): Response<ProfileResponse>
     data class ProfileResponse(val data: ProfileDTO)
 
+    /* Habit Endpoints */
+
+    /**
+     * Retrieves all habits for a specific user.
+     *
+     * @param userId The ID of the user to filter habits by
+     * @return Response containing a list of Habit objects for the specified user
+     */
     @GET("items/habits")
     suspend fun getHabits(@Query("filter[user_id][_eq]") userId: String): Response<List<Habit>>
 
-    //endpoints to create an habit
+    /**
+     * Creates a new habit in the system.
+     *
+     * @param habitDTO The HabitApiRequest object containing habit details
+     * @return Response with the created habit data in the body
+     */
     @POST("items/habits")
     suspend fun createHabit(@Body habitDTO: HabitApiRequest): Response<ResponseBody>
 
+    /**
+     * Creates a new habit-day association in the system.
+     *
+     * @param request The HabitDayApiRequest object containing habit-day relationship details
+     * @return Response with the created habit-day association data in the body
+     */
     @POST("items/habits_days")
     suspend fun createHabitDay(@Body request: HabitDayApiRequest): Response<ResponseBody>
 
+    /**
+     * Creates a new habit tracking record.
+     *
+     * @param request The HabitTrackingApiRequest object containing tracking details
+     * @return Response with status of the operation (no content body expected)
+     */
     @POST("items/habits_tracking")
     suspend fun createHabitTracking(@Body request: HabitTrackingApiRequest): Response<Unit>
 
-    //...
-    @PATCH("items/habits/{habit_id}")
-    suspend fun updateHabit(@Path("habit_id") habitId: String, @Body request: HabitUpdateRequest): Response<Habit>
+    /**
+     * Retrieves all day associations for a specific habit.
+     *
+     * @param habitId The ID of the habit to get days for
+     * @param fields Comma-separated list of fields to return (defaults to habit_id and week_day_id)
+     * @return Response containing a list of HabitDayResponse objects
+     */
+    @GET("items/habits_days")
+    suspend fun getHabitDays(
+        @Query("filter[habit_id][_eq]") habitId: String,
+        @Query("fields") fields: String = "habit_id,week_day_id"
+    ): Response<List<HabitDayResponse>>
 
+    /**
+     * Deletes all day associations for a specific habit.
+     *
+     * @param habitId The ID of the habit whose day associations should be deleted
+     * @return Response with status of the operation (no content body expected)
+     */
+    @DELETE("items/habits_days")
+    suspend fun deleteHabitDays(
+        @Query("filter[habit_id][_eq]") habitId: String
+    ): Response<Unit>
+
+    /**
+     * Soft deletes a habit by marking it as deleted (is_deleted = true).
+     *
+     * @param habitId The ID of the habit to soft delete
+     * @param request Map containing the soft delete flag (defaults to {"is_deleted": true})
+     * @return Response containing the updated Habit object
+     */
     @PATCH("items/habits/{habit_id}")
     suspend fun softDeleteHabit(
         @Path("habit_id") habitId: String,
