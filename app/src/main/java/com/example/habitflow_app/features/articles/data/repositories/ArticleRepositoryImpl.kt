@@ -1,6 +1,7 @@
 package com.example.habitflow_app.features.articles.data.repositories
 
 import com.example.habitflow_app.domain.models.ProfileArticle
+import com.example.habitflow_app.domain.models.RankedArticle
 import com.example.habitflow_app.domain.repositories.ArticleRepository
 import com.example.habitflow_app.features.articles.data.datasources.ArticleDataSource
 import com.example.habitflow_app.features.articles.data.dto.ProfileArticlesDTO
@@ -24,6 +25,10 @@ class ArticleRepositoryImpl @Inject constructor(
      */
     override suspend fun getUserArticles(userId: String): List<ProfileArticle> {
         return articleDataSource.getUserArticles(userId)
+    }
+
+    override suspend fun getRankedArticles(): List<RankedArticle> {
+        return articleDataSource.getRankedArticles()
     }
 }
 

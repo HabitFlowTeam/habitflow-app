@@ -2,6 +2,7 @@ package com.example.habitflow_app.core.network
 
 import com.example.habitflow_app.domain.models.Habit
 import com.example.habitflow_app.features.articles.data.dto.ProfileArticlesResponse
+import com.example.habitflow_app.features.articles.data.dto.RankedArticlesResponse
 import com.example.habitflow_app.features.authentication.data.dto.CreateProfileRequest
 import com.example.habitflow_app.features.authentication.data.dto.LoginRequest
 import com.example.habitflow_app.features.authentication.data.dto.LoginResponse
@@ -213,6 +214,13 @@ interface DirectusApiService {
         @Query("fields") fields: String = "title,image_url,likes_count"
     ): Response<ProfileArticlesResponse>
 
+    /**
+     * Obtiene los artículos destacados con información de autor y likes desde la view RANKED_ARTICLES_VIEW.
+     */
+    @GET("items/ranked_articles_view")
+    suspend fun getRankedArticles(
+        @Query("fields") fields: String = "title,content,author_name,author_image_url,likes_count"
+    ): Response<RankedArticlesResponse>
 
     /* Profile Endpoints */
     // TODO: Add user profile-related endpoints as needed
@@ -230,3 +238,4 @@ interface DirectusApiService {
     @GET("items/categories")
     suspend fun getCategories(): Response<CategoriesResponse>
 }
+

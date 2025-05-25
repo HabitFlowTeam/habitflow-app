@@ -1,6 +1,7 @@
 package com.example.habitflow_app.features.articles.di
 
 import com.example.habitflow_app.domain.repositories.ArticleRepository
+import com.example.habitflow_app.domain.usecases.GetRankedArticles
 import com.example.habitflow_app.domain.usecases.GetUserTopLikedArticlesUseCase
 import com.example.habitflow_app.features.articles.data.datasources.ArticleDataSource
 import com.example.habitflow_app.features.articles.data.repositories.ArticleRepositoryImpl
@@ -25,10 +26,12 @@ object ArticleModule {
     @Provides
     @Singleton
     fun provideArticleViewModel(
-        getUserTopLikedArticlesUseCase: GetUserTopLikedArticlesUseCase
+        getUserTopLikedArticlesUseCase: GetUserTopLikedArticlesUseCase,
+        getRankedArticles: GetRankedArticles
     ): ArticleViewModel {
         return ArticleViewModel(
-            getUserTopLikedArticlesUseCase
+            getUserTopLikedArticlesUseCase,
+            getRankedArticles
         )
     }
 }

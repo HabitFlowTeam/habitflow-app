@@ -25,3 +25,18 @@ data class ProfileArticlesDTO(
     val image_url: String?,
     val likes_count: Int
 )
+
+@Serializable
+data class RankedArticleDTO(
+    val title: String,
+    val content: String,
+    val author_name: String,
+    val author_image_url: String?,
+    val likes_count: Int
+)
+
+@Serializable
+data class RankedArticlesResponse(
+    val data: List<RankedArticleDTO>
+)
+

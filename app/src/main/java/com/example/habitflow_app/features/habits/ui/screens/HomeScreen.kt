@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.habitflow_app.core.ui.theme.HabitflowAppTheme
 import com.example.habitflow_app.features.articles.ui.components.ArticleCard
+import com.example.habitflow_app.features.articles.ui.viewmodel.ArticleViewModel
 import com.example.habitflow_app.features.habits.ui.components.Calendar
 import com.example.habitflow_app.features.habits.ui.components.HabitItem
 import com.example.habitflow_app.features.habits.ui.viewmodel.CalendarViewModelImpl
@@ -94,7 +95,17 @@ fun CalendarSection(
  * Section that displays featured articles in a horizontal carousel.
  */
 @Composable
-private fun ArticlesSection() {
+private fun ArticlesSection(
+    viewModel: ArticleViewModel = hiltViewModel()
+) {
+    val articles by viewModel.rankedArticles.collectAsState()
+    val isLoading by viewModel.rankedIsLoading.collectAsState()
+    val error by viewModel.rankedError.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchRankedArticles()
+    }
+
     Column {
         Text(
             text = "Artículos destacados",
@@ -104,20 +115,28 @@ private fun ArticlesSection() {
             modifier = Modifier.padding(bottom = 12.dp)
         )
 
-        LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            contentPadding = PaddingValues(end = 8.dp)
-        ) {
-            // Example of featured articles
-            val articles = getSampleArticles()
-            items(articles) { article ->
-                ArticleCard(
-                    authorName = article.authorName,
-                    authorImageUrl = article.authorImageUrl,
-                    title = article.title,
-                    description = article.description,
-                    modifier = Modifier.width(260.dp)
-                )
+        when {
+            isLoading -> {
+                Text("Cargando artículos...")
+            }
+            error != null -> {
+                Text("Error: $error")
+            }
+            else -> {
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    contentPadding = PaddingValues(end = 8.dp)
+                ) {
+                    items(articles) { article ->
+                        ArticleCard(
+                            authorName = article.authorName,
+                            authorImageUrl = article.authorImageUrl,
+                            title = article.title,
+                            description = article.content,
+                            modifier = Modifier.width(260.dp)
+                        )
+                    }
+                }
             }
         }
     }
@@ -221,3 +240,4 @@ fun HomeScreenPreview() {
         HomeScreen()
     }
 }
+

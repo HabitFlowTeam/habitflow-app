@@ -5,6 +5,7 @@ import com.example.habitflow_app.core.exceptions.ApiException
 import com.example.habitflow_app.core.exceptions.NetworkConnectionException
 import com.example.habitflow_app.core.network.DirectusApiService
 import com.example.habitflow_app.domain.models.ProfileArticle
+import com.example.habitflow_app.domain.models.RankedArticle
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -41,6 +42,29 @@ class ArticleDataSource @Inject constructor(
                     title = dto.title,
                     imageUrl = dto.image_url,
                     likes = dto.likes_count,
+                )
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error al obtener artículos", e)
+            throw Exception("Error al obtener artículos: ${e.message}")
+        }
+    }
+
+    suspend fun getRankedArticles(): List<RankedArticle> = withContext(Dispatchers.IO) {
+        try {
+            val response = directusApiService.getRankedArticles()
+            if (!response.isSuccessful) {
+                Log.e(TAG, "Error al obtener artículos: ${response.code()} ${response.message()}")
+                throw Exception("Error al obtener artículos: ${response.code()}")
+            }
+            val articles = response.body()?.data ?: emptyList()
+            articles.map { dto ->
+                RankedArticle(
+                    title = dto.title,
+                    content = dto.content,
+                    authorName = dto.author_name,
+                    authorImageUrl = dto.author_image_url,
+                    likesCount = dto.likes_count,
                 )
             }
         } catch (e: Exception) {

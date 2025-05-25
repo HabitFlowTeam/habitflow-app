@@ -10,6 +10,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.example.habitflow_app.core.network.DirectusApiService
+import com.example.habitflow_app.domain.models.RankedArticle
+import com.example.habitflow_app.domain.usecases.GetRankedArticles
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.withContext
 
 /**
  * ViewModel for managing and exposing article-related UI state.
@@ -21,7 +27,8 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class ArticleViewModel @Inject constructor(
-    private val getUserTopLikedArticlesUseCase: GetUserTopLikedArticlesUseCase
+    private val getUserTopLikedArticlesUseCase: GetUserTopLikedArticlesUseCase,
+    private val getRankedArticle: GetRankedArticles
 ) : ViewModel() {
     private companion object {
         const val TAG = "ArticleViewModel"
@@ -35,6 +42,16 @@ class ArticleViewModel @Inject constructor(
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
 
+    // --- Artículos destacados (Ranked) ---
+    private val _rankedArticles = MutableStateFlow<List<RankedArticle>>(emptyList())
+    val rankedArticles: StateFlow<List<RankedArticle>> = _rankedArticles
+
+    private val _rankedIsLoading = MutableStateFlow(false)
+    val rankedIsLoading: StateFlow<Boolean> = _rankedIsLoading
+
+    private val _rankedError = MutableStateFlow<String?>(null)
+    val rankedError: StateFlow<String?> = _rankedError
+
     /**
      * Loads the top liked articles for the specified user and updates the UI state.
      *
@@ -45,7 +62,6 @@ class ArticleViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val result = getUserTopLikedArticlesUseCase(userId)
-                Log.e(TAG, "This is the result: $result")
                 _profileArticles.value = result
                 _error.value = null
             } catch (e: Exception) {
@@ -55,5 +71,22 @@ class ArticleViewModel @Inject constructor(
             }
         }
     }
-}
 
+    fun fetchRankedArticles() {
+        _rankedIsLoading.value = true
+        viewModelScope.launch {
+            try {
+                val response = withContext(Dispatchers.IO) {
+                    getRankedArticle()
+                }
+                Log.e(TAG, "This is the result: $response")
+                _rankedArticles.value = response
+                _rankedError.value = null
+            } catch (e: Exception) {
+                _rankedError.value = "Error de red: ${e.localizedMessage}"
+            } finally {
+                _rankedIsLoading.value = false
+            }
+        }
+    }
+}
