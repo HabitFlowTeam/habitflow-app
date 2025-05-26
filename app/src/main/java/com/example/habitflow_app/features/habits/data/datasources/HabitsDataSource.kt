@@ -170,7 +170,7 @@ class HabitsDataSource @Inject constructor(
         if (!response.isSuccessful) {
             throw Exception("Error getting habit days: ${response.errorBody()?.string()}")
         }
-        return response.body() ?: emptyList()
+        return response.body()?.data ?: emptyList()
     }
 
     suspend fun updateHabitDays(request: UpdateHabitDaysRequest): HabitUpdateResponse {

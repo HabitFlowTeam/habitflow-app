@@ -160,7 +160,7 @@ interface DirectusApiService {
     suspend fun getHabitDays(
         @Query("filter[habit_id][_eq]") habitId: String,
         @Query("fields") fields: String = "habit_id,week_day_id"
-    ): Response<List<HabitDayResponse>>
+    ): Response<DirectusResponse<List<HabitDayResponse>>>
 
     /**
      * Deletes all day associations for a specific habit.
