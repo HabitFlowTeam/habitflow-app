@@ -57,6 +57,9 @@ COLLECTIONS=(
   "habits_days"
   "habits_tracking"
   "user_habit_calendar_view"
+  "user_articles_view"
+  "user_habit_tracking_view"
+  "ranked_articles_view"
 )
 
 # Plantilla de meta para activar colecciones (basada en tu ejemplo de "articles")

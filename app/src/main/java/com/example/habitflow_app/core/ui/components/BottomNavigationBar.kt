@@ -1,5 +1,5 @@
 package com.example.habitflow_app.core.ui.components
-
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -23,7 +23,8 @@ fun BottomNavigationBar(
 ) {
     NavigationBar(
         containerColor = Color.White,
-        tonalElevation = 8.dp
+        tonalElevation = 8.dp,
+        windowInsets = WindowInsets(0, 0, 0, 0) // Removes default insets
     ) {
         val backStackEntry = navController.currentBackStackEntryAsState()
         items.forEach { item ->

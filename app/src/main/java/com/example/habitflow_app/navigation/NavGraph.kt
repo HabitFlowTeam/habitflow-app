@@ -2,6 +2,7 @@ package com.example.habitflow_app.navigation
 
 import android.R.attr.type
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -39,8 +40,9 @@ fun AppNavGraph(
         Column(
             modifier = modifier
                 .padding(innerPadding)
+                .fillMaxSize()
         ) {
-            if (currentDestination != NavDestinations.LOGIN && currentDestination != NavDestinations.REGISTER && currentDestination != NavDestinations.FORGOT_PASSWORD) {
+            if (currentDestination != null && currentDestination != NavDestinations.LOGIN && currentDestination != NavDestinations.REGISTER && currentDestination != NavDestinations.FORGOT_PASSWORD) {
                 TopAppBar(
                     navController = navController,
                     streakCount = 2,

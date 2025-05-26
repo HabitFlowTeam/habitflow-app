@@ -3,6 +3,7 @@ package com.example.habitflow_app.features.habits.di
 import com.example.habitflow_app.domain.repositories.HabitsRepository
 import com.example.habitflow_app.domain.usecases.DeleteHabitUseCase
 import com.example.habitflow_app.features.authentication.validation.RegisterFormValidator
+import com.example.habitflow_app.features.habits.data.datasources.HabitsDataSource
 import com.example.habitflow_app.features.habits.data.repositories.HabitsRepositoryImpl
 import com.example.habitflow_app.features.habits.validation.EditHabitFormValidator
 import com.example.habitflow_app.features.habits.validation.HabitFormValidator
@@ -17,9 +18,15 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object HabitsModule {
     @Provides
+    @Singleton
     fun provideHabitsRepository(
         impl: HabitsRepositoryImpl
     ): HabitsRepository = impl
+
+    @Provides
+    fun provideHabitsRepositoryImpl(
+        dataSource: HabitsDataSource
+    ): HabitsRepositoryImpl = HabitsRepositoryImpl(dataSource)
 
     @Provides
     @Singleton

@@ -1,5 +1,6 @@
 package com.example.habitflow_app.features.articles.ui.components
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -34,8 +36,8 @@ fun ArticleCardPreview() {
         ArticleCard(
             authorName = "John Cooper",
             authorImageUrl = "https://xsgames.co/randomusers/assets/avatars/male/74.jpg",
-            title = "Cómo crear una rutina matutina",
-            description = "Empieza el día bien con estas técnicas probadas...",
+            title = "Cómo crear una rutina matutina exitosa para maximizar la productividad diaria",
+            description = "Empieza el día bien con estas técnicas probadas. La forma en que comienzas tu mañana puede determinar cómo te sentirás durante todo el día. Establecer una rutina matutina efectiva puede ayudarte a aumentar tu productividad, reducir el estrés y mejorar tu bienestar general. En este artículo, exploraremos varias estrategias que puedes implementar para crear una rutina matutina que funcione para ti.",
             modifier = Modifier.padding(16.dp)
         )
     }
@@ -48,6 +50,8 @@ fun ArticleCardPreview() {
  * @param authorImageUrl The URL of the author's image to display.
  * @param title The title of the article.
  * @param description A short description or preview of the article's content.
+ * @param titleMaxLines Maximum number of lines to show for the title before adding ellipsis.
+ * @param descriptionMaxLines Maximum number of lines to show for the description before adding ellipsis.
  * @param modifier An optional modifier to customize the layout.
  */
 @Composable
@@ -56,12 +60,13 @@ fun ArticleCard(
     authorImageUrl: String?,
     title: String,
     description: String,
-    modifier: Modifier = Modifier
+    titleMaxLines: Int = 1,
+    descriptionMaxLines: Int = 2,
+    @SuppressLint("ModifierParameter") modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier
-            .fillMaxWidth()
-            .padding(8.dp),
+            .fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(
@@ -90,7 +95,9 @@ fun ArticleCard(
                 Text(
                     text = authorName,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
 
@@ -101,7 +108,9 @@ fun ArticleCard(
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontWeight = FontWeight.Bold
                 ),
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = titleMaxLines,
+                overflow = TextOverflow.Ellipsis
             )
 
             Spacer(modifier = Modifier.padding(4.dp))
@@ -110,7 +119,8 @@ fun ArticleCard(
                 text = description,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 2
+                maxLines = descriptionMaxLines,
+                overflow = TextOverflow.Ellipsis
             )
         }
     }

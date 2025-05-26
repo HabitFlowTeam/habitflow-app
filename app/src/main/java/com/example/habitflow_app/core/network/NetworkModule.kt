@@ -86,22 +86,36 @@ object NetworkModule {
     }
 
     /**
-     * Creates and configures a Retrofit service for Directus API communication.
+     * Creates and configures a Retrofit instance for API communication.
      *
-     * @return Configured DirectusApiService instance with:
-     * - Base URL from build config
-     * - Custom OkHttpClient
-     * - GSON converter factory for JSON serialization/deserialization
+     * @param okHttpClient The OkHttpClient instance to be used by Retrofit
+     * @return Configured Retrofit instance with:
+     * - Base URL from BuildConfig
+     * - Gson converter factory for JSON serialization/deserialization
      */
     @Provides
     @Singleton
-    fun provideDirectusApiService(okHttpClient: OkHttpClient): DirectusApiService {
-        val retrofit = Retrofit.Builder()
+    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit =
+        Retrofit.Builder()
             .baseUrl(BuildConfig.DIRECTUS_URL)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
-        return retrofit.create(DirectusApiService::class.java)
-    }
+    /**
+     * Provides the DirectusApiService instance for API communication.
+     */
+    @Provides
+    @Singleton
+    fun provideDirectusApiService(retrofit: Retrofit): DirectusApiService =
+        retrofit.create(DirectusApiService::class.java)
+
+    /**
+     * Provides the CalendarApiService instance for calendar-related API communication.
+     */
+    @Provides
+    @Singleton
+    fun provideCalendarApiService(retrofit: Retrofit): CalendarApiService =
+        retrofit.create(CalendarApiService::class.java)
+
 }

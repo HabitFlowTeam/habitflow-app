@@ -21,12 +21,10 @@ fun CreateHabitRoute(
 @Composable
 fun EditHabitRoute(
     navController: NavController,
-    viewModel: HabitsViewModel = hiltViewModel(),
     habitId: String
 ) {
     EditHabitScreen(
         navController = navController,
-        viewModel = viewModel,
         habitId = habitId
     )
 }

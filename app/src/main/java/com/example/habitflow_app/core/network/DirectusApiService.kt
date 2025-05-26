@@ -1,25 +1,29 @@
 package com.example.habitflow_app.core.network
 
+import com.example.habitflow_app.features.habits.data.dto.HabitsResponse
 import com.example.habitflow_app.domain.models.Habit
+import com.example.habitflow_app.features.articles.data.dto.ProfileArticlesResponse
+import com.example.habitflow_app.features.articles.data.dto.RankedArticlesResponse
+import com.example.habitflow_app.features.authentication.data.dto.CreateProfileRequest
 import com.example.habitflow_app.features.authentication.data.dto.LoginRequest
 import com.example.habitflow_app.features.authentication.data.dto.LoginResponse
-import com.example.habitflow_app.features.authentication.data.dto.RegisterUserRequest
-import com.example.habitflow_app.features.authentication.data.dto.CreateProfileRequest
 import com.example.habitflow_app.features.authentication.data.dto.PasswordResetRequest
+import com.example.habitflow_app.features.authentication.data.dto.RegisterUserRequest
 import com.example.habitflow_app.features.category.data.dto.CategoriesResponse
 import com.example.habitflow_app.features.gamification.data.dto.HabitRankingResponse
 import com.example.habitflow_app.features.gamification.data.dto.LeaderboardResponse
 import com.example.habitflow_app.features.gamification.data.dto.ProfileRankingResponse
-import com.example.habitflow_app.features.habits.data.dto.CreateHabitRequest
 import com.example.habitflow_app.features.habits.data.dto.HabitApiRequest
 import com.example.habitflow_app.features.habits.data.dto.HabitDayApiRequest
 import com.example.habitflow_app.features.habits.data.dto.HabitDayResponse
 import com.example.habitflow_app.features.habits.data.dto.HabitTrackingApiRequest
+import com.example.habitflow_app.features.habits.data.dto.HabitTrackingResponseDto
+import com.example.habitflow_app.features.profile.data.dto.ProfileDTO
+import com.google.gson.annotations.SerializedName
+import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
-import com.example.habitflow_app.features.profile.data.dto.ProfileDTO
-import okhttp3.ResponseBody
 import retrofit2.http.GET
 import retrofit2.http.PATCH
 import retrofit2.http.POST
@@ -35,9 +39,9 @@ import retrofit2.http.Query
  * All methods are suspend functions to support coroutine-based asynchronous execution.
  */
 interface DirectusApiService {
-
-    data class ListResponse<T>(val data: List<T>)
-    data class SingleResponse<T>(val data: T)
+    data class DirectusResponse<T>(
+        @SerializedName("data") val data: T
+    )
 
     /* Authentication Endpoints */
 
@@ -95,6 +99,18 @@ interface DirectusApiService {
     suspend fun getProfile(@Path("id") userId: String): Response<ProfileResponse>
     data class ProfileResponse(val data: ProfileDTO)
 
+    @GET("items/active_user_habits")
+    suspend fun getUserHabits(): HabitsResponse
+
+    @PATCH("items/habits_tracking/{habit_tracking_id}")
+    suspend fun changeHabitCheck(
+        @Path("habit_tracking_id") habitTrackingId: String, @Body request: Map<String, Boolean>
+    ): Response<DirectusResponse<HabitTrackingResponseDto>>
+
+    @POST("items/habits_tracking")
+    suspend fun createHabitTracking(
+        @Body request: HabitTrackingApiRequest
+    ): Response<DirectusResponse<HabitTrackingResponseDto>>
     /* Habit Endpoints */
 
     /**
@@ -130,8 +146,8 @@ interface DirectusApiService {
      * @param request The HabitTrackingApiRequest object containing tracking details
      * @return Response with status of the operation (no content body expected)
      */
-    @POST("items/habits_tracking")
-    suspend fun createHabitTracking(@Body request: HabitTrackingApiRequest): Response<Unit>
+    // @POST("items/habits_tracking")
+    // suspend fun createHabitTracking(@Body request: HabitTrackingApiRequest): Response<Unit>
 
     /**
      * Retrieves all day associations for a specific habit.
@@ -169,6 +185,24 @@ interface DirectusApiService {
         @Path("habit_id") habitId: String,
         @Body request: Map<String, Boolean> = mapOf("is_deleted" to true)
     ): Response<Habit>
+
+    @GET("items/user_habit_tracking_view")
+    suspend fun getCompletedHabitsTracking(
+        @Query("filter[user_id][_eq]") userId: String,
+        @Query("filter[is_checked][_eq]") isChecked: Boolean = true
+    ): Response<CompletedHabitsTrackingResponse>
+
+    data class CompletedHabitsTrackingResponse(
+        val data: List<UserHabitTrackingViewDTO>
+    )
+
+    data class UserHabitTrackingViewDTO(
+        val tracking_id: String?,
+        val habit_id: String?,
+        val user_id: String?,
+        val is_checked: Boolean?,
+        val tracking_date: String?
+    )
 
     /* Gamification Endpoints */
 
@@ -231,6 +265,29 @@ interface DirectusApiService {
     /* Habits Endpoints */
     // TODO: Add habits-related endpoints as needed
 
+    /* Articles Endpoints */
+
+    /**
+     * Retrieves a user's articles along with like information per article using the USER_ARTICLES_VIEW view.
+     *
+     * @param userId ID of the user whose articles are to be retrieved
+     * @param fields Fields to return (default: title, image_url, likes_count)
+     * @return Response containing the list of articles and like information
+     */
+    @GET("items/user_articles_view")
+    suspend fun getUserArticles(
+        @Query("filter[user_id][_eq]") userId: String,
+        @Query("fields") fields: String = "title,image_url,likes_count"
+    ): Response<ProfileArticlesResponse>
+
+    /**
+     * Obtiene los artículos destacados con información de autor y likes desde la view RANKED_ARTICLES_VIEW.
+     */
+    @GET("items/ranked_articles_view")
+    suspend fun getRankedArticles(
+        @Query("fields") fields: String = "title,content,author_name,author_image_url,likes_count"
+    ): Response<RankedArticlesResponse>
+
     /* Profile Endpoints */
     // TODO: Add user profile-related endpoints as needed
 
@@ -242,8 +299,6 @@ interface DirectusApiService {
      * containing only their names for lightweight listing purposes.
      * Results are sorted alphabetically by category name in ascending order.
      *
-     * @param fields Comma-separated list of fields to include (default: "name")
-     * @param sort Sorting criteria (default: "name" for alphabetical order)
      * @return Retrofit Response containing the list of categories
      */
     @GET("items/categories")
