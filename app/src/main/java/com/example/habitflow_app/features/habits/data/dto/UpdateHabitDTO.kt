@@ -4,6 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 
 data class HabitDayResponse(
+    val id: String,
     @SerializedName("habit_id") val habitId: String,
     @SerializedName("week_day_id") val weekDayId: String
 )

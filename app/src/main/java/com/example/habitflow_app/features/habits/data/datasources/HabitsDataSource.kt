@@ -3,6 +3,7 @@ package com.example.habitflow_app.features.habits.data.datasources
 import com.example.habitflow_app.features.habits.data.dto.ActiveHabitDto
 import android.util.Log
 import com.example.habitflow_app.core.network.DirectusApiService
+import com.example.habitflow_app.core.network.DirectusApiService.DeleteHabitDaysRequest
 import com.example.habitflow_app.core.utils.ExtractInfoToken
 import com.example.habitflow_app.domain.models.Category
 import com.example.habitflow_app.domain.models.Habit
@@ -173,21 +174,71 @@ class HabitsDataSource @Inject constructor(
         return response.body()?.data ?: emptyList()
     }
 
+    fun String.normalizeUUID(): String {
+        return if (this.length == 32 && !this.contains("-")) {
+            "${this.substring(0, 8)}-${this.substring(8, 12)}-${this.substring(12, 16)}-" +
+                    "${this.substring(16, 20)}-${this.substring(20)}"
+        } else {
+            this
+        }
+    }
+
     suspend fun updateHabitDays(request: UpdateHabitDaysRequest): HabitUpdateResponse {
-        // 1. Eliminar días existentes
-        directusApiService.deleteHabitDays(request.habitId)
+        val normalizedHabitId = request.habitId.normalizeUUID()
+        Log.d("HabitsDataSource", "Updating days for habit: $normalizedHabitId")
 
-        // 2. Crear nuevos días
-        val createdCount = request.days.map { dayId ->
-            directusApiService.createHabitDay(
-                HabitDayApiRequest(request.habitId, dayId)
-            ).isSuccessful
-        }.count { it }
+        try {
 
-        return HabitUpdateResponse(
-            success = createdCount == request.days.size,
-            updatedCount = createdCount
-        )
+            val habitResponse = directusApiService.getHabitById(normalizedHabitId)
+            if (!habitResponse.isSuccessful || habitResponse.body()?.data.isNullOrEmpty()) {
+                throw Exception("Habit with ID $normalizedHabitId does not exist")
+            }
+            Log.d("HabitsDataSource", "Habit exists, proceeding with day updates")
+            
+            // 1. Obtener días existentes para este hábito
+            Log.d("HabitsDataSource", "Fetching existing days...")
+            val existingDays = getHabitDays(normalizedHabitId)
+
+            // 2. Eliminar días existentes usando sus IDs
+            if (existingDays.isNotEmpty()) {
+                Log.d("HabitsDataSource", "Deleting ${existingDays.size} existing days...")
+                val idsToDelete = existingDays.map { it.id }
+                Log.d("DELETE_REQUEST", "Deleting IDs: ${idsToDelete.joinToString()}")
+                val deleteResponse = directusApiService.deleteHabitDays(DeleteHabitDaysRequest(idsToDelete))
+
+                if (!deleteResponse.isSuccessful) {
+                    val errorBody = deleteResponse.errorBody()?.string()
+                    Log.e("HabitsDataSource", "Delete failed. Code: ${deleteResponse.code()}, Error: $errorBody")
+                    throw Exception("Failed to delete existing days: $errorBody")
+                }
+                Log.d("HabitsDataSource", "Existing days deleted successfully")
+            } else {
+                Log.d("HabitsDataSource", "No existing days to delete")
+            }
+
+            // 3. Crear nuevos días
+            Log.d("HabitsDataSource", "Creating ${request.days.size} new days...")
+            val createdCount = request.days.mapIndexed { index, dayId ->
+                val normalizedDayId = dayId.normalizeUUID()
+                Log.d("HabitsDataSource", "Creating day ${index + 1}: $normalizedDayId")
+                val response = directusApiService.createHabitDay(
+                    HabitDayApiRequest(normalizedHabitId, normalizedDayId)
+                )
+                if (!response.isSuccessful) {
+                    Log.e("HabitsDataSource", "Failed to create day $normalizedDayId: ${response.errorBody()?.string()}")
+                }
+                response.isSuccessful
+            }.count { it }
+
+            Log.d("HabitsDataSource", "Successfully created $createdCount/${request.days.size} days")
+            return HabitUpdateResponse(
+                success = createdCount == request.days.size,
+                updatedCount = createdCount
+            )
+        } catch (e: Exception) {
+            Log.e("HabitsDataSource", "Error in updateHabitDays", e)
+            throw Exception("Failed to update habit days: ${e.message}")
+        }
     }
 
     suspend fun softDeleteHabit(habitId: String): Boolean {

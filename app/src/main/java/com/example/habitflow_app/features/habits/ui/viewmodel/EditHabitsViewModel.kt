@@ -76,22 +76,9 @@ class HabitEditViewModel @Inject constructor(
     private fun validateAndUpdateDays() {
         _uiState.value = _uiState.value.copy(
             daysError = null,
-            error = null
+            error = null,
+            isLoading = true
         )
-
-        val validation = habitValidator.validateDays(
-            selectedDays = _uiState.value.selectedDays,
-            isDailySelected = _uiState.value.isDailySelected
-        )
-
-        if (!validation.isValid) {
-            _uiState.value = _uiState.value.copy(
-                daysError = validation.errorMessage
-            )
-            return
-        }
-
-        _uiState.value = _uiState.value.copy(isLoading = true)
 
         viewModelScope.launch {
             try {
@@ -101,19 +88,30 @@ class HabitEditViewModel @Inject constructor(
                     _uiState.value.selectedDays
                 }
 
-                updateHabitDaysUseCase(
+                val result = updateHabitDaysUseCase(
                     habitId = _uiState.value.habitId,
                     days = daysToUpdate
                 )
 
-                _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    isSuccess = true
+                result.fold(
+                    onSuccess = { response ->
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            isSuccess = response.success,
+                            error = if (!response.success) "Failed to update some days" else null
+                        )
+                    },
+                    onFailure = { e ->
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            error = e.message ?: "Failed to update days"
+                        )
+                    }
                 )
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    error = e.message ?: "Error al actualizar días"
+                    error = "Network error: ${e.message}"
                 )
             }
         }

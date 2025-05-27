@@ -25,6 +25,7 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.HTTP
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
@@ -159,7 +160,7 @@ interface DirectusApiService {
     @GET("items/habits_days")
     suspend fun getHabitDays(
         @Query("filter[habit_id][_eq]") habitId: String,
-        @Query("fields") fields: String = "habit_id,week_day_id"
+        @Query("fields") fields: String = "id,habit_id,week_day_id"
     ): Response<DirectusResponse<List<HabitDayResponse>>>
 
     /**
@@ -168,10 +169,15 @@ interface DirectusApiService {
      * @param habitId The ID of the habit whose day associations should be deleted
      * @return Response with status of the operation (no content body expected)
      */
-    @DELETE("items/habits_days")
-    suspend fun deleteHabitDays(
-        @Query("filter[habit_id][_eq]") habitId: String
-    ): Response<Unit>
+    @HTTP(method = "DELETE", path = "items/habits_days", hasBody = true)
+    suspend fun deleteHabitDays(@Body request: DeleteHabitDaysRequest): Response<Unit>
+
+    data class DeleteHabitDaysRequest(val keys: List<String>)
+
+    @GET("items/habits")
+    suspend fun getHabitById(
+        @Query("filter[id][_eq]") habitId: String
+    ): Response<DirectusResponse<List<Habit>>>
 
     /**
      * Soft deletes a habit by marking it as deleted (is_deleted = true).
