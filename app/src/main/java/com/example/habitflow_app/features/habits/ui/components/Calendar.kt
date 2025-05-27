@@ -1,6 +1,10 @@
 package com.example.habitflow_app.features.habits.ui.components
 
+import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,33 +16,43 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.KeyboardArrowRight
-import androidx.compose.material3.Icon
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.habitflow_app.core.ui.theme.HabitflowAppTheme
+import com.example.habitflow_app.domain.models.DayInfo
+import com.example.habitflow_app.domain.models.DayStatus
+import com.example.habitflow_app.domain.models.DayStyle
 import java.time.LocalDate
 import java.time.format.TextStyle
 import java.util.Locale
+import kotlin.math.abs
 
 @Preview(showBackground = true)
 @Composable
 fun HorizontalCalendarPreview() {
     val today = LocalDate.now()
     val dayStatuses = mapOf(
+        today.minusDays(4) to DayStatus.NoHabits,
         today.minusDays(3) to DayStatus.Partial,
         today.minusDays(2) to DayStatus.Failed,
         today.minusDays(1) to DayStatus.Completed,
@@ -52,176 +66,319 @@ fun HorizontalCalendarPreview() {
         Calendar(
             currentDate = today,
             dayStatuses = dayStatuses,
+            onDateRangeChanged = { startDate, endDate ->
+                Log.e("Date range", "Loading data from $startDate to $endDate")
+            },
             modifier = Modifier.padding(16.dp)
         )
     }
 }
 
-sealed class DayStatus {
-    object Completed : DayStatus()
-    object Partial : DayStatus()
-    object Failed : DayStatus()
-    object Future : DayStatus()
-}
-
 /**
  * A composable that displays a horizontal calendar showing a range of days
- * centered around the current date, indicating the completion status of each day.
- *
- * @param currentDate The reference date from which the calendar range is calculated.
- * @param dayStatuses A map associating dates with their respective status (completed, partial, failed, or future).
- * @param modifier An optional [Modifier] for layout customization.
+ * with swipe navigation support to load different date ranges.
  */
 @Composable
 fun Calendar(
     currentDate: LocalDate = LocalDate.now(),
     dayStatuses: Map<LocalDate, DayStatus> = emptyMap(),
-    modifier: Modifier = Modifier
+    onDateRangeChanged: ((startDate: LocalDate, endDate: LocalDate) -> Unit)? = null,
+    @SuppressLint("ModifierParameter") modifier: Modifier = Modifier
 ) {
-    val daysToShow = 7
     val today = LocalDate.now()
-    val spanishLocale = Locale("es", "ES")
+    val spanishLocale = remember { Locale("es", "ES") }
 
-    Column(
-        modifier = modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "Hoy",
-            style = MaterialTheme.typography.titleLarge.copy(
-                fontWeight = FontWeight.Bold,
-                fontSize = 20.sp
-            ),
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
+    var centerDate by remember { mutableStateOf(currentDate) }
+    var accumulatedDrag by remember { mutableFloatStateOf(0f) }
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            (-3..3).forEach { offset ->
-                val date = today.plusDays(offset.toLong())
-                val dayName = date.dayOfWeek.getDisplayName(
-                    TextStyle.SHORT,
-                    spanishLocale
-                ).replace(".", "").replaceFirstChar { it.uppercase() }
+    // Use derivedStateOf to avoid unnecessary recompositions
+    val isCurrentWeek by remember {
+        derivedStateOf {
+            centerDate.isEqual(today) || (centerDate.isAfter(today.minusDays(3)) && centerDate.isBefore(
+                today.plusDays(4)
+            ))
+        }
+    }
 
-                Text(
-                    text = dayName,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.width(40.dp)
+    val displayCenterDate by remember {
+        derivedStateOf {
+            if (isCurrentWeek) today else centerDate
+        }
+    }
+
+    // Precalculate day information to avoid repeated calculations
+    val daysInfo by remember(displayCenterDate, dayStatuses) {
+        derivedStateOf {
+            (-3..3).map { offset ->
+                val date = displayCenterDate.plusDays(offset.toLong())
+                DayInfo(
+                    date = date,
+                    dayNumber = date.dayOfMonth,
+                    dayName = date.dayOfWeek.getDisplayName(TextStyle.SHORT, spanishLocale)
+                        .replace(".", "").replaceFirstChar { it.uppercase() },
+                    isToday = date == today,
+                    isPast = date.isBefore(today),
+                    status = dayStatuses[date] ?: DayStatus.Future
                 )
             }
         }
+    }
+
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .pointerInput(centerDate) { // Use centerDate as key to recreate only when it changes
+                detectDragGestures(
+                    onDragEnd = {
+                        accumulatedDrag = 0f
+                    }) { _, dragAmount ->
+                    accumulatedDrag += dragAmount.x
+                    val threshold = 150f // Increase threshold for less sensitivity
+
+                    if (abs(accumulatedDrag) > threshold) {
+                        val newCenterDate = if (accumulatedDrag > 0) {
+                            centerDate.minusDays(7)
+                        } else {
+                            centerDate.plusDays(7)
+                        }
+
+                        centerDate = newCenterDate
+                        accumulatedDrag = 0f
+
+                        val startDate = newCenterDate.minusDays(3)
+                        val endDate = newCenterDate.plusDays(3)
+                        onDateRangeChanged?.invoke(startDate, endDate)
+                    }
+                }
+            },
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // Title and Back to Today Button
+        CalendarHeader(
+            isCurrentWeek = isCurrentWeek,
+            onBackToToday = {
+                centerDate = today
+                val startDate = today.minusDays(3)
+                val endDate = today.plusDays(3)
+                onDateRangeChanged?.invoke(startDate, endDate)
+            }
+        )
+
+        // Names of days
+        DayNamesRow(daysInfo = daysInfo)
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            (-3..3).forEach { offset ->
-                val date = today.plusDays(offset.toLong())
-                val isToday = date == today
-                val isPast = date.isBefore(today)
-                val status = dayStatuses[date] ?: DayStatus.Future
+        // Circles of days
+        DayCirclesRow(daysInfo = daysInfo)
 
-                DayCircle(
-                    day = date.dayOfMonth,
-                    isToday = isToday,
-                    isPast = isPast,
-                    status = status
+        val visibleStartDate = daysInfo.first().date
+        val visibleEndDate = daysInfo.last().date
+        DateRangeLabel(startDate = visibleStartDate, endDate = visibleEndDate)
+    }
+}
+
+@Composable
+private fun CalendarHeader(
+    isCurrentWeek: Boolean,
+    onBackToToday: () -> Unit
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        if (isCurrentWeek) {
+            // Title only when in the current week
+            Text(
+                text = "Semana actual",
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontWeight = FontWeight.Bold
+                ),
+                color = MaterialTheme.colorScheme.onSurface,
+                textAlign = TextAlign.Center
+            )
+        } else {
+            // Only button when not in the current week
+            Button(
+                onClick = onBackToToday,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+                    contentColor = MaterialTheme.colorScheme.primary
+                ),
+                shape = RoundedCornerShape(14.dp),
+                modifier = Modifier.height(36.dp)
+            ) {
+                Text(
+                    text = "Volver a la semana actual",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium
                 )
             }
+        }
+        Spacer(modifier = Modifier.height(12.dp))
+    }
+}
+
+/**
+ * Displays the names of the days in a row.
+ * The names are derived from the provided list of DayInfo objects.
+ */
+@Composable
+private fun DayNamesRow(daysInfo: List<DayInfo>) {
+    Row(
+        modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+        daysInfo.forEach { dayInfo ->
+            Text(
+                text = dayInfo.dayName,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                textAlign = TextAlign.Center,
+                modifier = Modifier.width(40.dp)
+            )
+        }
+    }
+}
+
+@Composable
+private fun DayCirclesRow(daysInfo: List<DayInfo>) {
+    Row(
+        modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+        daysInfo.forEach { dayInfo ->
+            DayCircle(dayInfo = dayInfo)
         }
     }
 }
 
 /**
- * A composable that visually represents a day in the calendar as a circle,
- * optionally showing an icon based on the day's status.
- *
- * @param day The day number (1–31) to display inside the circle.
- * @param isToday True if the day represents the current date.
- * @param isPast True if the day is before today.
- * @param status The status of the day (completed, partial, failed, or future).
+ * Displays the date range label based on the start and end dates.
+ * The label is formatted in Spanish and adjusts based on the month and year.
  */
 @Composable
-private fun DayCircle(
-    day: Int,
-    isToday: Boolean,
-    isPast: Boolean,
-    status: DayStatus
-) {
-    val (icon, backgroundColor, contentColor) = when {
-        isToday -> Triple(
-            null,
-            when (status) {
-                is DayStatus.Completed -> Color(0xFF4CAF50).copy(alpha = 0.2f)
-                is DayStatus.Partial -> Color(0xFFFF9800).copy(alpha = 0.2f)
-                is DayStatus.Failed -> Color(0xFFF44336).copy(alpha = 0.2f)
-                else -> Color.Transparent
-            },
-            MaterialTheme.colorScheme.onSurface
-        )
-        isPast -> Triple(
-            when (status) {
-                is DayStatus.Completed -> Icons.Default.Check
-                is DayStatus.Partial -> Icons.Default.KeyboardArrowRight
-                is DayStatus.Failed -> Icons.Default.Close
-                else -> null
-            },
-            when (status) {
-                is DayStatus.Completed -> Color(0xFF4CAF50).copy(alpha = 0.2f)
-                is DayStatus.Partial -> Color(0xFFFF9800).copy(alpha = 0.2f)
-                is DayStatus.Failed -> Color(0xFFF44336).copy(alpha = 0.2f)
-                else -> Color.Transparent
-            },
-            when (status) {
-                is DayStatus.Completed -> Color(0xFF4CAF50)
-                is DayStatus.Partial -> Color(0xFFFF9800)
-                is DayStatus.Failed -> Color(0xFFF44336)
-                else -> Color.Transparent
-            }
-        )
-        else -> Triple(
-            null,
-            Color(0xFF9E9E9E).copy(alpha = 0.2f),
-            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-        )
+private fun DateRangeLabel(startDate: LocalDate, endDate: LocalDate) {
+    val startMonth = startDate.month.getDisplayName(TextStyle.FULL, Locale("es"))
+    val endMonth = endDate.month.getDisplayName(TextStyle.FULL, Locale("es"))
+    val startYear = startDate.year
+    val endYear = endDate.year
+
+    val label = when {
+        startMonth == endMonth && startYear == endYear -> {
+            "$startMonth $startYear"
+        }
+
+        startYear == endYear -> {
+            "$startMonth – $endMonth $startYear"
+        }
+
+        else -> {
+            "$startMonth $startYear – $endMonth $endYear"
+        }
+    }
+
+    Spacer(modifier = Modifier.height(8.dp))
+    Text(
+        text = label.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale("es")) else it.toString() },
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+        textAlign = TextAlign.Center,
+        modifier = Modifier.fillMaxWidth()
+    )
+}
+
+
+/**
+ * Optimized DayCircle using cached DayInfo and memoized styles
+ */
+@Composable
+private fun DayCircle(dayInfo: DayInfo) {
+    // Memorize styles to avoid recalculations
+    val dayStyle = remember(dayInfo.isToday, dayInfo.isPast, dayInfo.status) {
+        calculateDayStyle(dayInfo)
     }
 
     Box(
         modifier = Modifier
             .size(40.dp)
             .clip(CircleShape)
-            .background(backgroundColor),
-        contentAlignment = Alignment.Center
+            .background(dayStyle.backgroundColor)
+            .border(
+                width = if (dayInfo.isToday) 2.dp else 0.dp,
+                color = if (dayInfo.isToday) getStatusContentColor(dayInfo.status) else Color.Transparent,
+                shape = CircleShape
+            ),
+        contentAlignment = Alignment.Center,
     ) {
-        if (isPast) {
-            icon?.let {
-                Icon(
-                    imageVector = it,
-                    contentDescription = when (status) {
-                        is DayStatus.Completed -> "Completado"
-                        is DayStatus.Partial -> "Parcial"
-                        is DayStatus.Failed -> "Fallado"
-                        else -> null
-                    },
-                    tint = contentColor,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-        } else {
-            Text(
-                text = day.toString(),
-                color = if (isToday) MaterialTheme.colorScheme.primary else contentColor,
-                fontWeight = if (isToday) FontWeight.Bold else FontWeight.Normal,
-                fontSize = if (isToday) 16.sp else 14.sp
-            )
-        }
+        DayContent(
+            dayInfo = dayInfo, dayStyle = dayStyle
+        )
+    }
+}
+
+@Composable
+private fun DayContent(dayInfo: DayInfo, dayStyle: DayStyle) {
+    // Always display the day number
+    Text(
+        text = dayInfo.dayNumber.toString(),
+        color = dayStyle.contentColor,
+        fontWeight = if (dayInfo.isToday) FontWeight.Bold else FontWeight.Normal,
+        fontSize = if (dayInfo.isToday) 16.sp else 14.sp
+    )
+}
+
+// Pure function for calculating styles (does not recompose)
+private fun calculateDayStyle(dayInfo: DayInfo): DayStyle {
+    Log.e("DayInfo", "$dayInfo")
+    return when {
+        dayInfo.isToday -> DayStyle(
+            icon = null,
+            backgroundColor = getStatusBackgroundColor(dayInfo.status),
+            contentColor = getStatusContentColor(
+                dayInfo.status,
+                Color(0xFF1976D2)
+            ), // Material Blue 700
+        )
+
+        dayInfo.isPast -> DayStyle(
+            icon = null,
+            backgroundColor = getStatusBackgroundColor(
+                dayInfo.status,
+                Color(0xFF1976D2).copy(alpha = 0.2f)
+            ),
+            contentColor = getStatusContentColor(dayInfo.status)
+        )
+
+        else -> DayStyle(
+            icon = null,
+            backgroundColor = Color(0xFF9E9E9E).copy(alpha = 0.2f),
+            contentColor = Color(0xFF757575) // Material Grey 600
+        )
+    }
+}
+
+// Pure function for getting status color (does not recompose)
+private fun getStatusContentColor(
+    status: DayStatus,
+    defaultColor: Color = Color(0xFF757575)
+): Color {
+    return when (status) {
+        DayStatus.Completed -> Color(0xFF4CAF50)
+        DayStatus.Partial -> Color(0xFFFF9800)
+        DayStatus.Failed -> Color(0xFFF44336)
+        DayStatus.NoHabits -> Color(0xFF9E9E9E).copy(alpha = 0.6f)
+        else -> defaultColor
+    }
+}
+
+fun getStatusBackgroundColor(
+    status: DayStatus,
+    defaultColor: Color = Color.Transparent
+): Color {
+    return when (status) {
+        DayStatus.Completed -> Color(0xFF4CAF50).copy(alpha = 0.2f)
+        DayStatus.Partial -> Color(0xFFFF9800).copy(alpha = 0.2f)
+        DayStatus.Failed -> Color(0xFFF44336).copy(alpha = 0.2f)
+        DayStatus.NoHabits -> Color(0xFF9E9E9E).copy(alpha = 0.1f)
+        else -> defaultColor
     }
 }

@@ -20,13 +20,15 @@ VALUES
     ('f31a5698-2a4d-4818-8a0b-e7f843b9ec14', 'Sábado', 'SA'),
     ('82a4b1c9-72a8-4e91-aaa4-2c92d30b810f', 'Domingo', 'DO');
 
--- Inserción de datos en la tabla directus_roles
+-- Script de migración para versión anterior de Directus (sin tabla directus_policies)
+
+-- Primero mantenemos la inserción de roles que sigue siendo compatible
 INSERT INTO directus_roles (id, name)
 VALUES
     ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'ADMIN'),
     ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'USER');
 
--- Inserción de datos en la tabla directus_users
+-- Inserción de usuarios (compatible con ambas versiones)
 INSERT INTO directus_users (id, email, password, role)
 VALUES
     ('05e8c0f7-6433-4e23-ab06-36a67c7e23a3', 'admin@ejemplo.com', '$argon2id$v=19$m=64,t=3,p=4$bjJxemdpaTZhamYwMDAwMA$mQp7+d3cVuwTx71lb6TrqiZU/lB3Ph8l4K5okmS5f9oeWPzk/lzR6jAJ2ozWuxhIGSQ6iy3O8tnLRB7QcZ0O0g', 'a21cfc5d-3f01-4e45-8e93-dd0d440af562'),
@@ -36,7 +38,7 @@ VALUES
     ('b4a7c8d9-e0f1-4a5b-9c8d-7e6f5a4b3c2d', 'miguel_gonzalez@ejemplo.com', '$argon2id$v=19$m=64,t=3,p=4$bjJxemdpaTZhamYwMDAwMA$mQp7+d3cVuwTx71lb6TrqiZU/lB3Ph8l4K5okmS5f9oeWPzk/lzR6jAJ2ozWuxhIGSQ6iy3O8tnLRB7QcZ0O0g', '5e8b7092-6ee2-47df-b24a-b3c9f733a9c4'),
     ('c8d9e0f1-a2b3-4c5d-6e7f-8a9b0c1d2e3f', 'pablo_pineda@ejemplo.com', '$argon2id$v=19$m=64,t=3,p=4$bjJxemdpaTZhamYwMDAwMA$mQp7+d3cVuwTx71lb6TrqiZU/lB3Ph8l4K5okmS5f9oeWPzk/lzR6jAJ2ozWuxhIGSQ6iy3O8tnLRB7QcZ0O0g', '5e8b7092-6ee2-47df-b24a-b3c9f733a9c4');
 
--- Inserción de datos en la tabla directus_users
+-- Inserción de perfiles (compatible con ambas versiones)
 INSERT INTO profiles (id, full_name, username, streak, best_streak, avatar_url, created_at)
 VALUES
     ('05e8c0f7-6433-4e23-ab06-36a67c7e23a3', 'Administrador', 'admin', 15, 20, 'https://randomuser.me/api/portraits/men/22.jpg', '2024-01-15 08:30:00'),
@@ -46,35 +48,101 @@ VALUES
     ('b4a7c8d9-e0f1-4a5b-9c8d-7e6f5a4b3c2d', 'Miguel Gonzalez', 'miguel_gonzalez', 22, 30, 'https://randomuser.me/api/portraits/men/15.jpg', '2023-10-18 16:50:00'),
     ('c8d9e0f1-a2b3-4c5d-6e7f-8a9b0c1d2e3f', 'Pablo Pineda', 'pablo_pineda', 9, 14, 'https://randomuser.me/api/portraits/men/19.jpg', '2024-01-30 12:10:00');
 
-
--- Inserción de la política ACCESS_USER
-INSERT INTO directus_policies (id, name, description, app_access)
+-- Permisos para usuarios públicos (sin autenticar)
+INSERT INTO directus_permissions (role, collection, action, fields, permissions)
 VALUES
-    ('2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e', 'ACCESS_USER', 'Limited access to users', true);
+    ((SELECT id FROM directus_roles WHERE name = 'Public'), 'directus_users', 'create', '*', '{}'),
+    ((SELECT id FROM directus_roles WHERE name = 'Public'), 'directus_users', 'delete', '*', '{}'),
+    ((SELECT id FROM directus_roles WHERE name = 'Public'), 'profiles', 'create', '*', '{}'),
+    ((SELECT id FROM directus_roles WHERE name = 'Public'), 'habits', 'read', '*', '{}');
 
--- Inserción de la política ACCESS_ADMIN
-INSERT INTO directus_policies (id, name, description, admin_access, app_access)
-VALUES
-    ('f9a8b7c6-d5e4-4f3a-9b2c-1a0e8d7f6c5b', 'ACCESS_ADMIN', 'Unlimited access to users', true, true);
+-- Permisos para el rol ADMIN (a21cfc5d-3f01-4e45-8e93-dd0d440af562)
+-- Configuramos al administrador con acceso completo al sistema
+UPDATE directus_roles 
+SET admin_access = true, app_access = true
+WHERE id = 'a21cfc5d-3f01-4e45-8e93-dd0d440af562';
 
--- Inserción de permisos en policies
-INSERT INTO directus_permissions (collection, action, fields, permissions, validation, policy)
+-- En algunas versiones anteriores, la configuración admin_access = true otorga todos los permisos
+-- Sin embargo, para mayor seguridad, añadimos permisos explícitos también
+INSERT INTO directus_permissions (role, collection, action, fields, permissions)
 VALUES
-    ('directus_users', 'create', '*', '{}', '{}', (SELECT id FROM directus_policies WHERE name LIKE '%public_label%')), -- Creación de usuario a publico
-    ('directus_users', 'delete', '*', '{}', '{}', (SELECT id FROM directus_policies WHERE name LIKE '%public_label%')), -- Eliminación de usuario a publico
-    ('profiles', 'create', '*', '{}', '{}', (SELECT id FROM directus_policies WHERE name LIKE '%public_label%')), -- Creación de perfil a publico
-    ('profiles', 'read', '*', '{}', '{}', '2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e'), -- Leer perfil a ACCESS_USER
-    ('profiles', 'update', '*', '{}', '{}', '2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e'), -- Actualizar perfil a ACCESS_USER
-    ('profiles', 'delete', '*', '{}', '{}', '2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e'), -- Eliminar perfil a ACCESS_USER
-    ('profiles', 'read', '*', '{}', '{}', 'f9a8b7c6-d5e4-4f3a-9b2c-1a0e8d7f6c5b'), -- Leer perfil a ACCESS_ADMIN
-    ('profiles', 'update', '*', '{}', '{}', 'f9a8b7c6-d5e4-4f3a-9b2c-1a0e8d7f6c5b'), -- Actualizar perfil a ACCESS_ADMIN
-    ('profiles', 'delete', '*', '{}', '{}', 'f9a8b7c6-d5e4-4f3a-9b2c-1a0e8d7f6c5b'); -- Eliminar perfil a ACCESS_ADMIN
+    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'profiles', 'read', '*', '{}'),
+    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'profiles', 'create', '*', '{}'),
+    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'profiles', 'update', '*', '{}'),
+    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'profiles', 'delete', '*', '{}'),
+    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'habits', 'read', '*', '{}'),
+    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'habits', 'create', '*', '{}'),
+    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'habits', 'update', 'is_deleted', '{}'),
+    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'habits', 'delete', '*', '{}'),
+    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'articles', 'read', '*', '{}'),
+    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'articles', 'create', '*', '{}'),
+    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'articles', 'update', '*', '{}'),
+    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'articles', 'delete', '*', '{}'),
+    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'articles_liked', 'read', '*', '{}'),
+    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'articles_liked', 'create', '*', '{}'),
+    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'articles_liked', 'delete', '*', '{}'),
+    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'categories', 'read','*','{}'),
+    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'habits_days', 'read', '*', '{}'),
+    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'habits_days', 'create', '*', '{}'),
+    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'habits_days', 'update', '*', '{}'),
+    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'habits_days', 'delete', '*', '{}'),
+    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'habits_tracking', 'read', '*', '{}'),
+    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'habits_tracking', 'create', '*', '{}'),
+    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'habits_tracking', 'update', '*', '{}'),
+    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'categories', 'update','*','{}'),
+    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'active_user_habits', 'read', '*', '{}'),
+    -- Añadimos permiso para la vista user_habit_calendar_view (sin filtro para admins)
+    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'user_habit_calendar_view', 'read', '*', '{}'),
+    -- Añadimos permiso para la vista user_articles_view (sin filtro para admins)
+    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'user_articles_view', 'read', '*', '{}'),
+    -- Permiso para leer la vista user_habit_tracking_view (sin filtro para admins)
+    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'user_habit_tracking_view', 'read', '*', '{"_and":[{"user_id":{"_eq":"$CURRENT_USER"}}]}'),
+    -- Permiso para leer la vista ranked_articles_view (sin filtro para admins)
+    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'ranked_articles_view', 'read', '*', '{"_and":[{"user_id":{"_eq":"$CURRENT_USER"}}]}');
 
--- Inserción de politicas con sus roles
-INSERT INTO directus_access(id, role, policy)
+
+-- Permisos para el rol USER (5e8b7092-6ee2-47df-b24a-b3c9f733a9c4)
+-- Configuramos el acceso básico para usuarios normales
+UPDATE directus_roles 
+SET admin_access = false, app_access = true
+WHERE id = '5e8b7092-6ee2-47df-b24a-b3c9f733a9c4';
+
+-- Añadimos permisos específicos para el rol USER
+INSERT INTO directus_permissions (role, collection, action, fields, permissions)
 VALUES
-    ('3f2a1b4c-5d6e-7f8a-9b0c-1d2e3f4a5b6c', 'a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'f9a8b7c6-d5e4-4f3a-9b2c-1a0e8d7f6c5b'), -- Administrador
-    ('4a5b6c7d-8e9f-0a1b-2c3d-4e5f6a7b8c9d', '5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', '2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e'); -- Usuario
+    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'profiles', 'read', '*', '{}'),
+    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'profiles', 'create', '*', '{}'),
+    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'profiles', 'update', '*', '{}'),
+    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'profiles', 'delete', '*', '{}'),
+    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'habits', 'read', '*', '{"_and":[{"user_id":{"_eq":"$CURRENT_USER"}}]}'),
+    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'habits', 'create', '*', '{}'),
+    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'habits', 'update', 'is_deleted', '{}'),
+    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'habits', 'delete', '*', '{}'),
+    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'articles', 'read', '*', '{}'),
+    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'articles', 'create', '*', '{}'),
+    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'articles', 'update', '*', '{}'),
+    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'articles', 'delete', '*', '{}'),
+    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'articles_liked', 'read', '*', '{}'),
+    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'articles_liked', 'create', '*', '{}'),
+    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'articles_liked', 'delete', '*', '{}'),
+    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'categories', 'read','*','{}'),
+    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'habits_days', 'read', '*', '{}'),
+    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'habits_days', 'create', '*', '{}'),
+    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'habits_days', 'update', '*', '{}'),
+    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'habits_days', 'delete', '*', '{}'),
+    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'habits_tracking', 'read', '*', '{}'),
+    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'habits_tracking', 'create', '*', '{}'),
+    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'habits_tracking', 'update', '*', '{}'),
+    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'categories', 'update','*','{}'),
+    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'active_user_habits', 'read', '*', '{"_and":[{"user_id":{"_eq":"$CURRENT_USER"}}]}'),
+    -- Permiso para leer la vista user_habit_calendar_view con filtro para el usuario actual
+    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'user_habit_calendar_view', 'read', '*', '{"_and":[{"user_id":{"_eq":"$CURRENT_USER"}}]}'),
+    -- Permiso para leer la vista user_articles_view con filtro para el usuario actual
+    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'user_articles_view', 'read', '*', '{"_and":[{"user_id":{"_eq":"$CURRENT_USER"}}]}'),
+    -- Permiso para leer la vista user_habit_tracking_view con filtro para el usuario actual
+    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'user_habit_tracking_view', 'read', '*', '{"_and":[{"user_id":{"_eq":"$CURRENT_USER"}}]}'),
+    -- Permiso para leer la vista ranked_articles_view con filtro para el usuario actual
+    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'ranked_articles_view', 'read', '*', '{"_and":[{"user_id":{"_eq":"$CURRENT_USER"}}]}');
 
 -- Inserción de artículos
 INSERT INTO articles (id, title, content, image_url, is_deleted, created_at, user_id, category_id)
@@ -180,3 +248,104 @@ VALUES
     ('c7d8e9f0-a1b2-3c4d-5e6f-7a8b9c0d1e2f', TRUE, '2024-04-20', '6f7a8b9c-0d1e-2f3a-4b5c-6d7e8f9a0b1c'), -- Diario gratitud: Sábado pasado
     ('d8e9f0a1-b2c3-4d5e-6f7a-8b9c0d1e2f3a', TRUE, '2024-04-21', '6f7a8b9c-0d1e-2f3a-4b5c-6d7e8f9a0b1c'), -- Diario gratitud: Domingo pasado
     ('e9f0a1b2-c3d4-5e6f-7a8b-9c0d1e2f3a4b', TRUE, '2024-04-15', '7a8b9c0d-1e2f-3a4b-5c6d-7e8f9a0b1c2d'); -- Ahorrar: Lunes pasado
+
+
+-- Inserción de hábitos para el usuario esteban_gaviria@ejemplo.com
+INSERT INTO habits (id, name, streak, notifications_enable, reminder_time, is_deleted, created_at, expiration_date, category_id, user_id)
+VALUES
+    ('8f9a0b1c-2d3e-4f5a-6b7c-8d9e0f1a2b3c', 'Hacer ejercicio matutino', 12, TRUE, '07:00:00', FALSE, '2025-04-01 06:30:00', '2025-10-01', '3e7c78bc-e145-4c2d-aa36-58b97f68a6d3', 'a3dc5f62-78f7-4215-b78a-cf75a6348067'),
+    ('9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d', 'Leer antes de dormir', 7, TRUE, '21:30:00', FALSE, '2025-04-15 20:00:00', '2025-11-15', 'b5a9f41d-31a6-4f11-b80f-7d2764c0a75b', 'a3dc5f62-78f7-4215-b78a-cf75a6348067'),
+    ('0b1c2d3e-4f5a-6b7c-8d9e-0f1a2b3c4d5e', 'Meditar 15 minutos', 5, TRUE, '08:30:00', FALSE, '2025-05-01 07:45:00', '2025-12-01', '7d7cfd2a-86a3-4879-aa4f-2e5413b3538b', 'a3dc5f62-78f7-4215-b78a-cf75a6348067'),
+    ('1c2d3e4f-5a6b-7c8d-9e0f-1a2b3c4d5e6f', 'Tomar vitaminas', 3, FALSE, NULL, FALSE, '2025-05-10 12:00:00', '2025-08-10', '1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed', 'a3dc5f62-78f7-4215-b78a-cf75a6348067'),
+    ('2d3e4f5a-6b7c-8d9e-0f1a-2b3c4d5e6f7a', 'Escribir en diario', 15, TRUE, '22:00:00', FALSE, '2025-03-20 21:30:00', '2025-09-20', 'b5a9f41d-31a6-4f11-b80f-7d2764c0a75b', 'a3dc5f62-78f7-4215-b78a-cf75a6348067');
+
+
+-- Inserción en habits_days para programar los días de la semana
+INSERT INTO habits_days (habit_id, week_day_id)
+VALUES
+    -- Ejercicio matutino: Lunes, Miércoles, Viernes
+    ('8f9a0b1c-2d3e-4f5a-6b7c-8d9e0f1a2b3c', 'd3b15c58-711f-40d9-9f4b-06d0d6e925d1'), -- Lunes
+    ('8f9a0b1c-2d3e-4f5a-6b7c-8d9e0f1a2b3c', '4afe91c2-9851-4af7-b282-39a543989ea3'), -- Miércoles
+    ('8f9a0b1c-2d3e-4f5a-6b7c-8d9e0f1a2b3c', '22f2bf21-fcbd-473f-98d2-96ba47fabe16'), -- Viernes
+    
+    -- Leer antes de dormir: Todos los días
+    ('9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d', 'd3b15c58-711f-40d9-9f4b-06d0d6e925d1'), -- Lunes
+    ('9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d', 'b9b3995e-c6a5-46c7-bf8a-f1c1c2e65dd6'), -- Martes
+    ('9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d', '4afe91c2-9851-4af7-b282-39a543989ea3'), -- Miércoles
+    ('9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d', 'ea5e7c7a-182c-4b49-8b2d-2162cd138384'), -- Jueves
+    ('9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d', '22f2bf21-fcbd-473f-98d2-96ba47fabe16'), -- Viernes
+    ('9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d', 'f31a5698-2a4d-4818-8a0b-e7f843b9ec14'), -- Sábado
+    ('9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d', '82a4b1c9-72a8-4e91-aaa4-2c92d30b810f'), -- Domingo
+    
+    -- Meditar: Martes, Jueves, Sábado
+    ('0b1c2d3e-4f5a-6b7c-8d9e-0f1a2b3c4d5e', 'b9b3995e-c6a5-46c7-bf8a-f1c1c2e65dd6'), -- Martes
+    ('0b1c2d3e-4f5a-6b7c-8d9e-0f1a2b3c4d5e', 'ea5e7c7a-182c-4b49-8b2d-2162cd138384'), -- Jueves
+    ('0b1c2d3e-4f5a-6b7c-8d9e-0f1a2b3c4d5e', 'f31a5698-2a4d-4818-8a0b-e7f843b9ec14'), -- Sábado
+    
+    -- Tomar vitaminas: Lunes a Viernes
+    ('1c2d3e4f-5a6b-7c8d-9e0f-1a2b3c4d5e6f', 'd3b15c58-711f-40d9-9f4b-06d0d6e925d1'), -- Lunes
+    ('1c2d3e4f-5a6b-7c8d-9e0f-1a2b3c4d5e6f', 'b9b3995e-c6a5-46c7-bf8a-f1c1c2e65dd6'), -- Martes
+    ('1c2d3e4f-5a6b-7c8d-9e0f-1a2b3c4d5e6f', '4afe91c2-9851-4af7-b282-39a543989ea3'), -- Miércoles
+    ('1c2d3e4f-5a6b-7c8d-9e0f-1a2b3c4d5e6f', 'ea5e7c7a-182c-4b49-8b2d-2162cd138384'), -- Jueves
+    ('1c2d3e4f-5a6b-7c8d-9e0f-1a2b3c4d5e6f', '22f2bf21-fcbd-473f-98d2-96ba47fabe16'), -- Viernes
+    
+    -- Escribir en diario: Domingo
+    ('2d3e4f5a-6b7c-8d9e-0f1a-2b3c4d5e6f7a', '82a4b1c9-72a8-4e91-aaa4-2c92d30b810f'); -- Domingo
+
+-- Inserción de seguimiento de hábitos (basado en fecha actual: 24 de mayo de 2025)
+-- Esto crea diferentes escenarios: días completados, parciales, ninguno y sin hábitos
+INSERT INTO habits_tracking (id, is_checked, tracking_date, habit_id)
+VALUES
+    -- Semana del 19-25 de mayo de 2025 (semana actual)
+    
+    -- Lunes 19 mayo 2025 - DÍA COMPLETADO (todos los hábitos programados)
+    ('3e4f5a6b-7c8d-9e0f-1a2b-3c4d5e6f7a8b', TRUE, '2025-05-19', '8f9a0b1c-2d3e-4f5a-6b7c-8d9e0f1a2b3c'), -- Ejercicio ✓
+    ('4f5a6b7c-8d9e-0f1a-2b3c-4d5e6f7a8b9c', TRUE, '2025-05-19', '9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d'), -- Leer ✓
+    ('5a6b7c8d-9e0f-1a2b-3c4d-5e6f7a8b9c0d', TRUE, '2025-05-19', '1c2d3e4f-5a6b-7c8d-9e0f-1a2b3c4d5e6f'), -- Vitaminas ✓
+    
+    -- Martes 20 mayo 2025 - DÍA PARCIAL (algunos hábitos completados)
+    ('6b7c8d9e-0f1a-2b3c-4d5e-6f7a8b9c0d1e', TRUE, '2025-05-20', '9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d'), -- Leer ✓
+    ('7c8d9e0f-1a2b-3c4d-5e6f-7a8b9c0d1e2f', TRUE, '2025-05-20', '0b1c2d3e-4f5a-6b7c-8d9e-0f1a2b3c4d5e'), -- Meditar ✓
+    ('8d9e0f1a-2b3c-4d5e-6f7a-8b9c0d1e2f3a', FALSE, '2025-05-20', '1c2d3e4f-5a6b-7c8d-9e0f-1a2b3c4d5e6f'), -- Vitaminas ✗
+    
+    -- Miércoles 21 mayo 2025 - DÍA NINGUNO (ningún hábito completado)
+    ('9e0f1a2b-3c4d-5e6f-7a8b-9c0d1e2f3a4b', FALSE, '2025-05-21', '8f9a0b1c-2d3e-4f5a-6b7c-8d9e0f1a2b3c'), -- Ejercicio ✗
+    ('0f1a2b3c-4d5e-6f7a-8b9c-0d1e2f3a4b5c', FALSE, '2025-05-21', '9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d'), -- Leer ✗
+    ('1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d', FALSE, '2025-05-21', '1c2d3e4f-5a6b-7c8d-9e0f-1a2b3c4d5e6f'), -- Vitaminas ✗
+    
+    -- Jueves 22 mayo 2025 - DÍA COMPLETADO
+    ('2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e', TRUE, '2025-05-22', '9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d'), -- Leer ✓
+    ('3c4d5e6f-7a8b-9c0d-1e2f-3a4b5c6d7e8f', TRUE, '2025-05-22', '0b1c2d3e-4f5a-6b7c-8d9e-0f1a2b3c4d5e'), -- Meditar ✓
+    ('4d5e6f7a-8b9c-0d1e-2f3a-4b5c6d7e8f9a', TRUE, '2025-05-22', '1c2d3e4f-5a6b-7c8d-9e0f-1a2b3c4d5e6f'), -- Vitaminas ✓
+    
+    -- Viernes 23 mayo 2025 - DÍA PARCIAL
+    ('5e6f7a8b-9c0d-1e2f-3a4b-5c6d7e8f9a0b', TRUE, '2025-05-23', '8f9a0b1c-2d3e-4f5a-6b7c-8d9e0f1a2b3c'), -- Ejercicio ✓
+    ('6f7a8b9c-0d1e-2f3a-4b5c-6d7e8f9a0b1c', FALSE, '2025-05-23', '9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d'), -- Leer ✗
+    ('7a8b9c0d-1e2f-3a4b-5c6d-7e8f9a0b1c2d', TRUE, '2025-05-23', '1c2d3e4f-5a6b-7c8d-9e0f-1a2b3c4d5e6f'), -- Vitaminas ✓
+    
+    -- Sábado 24 mayo 2025 (hoy) - DÍA COMPLETADO
+    ('8b9c0d1e-2f3a-4b5c-6d7e-8f9a0b1c2d3e', TRUE, '2025-05-24', '9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d'), -- Leer ✓
+    ('9c0d1e2f-3a4b-5c6d-7e8f-9a0b1c2d3e4f', TRUE, '2025-05-24', '0b1c2d3e-4f5a-6b7c-8d9e-0f1a2b3c4d5e'), -- Meditar ✓
+    
+    -- Domingo 25 mayo 2025 (mañana) - Sin registros aún, pero hay hábitos programados
+    -- (No hay inserts para este día para mostrar el estado "sin registros pero con hábitos")
+    
+    -- Semana anterior (12-18 mayo 2025) - Para mostrar histórico
+    
+    -- Lunes 12 mayo 2025 - DÍA COMPLETADO
+    ('0d1e2f3a-4b5c-6d7e-8f9a-0b1c2d3e4f5a', TRUE, '2025-05-12', '8f9a0b1c-2d3e-4f5a-6b7c-8d9e0f1a2b3c'), -- Ejercicio ✓
+    ('1e2f3a4b-5c6d-7e8f-9a0b-1c2d3e4f5a6b', TRUE, '2025-05-12', '9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d'), -- Leer ✓
+    ('2f3a4b5c-6d7e-8f9a-0b1c-2d3e4f5a6b7c', TRUE, '2025-05-12', '1c2d3e4f-5a6b-7c8d-9e0f-1a2b3c4d5e6f'), -- Vitaminas ✓
+    
+    -- Domingo 18 mayo 2025 - DÍA COMPLETADO (solo diario programado)
+    ('3a4b5c6d-7e8f-9a0b-1c2d-3e4f5a6b7c8d', TRUE, '2025-05-18', '9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d'), -- Leer ✓
+    ('4b5c6d7e-8f9a-0b1c-2d3e-4f5a6b7c8d9e', TRUE, '2025-05-18', '2d3e4f5a-6b7c-8d9e-0f1a-2b3c4d5e6f7a'), -- Diario ✓
+    
+    -- Días sin hábitos programados para mostrar estado "no hábitos"
+    -- (Los días sin entries en habits_days mostrarán automáticamente "no hábitos")
+    
+    -- Algunos días más antiguos para mostrar variedad
+    -- 5 mayo 2025 (domingo anterior) - PARCIAL
+    ('5c6d7e8f-9a0b-1c2d-3e4f-5a6b7c8d9e0f', TRUE, '2025-05-05', '9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d'), -- Leer ✓
+    ('6d7e8f9a-0b1c-2d3e-4f5a-6b7c8d9e0f1a', FALSE, '2025-05-05', '2d3e4f5a-6b7c-8d9e-0f1a-2b3c4d5e6f7a'); -- Diario ✗
+
