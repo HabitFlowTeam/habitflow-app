@@ -377,32 +377,33 @@ fun HabitNameField(
 @Composable
 fun HabitEditActionButtons(
     onSave: () -> Unit,
-    onDelete: () -> Unit,
-    modifier: Modifier = Modifier
+    onDelete: () -> Unit
 ) {
     Row(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Button(
             onClick = onDelete,
+            modifier = Modifier.weight(1f),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color.White,
-                contentColor = Color.Red
+                containerColor = MaterialTheme.colorScheme.errorContainer,
+                contentColor = MaterialTheme.colorScheme.onErrorContainer
             ),
-            border = BorderStroke(1.dp, Color.Red)
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.error)
         ) {
             Text("Eliminar")
         }
 
         Button(
             onClick = onSave,
+            modifier = Modifier.weight(1f),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color.Black,
                 contentColor = Color.White
             )
         ) {
-            Text("Guardar cambios")
+            Text("Guardar Cambios")
         }
     }
 }

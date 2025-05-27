@@ -6,6 +6,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Category
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -78,7 +81,7 @@ fun EditHabitScreen(
             )
         }
     ) { paddingValues ->
-        if (editState.isLoading) {
+        if (editState.isLoading && editState.habitName.isEmpty()) {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -98,9 +101,28 @@ fun EditHabitScreen(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(containerColor = Color.White),
                     border = BorderStroke(1.dp, Color.LightGray),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.padding(bottom = 12.dp)
+                        ) {
+                            Text(
+                                text = "Editar Frecuencia",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+
+                        Divider(
+                            color = Color.LightGray.copy(alpha = 0.5f),
+                            thickness = 1.dp,
+                            modifier = Modifier.padding(bottom = 16.dp)
+                        )
+
                         FrequencySelector(
                             isDailySelected = editState.isDailySelected,
                             onFrequencySelected = { isDaily ->
@@ -109,6 +131,7 @@ fun EditHabitScreen(
                         )
 
                         if (!editState.isDailySelected) {
+                            Spacer(modifier = Modifier.height(8.dp))
                             DaysSelector(
                                 selectedDays = editState.selectedDays,
                                 onDaySelected = { dayId, isSelected ->
@@ -124,23 +147,56 @@ fun EditHabitScreen(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
-
                 editState.daysError?.let {
-                    Text(it, color = Color.Red, fontSize = 14.sp)
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.1f)
+                        ),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.3f))
+                    ) {
+                        Text(
+                            text = it,
+                            color = MaterialTheme.colorScheme.error,
+                            fontSize = 14.sp,
+                            modifier = Modifier.padding(12.dp)
+                        )
+                    }
                 }
 
                 editState.error?.let {
-                    Text(it, color = Color.Red, fontSize = 14.sp)
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.1f)
+                        ),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.3f))
+                    ) {
+                        Text(
+                            text = it,
+                            color = MaterialTheme.colorScheme.error,
+                            fontSize = 14.sp,
+                            modifier = Modifier.padding(12.dp)
+                        )
+                    }
                 }
 
                 when (deleteState) {
                     is DeleteHabitViewModel.DeleteState.Error -> {
-                        Text(
-                            (deleteState as DeleteHabitViewModel.DeleteState.Error).message,
-                            color = Color.Red,
-                            fontSize = 14.sp
-                        )
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.1f)
+                            ),
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.3f))
+                        ) {
+                            Text(
+                                text = (deleteState as DeleteHabitViewModel.DeleteState.Error).message,
+                                color = MaterialTheme.colorScheme.error,
+                                fontSize = 14.sp,
+                                modifier = Modifier.padding(12.dp)
+                            )
+                        }
                     }
                     else -> {}
                 }
@@ -148,7 +204,7 @@ fun EditHabitScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp)
+                        .padding(vertical = 16.dp)
                 ) {
                     HabitEditActionButtons(
                         onSave = { editViewModel.onEvent(HabitEditEvent.Submit) },
@@ -161,8 +217,15 @@ fun EditHabitScreen(
         if (showDeleteDialog) {
             AlertDialog(
                 onDismissRequest = { showDeleteDialog = false },
-                title = { Text("Eliminar hábito") },
-                text = { Text("¿Estás seguro de que quieres eliminar este hábito?") },
+                title = {
+                    Text(
+                        "Eliminar hábito",
+                        fontWeight = FontWeight.Bold
+                    )
+                },
+                text = {
+                    Text("¿Estás seguro de que quieres eliminar este hábito? Esta acción no se puede deshacer.")
+                },
                 confirmButton = {
                     if (deleteState is DeleteHabitViewModel.DeleteState.Loading) {
                         CircularProgressIndicator(modifier = Modifier.size(24.dp))
@@ -172,7 +235,7 @@ fun EditHabitScreen(
                                 deleteViewModel.deleteHabit(habitId)
                             }
                         ) {
-                            Text("Eliminar", color = Color.Red)
+                            Text("Eliminar", color = MaterialTheme.colorScheme.error)
                         }
                     }
                 },
@@ -183,7 +246,9 @@ fun EditHabitScreen(
                     ) {
                         Text("Cancelar")
                     }
-                }
+                },
+                containerColor = Color.White,
+                tonalElevation = 8.dp
             )
         }
     }

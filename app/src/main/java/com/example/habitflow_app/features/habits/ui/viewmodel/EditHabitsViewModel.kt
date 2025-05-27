@@ -130,6 +130,10 @@ class HabitEditViewModel @Inject constructor(
 
 // Estados de la UI para edición
 data class HabitEditUiState(
+    val habitName: String = "",
+    val categoryName: String = "",
+    val hasReminder: Boolean = false,
+    val reminderTime: String? = null,
     val habitId: String = "",
     val selectedDays: List<String> = emptyList(),
     val isDailySelected: Boolean = true,
