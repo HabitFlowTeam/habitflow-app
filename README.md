@@ -117,6 +117,7 @@ habitflow_app/
 | **ranked_articles_view**     | Read  | Read (own)                                        | –              |
 
 > `CRUDS` = Create, Read, Update, Delete, Share
+> 
 > `(own)` = Data access restricted to the current user only (`user_id = $CURRENT_USER`)
 
 This configuration ensures that the **ADMIN** role has unrestricted access, the **USER** role has
