@@ -1,5 +1,6 @@
 package com.example.habitflow_app.features.habits.ui.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.habitflow_app.domain.models.DayStatus
@@ -31,7 +32,7 @@ class CalendarViewModelImpl @Inject constructor(
      * Loads the initial calendar centered on the current date
      */
     override fun loadInitialData(centerDate: LocalDate) {
-        val startDate = centerDate.minusDays(10)
+        val startDate = centerDate.minusDays(3)
         val endDate = centerDate.plusDays(3)
         loadCalendarForDateRange(startDate, endDate)
     }
