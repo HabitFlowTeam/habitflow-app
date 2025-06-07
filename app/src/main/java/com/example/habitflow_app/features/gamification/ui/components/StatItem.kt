@@ -43,7 +43,6 @@ fun StatItem(
             modifier = Modifier.padding(vertical = 16.dp, horizontal = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // numerical value
             Text(
                 text = value.toString(),
                 style = AppTypography.bodyLarge,
@@ -53,7 +52,6 @@ fun StatItem(
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            // label
             Text(
                 text = label,
                 style = AppTypography.bodyMedium,

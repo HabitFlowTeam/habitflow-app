@@ -60,7 +60,6 @@ fun StatsPersonalScreen(
             .verticalScroll(scrollState)
             .padding(16.dp)
     ) {
-        // Título de la pantalla
         Text(
             text = "Mis Estadísticas",
             fontWeight = FontWeight.Bold,
@@ -86,12 +85,10 @@ fun StatsPersonalScreen(
             return
         }
 
-        // Estadísticas personales
         Column(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Estadísticas en grid atractivo
             androidx.compose.foundation.layout.Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = androidx.compose.foundation.layout.Arrangement.SpaceEvenly
@@ -118,7 +115,6 @@ fun StatsPersonalScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Gráfica de barras: hábitos completados por día
             BarChart(
                 data = barChartData,
                 labels = listOf("L", "M", "X", "J", "V", "S", "D"),
@@ -127,7 +123,6 @@ fun StatsPersonalScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Gráfica de pastel: distribución de tipos de hábitos
             PieChart(
                 data = pieChartData.values.map { it.toFloat() },
                 colors = listOf(
@@ -144,7 +139,6 @@ fun StatsPersonalScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Mensaje motivacional
             Box(
                 modifier = Modifier
                     .fillMaxWidth()

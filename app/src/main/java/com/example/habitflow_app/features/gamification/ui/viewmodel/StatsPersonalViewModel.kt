@@ -67,12 +67,12 @@ class StatsPersonalViewModel @Inject constructor(
                     _error.value = "Autenticación requerida"
                     return@launch
                 }
-                // Obtener streaks del perfil
+
                 val userId = extractInfoToken.extractUserIdFromToken(accessToken)
                 val profile = profileRepository.getProfile(userId)
                 _currentStreak.value = profile?.streak ?: 0
                 _bestStreak.value = profile?.bestStreak ?: 0
-                // Obtener hábitos y calcular el resto de estadísticas
+
                 val data = getUserHabitCategoriesUseCase(userId)
                 _habits.value = data
                 calculateStats(data)
@@ -85,26 +85,26 @@ class StatsPersonalViewModel @Inject constructor(
     }
 
     private fun calculateStats(habits: List<HabitWithCategory>) {
-        // Hábitos completados (trackings con isChecked true)
+
         _completedHabits.value = habits.count { it.isChecked == true }
-        // Porcentaje de cumplimiento semanal (trackings de la última semana)
+
         val last7Days = habits.filter { it.trackingDate != null && isInLast7Days(it.trackingDate!!) }
         val checkedLast7Days = last7Days.count { it.isChecked == true }
         _weeklyCompletion.value = if (last7Days.isNotEmpty()) (checkedLast7Days * 100 / last7Days.size) else 0
-        // Días activos este mes (días únicos con tracking)
+
         val daysThisMonth = habits.mapNotNull { it.trackingDate?.take(10) }
             .filter { isInCurrentMonth(it) }
             .toSet().size
         _activeDaysThisMonth.value = daysThisMonth
-        // Hábito más frecuente (el nombre con más trackings)
+
         val mostFrequent = habits.groupBy { it.habitName }.maxByOrNull { it.value.size }?.key ?: ""
         _mostFrequentHabit.value = mostFrequent ?: ""
-        // Datos para gráfica de barras (hábitos completados por día de la semana)
+
         val barData = (0..6).map { dayOfWeek ->
             habits.count { it.trackingDate?.let { date -> getDayOfWeek(date) == dayOfWeek && it.isChecked == true } == true }
         }
         _barChartData.value = barData
-        // Datos para gráfica de pastel (conteo por categoría)
+
         val pieData = habits.groupBy { it.categoryName ?: "Otros" }.mapValues { it.value.size }
         _pieChartData.value = pieData
     }
@@ -126,7 +126,6 @@ class StatsPersonalViewModel @Inject constructor(
     }
 
     private fun getDayOfWeek(date: String): Int {
-        // 0 = Lunes, 6 = Domingo
         return try {
             val parsed = LocalDate.parse(date.take(10))
             val day = parsed.dayOfWeek.value

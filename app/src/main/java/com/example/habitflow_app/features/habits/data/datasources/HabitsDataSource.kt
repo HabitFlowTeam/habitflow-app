@@ -6,7 +6,6 @@ import com.example.habitflow_app.core.network.DirectusApiService
 import com.example.habitflow_app.core.network.DirectusApiService.DeleteHabitDaysRequest
 import com.example.habitflow_app.core.utils.ExtractInfoToken
 import com.example.habitflow_app.domain.models.Category
-import com.example.habitflow_app.domain.models.Habit
 import com.example.habitflow_app.domain.models.HabitWithCategory
 import com.example.habitflow_app.domain.repositories.AuthRepository
 import com.example.habitflow_app.features.habits.data.dto.CreateHabitRequest
@@ -150,7 +149,7 @@ class HabitsDataSource @Inject constructor(
 
     suspend fun createHabitTracking(
         habitId: String,
-        isChecked: Boolean = false // Default to false for initial tracking
+        isChecked: Boolean = false
     ): HabitTrackingResponseDto {
         val response = directusApiService.createHabitTracking(
             HabitTrackingApiRequest(

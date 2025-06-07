@@ -27,8 +27,8 @@ data class HabitTrackingResponseDto(
         Log.d("HabitTrackingDTO", "habitId: $habitId")
         Log.d("HabitTrackingDTO", "date: $trackingDate")
         Log.d("HabitTrackingDTO", "isChecked: $isChecked")
-        // Convert String to LocalDate
-        val dateFormatter = DateTimeFormatter.ISO_LOCAL_DATE  // Format: "yyyy-MM-dd"
+
+        val dateFormatter = DateTimeFormatter.ISO_LOCAL_DATE
         val localDate = try {
             LocalDate.parse(trackingDate, dateFormatter)
         } catch (e: Exception) {

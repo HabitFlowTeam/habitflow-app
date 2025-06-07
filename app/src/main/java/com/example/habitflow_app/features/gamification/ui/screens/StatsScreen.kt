@@ -39,7 +39,6 @@ fun StatsScreen(
             .background(Background)
             .padding(16.dp)
     ) {
-        // Control segmentado para alternar entre vistas personales y globales
         SegmentedControl(
             options = listOf("Personales", "Globales"),
             selectedIndex = selectedTabIndex,
@@ -51,7 +50,6 @@ fun StatsScreen(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Mostrar la pantalla correspondiente según la pestaña seleccionada
         when (selectedTabIndex) {
             0 -> StatsPersonalScreen(personalViewModel)
             1 -> StatsGlobalScreen(globalViewModel)
