@@ -45,3 +45,20 @@ data class CategoryResponse(
     val name: String,
     val description: String
 )
+
+data class HabitWithCategory(
+    val trackingId: String?,
+    val habitId: String?,
+    val habitName: String?,
+    val streak: Int?,
+    val notificationsEnable: Boolean?,
+    val reminderTime: String?,
+    val isDeleted: Boolean?,
+    val createdAt: String?,
+    val expirationDate: String?,
+    val categoryId: String?,
+    val userId: String?,
+    val isChecked: Boolean?,
+    val trackingDate: String?,
+    val categoryName: String?
+)

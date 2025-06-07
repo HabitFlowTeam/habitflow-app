@@ -18,6 +18,7 @@ import com.example.habitflow_app.features.habits.data.dto.HabitDayApiRequest
 import com.example.habitflow_app.features.habits.data.dto.HabitDayResponse
 import com.example.habitflow_app.features.habits.data.dto.HabitTrackingApiRequest
 import com.example.habitflow_app.features.habits.data.dto.HabitTrackingResponseDto
+import com.example.habitflow_app.features.habits.data.dto.UserHabitCategoriesViewResponse
 import com.example.habitflow_app.features.profile.data.dto.ProfileDTO
 import com.google.gson.annotations.SerializedName
 import okhttp3.ResponseBody
@@ -209,6 +210,11 @@ interface DirectusApiService {
         val is_checked: Boolean?,
         val tracking_date: String?
     )
+
+    @GET("items/user_habit_categories_view")
+    suspend fun getUserHabitCategoriesView(
+        @Query("filter[user_id][_eq]") userId: String
+    ): Response<UserHabitCategoriesViewResponse>
 
     /* Gamification Endpoints */
 

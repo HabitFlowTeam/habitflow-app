@@ -4,6 +4,7 @@ import com.example.habitflow_app.features.habits.data.dto.ActiveHabitDto
 import com.example.habitflow_app.domain.models.Category
 import com.example.habitflow_app.domain.models.Habit
 import com.example.habitflow_app.domain.models.HabitTracking
+import com.example.habitflow_app.domain.models.HabitWithCategory
 import com.example.habitflow_app.domain.repositories.HabitsRepository
 import com.example.habitflow_app.features.habits.data.datasources.HabitsDataSource
 import com.example.habitflow_app.features.habits.data.dto.CreateHabitRequest
@@ -61,5 +62,8 @@ class HabitsRepositoryImpl @Inject constructor(
     override suspend fun getCompletedHabitsCount(userId: String): Int {
         return habitsDataSource.getCompletedHabitsCount(userId)
     }
-}
 
+    override suspend fun getUserHabitCategoriesView(userId: String): List<HabitWithCategory> {
+        return habitsDataSource.getUserHabitCategoriesView(userId)
+    }
+}
