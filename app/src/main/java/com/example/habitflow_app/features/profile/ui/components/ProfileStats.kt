@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.habitflow_app.features.gamification.ui.components.StatItem
 
 /**
  * A composable function that displays a row of profile statistics.

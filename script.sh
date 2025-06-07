@@ -10,6 +10,7 @@ HABITS_DAILY_TRIGGER_FILE=${7:-sql/HABITS_DAILY_TRIGGER.sql}
 RANKED_ARTICLES_VIEW_FILE=${8:-sql/RANKED_ARTICLES_VIEW.sql}
 USER_ARTICLES_VIEW_FILE=${9:-sql/USER_ARTICLES_VIEW.sql}
 USER_HABIT_TRACKING_VIEW_FILE=${10:-sql/USER_HABIT_TRACKING_VIEW.sql}
+USER_HABIT_CATEGORIES_VIEW_FILE=${11:-sql/USER_HABIT_CATEGORIES_VIEW.sql}
 DML_FILE=${9:-sql/DML.sql}
 
 # Copiar archivos SQL al contenedor
@@ -20,6 +21,7 @@ docker cp "$RANKED_ARTICLES_VIEW_FILE" "$CONTAINER_NAME:/tmp/ranked_articles_vie
 docker cp "$HABITS_DAILY_TRIGGER_FILE" "$CONTAINER_NAME:/tmp/habits_daily_trigger.sql"
 docker cp "$USER_ARTICLES_VIEW_FILE" "$CONTAINER_NAME:/tmp/user_articles_view.sql"
 docker cp "$USER_HABIT_TRACKING_VIEW_FILE" "$CONTAINER_NAME:/tmp/user_habit_tracking_view.sql"
+docker cp "$USER_HABIT_CATEGORIES_VIEW_FILE" "$CONTAINER_NAME:/tmp/user_habit_categories_view.sql"
 docker cp "$DML_FILE" "$CONTAINER_NAME:/tmp/DML.sql"
 
 # Ejecutar los scripts SQL
@@ -28,4 +30,5 @@ docker exec -it "$CONTAINER_NAME" psql -U "$DB_USER" -d "$DB_NAME" -f /tmp/user_
 docker exec -it "$CONTAINER_NAME" psql -U "$DB_USER" -d "$DB_NAME" -f /tmp/user_habits_view.sql
 docker exec -it "$CONTAINER_NAME" psql -U "$DB_USER" -d "$DB_NAME" -f /tmp/ranked_articles_view.sql
 docker exec -it "$CONTAINER_NAME" psql -U "$DB_USER" -d "$DB_NAME" -f /tmp/habits_daily_trigger.sql
+docker exec -it "$CONTAINER_NAME" psql -U "$DB_USER" -d "$DB_NAME" -f /tmp/user_habit_categories_view.sql
 docker exec -it "$CONTAINER_NAME" psql -U "$DB_USER" -d "$DB_NAME" -f /tmp/DML.sql
