@@ -100,7 +100,9 @@ VALUES
     -- Permiso para leer la vista ranked_articles_view (sin filtro para admins)
     ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'ranked_articles_view', 'read', '*', '{}'),
     -- Permiso para leer la vista user_habit_categories_view (sin filtro para admins)
-    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'user_habit_categories_view', 'read', '*', '{"_and":[{"user_id":{"_eq":"$CURRENT_USER"}}]}');
+    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'user_habit_categories_view', 'read', '*', '{"_and":[{"user_id":{"_eq":"$CURRENT_USER"}}]}'),
+    -- Permiso para leer la vista category_ranking_view
+    ('a21cfc5d-3f01-4e45-8e93-dd0d440af562', 'category_ranking_view', 'read', '*', '{}');
 
 
 -- Permisos para el rol USER (5e8b7092-6ee2-47df-b24a-b3c9f733a9c4)
@@ -146,7 +148,9 @@ VALUES
     -- Permiso para leer la vista ranked_articles_view con filtro para el usuario actual
     ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'ranked_articles_view', 'read', '*', '{}'),
     -- Permiso para leer la vista user_habit_categories_view con filtro para el usuario actual
-    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'user_habit_categories_view', 'read', '*', '{"_and":[{"user_id":{"_eq":"$CURRENT_USER"}}]}');
+    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'user_habit_categories_view', 'read', '*', '{"_and":[{"user_id":{"_eq":"$CURRENT_USER"}}]}'),
+    -- Permiso para leer la vista category_ranking_view
+    ('5e8b7092-6ee2-47df-b24a-b3c9f733a9c4', 'category_ranking_view', 'read', '*', '{}');
 
 -- Inserción de artículos
 INSERT INTO articles (id, title, content, image_url, is_deleted, created_at, user_id, category_id)
@@ -352,4 +356,3 @@ VALUES
     -- 5 mayo 2025 (domingo anterior) - PARCIAL
     ('5c6d7e8f-9a0b-1c2d-3e4f-5a6b7c8d9e0f', TRUE, '2025-05-05', '9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d'), -- Leer ✓
     ('6d7e8f9a-0b1c-2d3e-4f5a-6b7c8d9e0f1a', FALSE, '2025-05-05', '2d3e4f5a-6b7c-8d9e-0f1a-2b3c4d5e6f7a'); -- Diario ✗
-

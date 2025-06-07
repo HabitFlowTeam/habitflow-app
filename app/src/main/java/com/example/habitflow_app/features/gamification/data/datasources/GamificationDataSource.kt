@@ -99,30 +99,12 @@ class GamificationDataSource @Inject constructor(
             return emptyList()
         }
 
-        // Paso 2: Obtener perfiles para los user_ids encontrados
-        val userIds = habitData.map { it.user_id }.joinToString(",")
-        val profileResponse = directusApiService.getProfileRanking(userIds)
-
-        if (!profileResponse.isSuccessful) {
-            Log.e(
-                TAG,
-                "Error al obtener perfiles para ranking: ${profileResponse.code()} ${profileResponse.message()}"
-            )
-            throw Exception("Error al obtener perfiles para ranking: ${profileResponse.code()}")
-        }
-
-        val profileData = profileResponse.body()?.data ?: emptyList()
-
-        // Paso 3: Combinar datos de hábitos y perfiles
-        val profileMap = profileData.associateBy { it.id }
-
-        return habitData.mapIndexed { index, habitDto ->
-            val profile = profileMap[habitDto.user_id]
+        return habitData.mapIndexed { index, dto ->
             LeaderboardUser(
-                id = habitDto.user_id,
-                fullName = profile?.full_name ?: "Usuario",
-                streak = habitDto.streak,
-                avatarUrl = profile?.avatar_url ?: "",
+                id = dto.id,
+                fullName = dto.full_name,
+                streak = dto.streak,
+                avatarUrl = dto.avatar_url,
                 rank = index + 1
             )
         }
