@@ -71,14 +71,13 @@ object GamificationViewModelModule {
     }
 
     /**
-     * Provides singleton instance of StatsPersonalViewModel.
+     * Provides instance of StatsPersonalViewModel.
      *
      * @param getUserHabitCategoriesUseCase Injected use case for user habit categories
      * @param profileRepository Injected profile repository instance
      * @return Configured StatsPersonalViewModel instance
      */
     @Provides
-    @Singleton
     fun provideStatsPersonalViewModel(
         getUserHabitCategoriesUseCase: GetUserHabitCategoriesUseCase,
         profileRepository: ProfileRepository,
