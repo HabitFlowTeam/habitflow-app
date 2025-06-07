@@ -43,3 +43,26 @@ data class HabitTrackingResponseDto(
         )
     }
 }
+
+@kotlinx.serialization.Serializable
+data class UserHabitCategoriesViewDTO(
+    val tracking_id: String?,
+    val habit_id: String?,
+    val habit_name: String?,
+    val streak: Int?,
+    val notifications_enable: Boolean?,
+    val reminder_time: String?,
+    val is_deleted: Boolean?,
+    val created_at: String?,
+    val expiration_date: String?,
+    val category_id: String?,
+    val user_id: String?,
+    val is_checked: Boolean?,
+     val tracking_date: String?,
+    val category_name: String?
+)
+
+@kotlinx.serialization.Serializable
+data class UserHabitCategoriesViewResponse(
+    val data: List<UserHabitCategoriesViewDTO>
+)

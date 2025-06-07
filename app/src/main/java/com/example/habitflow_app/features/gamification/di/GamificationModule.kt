@@ -1,6 +1,7 @@
 package com.example.habitflow_app.features.gamification.di
 
 import com.example.habitflow_app.core.utils.ExtractInfoToken
+import com.example.habitflow_app.domain.repositories.AuthRepository
 import com.example.habitflow_app.domain.repositories.GamificationRepository
 import com.example.habitflow_app.domain.usecases.GetCategoriesUseCase
 import com.example.habitflow_app.domain.usecases.GetGlobalRankingUseCase
@@ -8,6 +9,9 @@ import com.example.habitflow_app.features.authentication.data.datasources.LocalD
 import com.example.habitflow_app.features.gamification.data.datasources.GamificationDataSource
 import com.example.habitflow_app.features.gamification.data.repositories.GamificationRepositoryImpl
 import com.example.habitflow_app.features.gamification.ui.viewmodel.StatsGlobalViewModel
+import com.example.habitflow_app.features.gamification.ui.viewmodel.StatsPersonalViewModel
+import com.example.habitflow_app.domain.usecases.GetUserHabitCategoriesUseCase
+import com.example.habitflow_app.domain.repositories.ProfileRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -59,5 +63,23 @@ object GamificationModule {
             localDataStore,
             extractInfoToken
         )
+    }
+
+    /**
+     * Provides singleton instance of StatsPersonalViewModel.
+     *
+     * @param getUserHabitCategoriesUseCase Injected use case for user habit categories
+     * @param profileRepository Injected profile repository instance
+     * @return Configured StatsPersonalViewModel instance
+     */
+    @Provides
+    @Singleton
+    fun provideStatsPersonalViewModel(
+        getUserHabitCategoriesUseCase: GetUserHabitCategoriesUseCase,
+        profileRepository: ProfileRepository,
+        extractInfoToken: ExtractInfoToken,
+        authRepository: AuthRepository,
+    ): StatsPersonalViewModel {
+        return StatsPersonalViewModel(getUserHabitCategoriesUseCase, profileRepository, extractInfoToken, authRepository)
     }
 }

@@ -7,6 +7,7 @@ import com.example.habitflow_app.core.network.DirectusApiService.DeleteHabitDays
 import com.example.habitflow_app.core.utils.ExtractInfoToken
 import com.example.habitflow_app.domain.models.Category
 import com.example.habitflow_app.domain.models.Habit
+import com.example.habitflow_app.domain.models.HabitWithCategory
 import com.example.habitflow_app.domain.repositories.AuthRepository
 import com.example.habitflow_app.features.habits.data.dto.CreateHabitRequest
 import com.example.habitflow_app.features.habits.data.dto.HabitApiRequest
@@ -271,6 +272,32 @@ class HabitsDataSource @Inject constructor(
             return response.body()?.data?.size ?: 0
         } else {
             throw Exception("Error getting completed habits")
+        }
+    }
+
+    suspend fun getUserHabitCategoriesView(userId: String): List<HabitWithCategory> {
+        val response = directusApiService.getUserHabitCategoriesView(userId)
+        if (response.isSuccessful) {
+            return response.body()?.data?.map { dto ->
+                HabitWithCategory(
+                    trackingId = dto.tracking_id,
+                    habitId = dto.habit_id,
+                    habitName = dto.habit_name,
+                    streak = dto.streak,
+                    notificationsEnable = dto.notifications_enable,
+                    reminderTime = dto.reminder_time,
+                    isDeleted = dto.is_deleted,
+                    createdAt = dto.created_at,
+                    expirationDate = dto.expiration_date,
+                    categoryId = dto.category_id,
+                    userId = dto.user_id,
+                    isChecked = dto.is_checked,
+                    trackingDate = dto.tracking_date,
+                    categoryName = dto.category_name
+                )
+            } ?: emptyList()
+        } else {
+            throw Exception("Error getting user habit categories view: ${response.errorBody()?.string()}")
         }
     }
 

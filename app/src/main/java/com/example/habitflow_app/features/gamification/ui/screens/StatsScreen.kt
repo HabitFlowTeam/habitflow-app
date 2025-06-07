@@ -18,6 +18,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.habitflow_app.core.ui.theme.Background
 import com.example.habitflow_app.features.gamification.ui.components.SegmentedControl
 import com.example.habitflow_app.features.gamification.ui.viewmodel.StatsGlobalViewModel
+import com.example.habitflow_app.features.gamification.ui.viewmodel.StatsPersonalViewModel
 
 /**
  * Main statistics screen that displays either personal or global statistics
@@ -27,7 +28,8 @@ import com.example.habitflow_app.features.gamification.ui.viewmodel.StatsGlobalV
  */
 @Composable
 fun StatsScreen(
-    globalViewModel: StatsGlobalViewModel = hiltViewModel()
+    globalViewModel: StatsGlobalViewModel = hiltViewModel(),
+    personalViewModel: StatsPersonalViewModel = hiltViewModel()
 ) {
     var selectedTabIndex by remember { mutableStateOf(0) }
 
@@ -51,7 +53,7 @@ fun StatsScreen(
 
         // Mostrar la pantalla correspondiente según la pestaña seleccionada
         when (selectedTabIndex) {
-            0 -> StatsPersonalScreen()
+            0 -> StatsPersonalScreen(personalViewModel)
             1 -> StatsGlobalScreen(globalViewModel)
         }
     }

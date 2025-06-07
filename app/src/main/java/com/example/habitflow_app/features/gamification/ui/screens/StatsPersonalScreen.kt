@@ -23,14 +23,36 @@ import com.example.habitflow_app.core.ui.theme.Background
 import com.example.habitflow_app.features.gamification.ui.components.BarChart
 import com.example.habitflow_app.features.gamification.ui.components.PieChart
 import com.example.habitflow_app.features.gamification.ui.components.StatItem
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import com.example.habitflow_app.features.gamification.ui.viewmodel.StatsPersonalViewModel
 
 /**
  * Screen that displays the user's personal statistics and achievements.
  * Shows current streak, best streak, completed habits count and motivational message.
  */
 @Composable
-fun StatsPersonalScreen() {
+fun StatsPersonalScreen(
+    viewModel: StatsPersonalViewModel = hiltViewModel()
+) {
     val scrollState = rememberScrollState()
+    val isLoading by viewModel.isLoading.collectAsState()
+    val error by viewModel.error.collectAsState()
+    val currentStreak by viewModel.currentStreak.collectAsState()
+    val bestStreak by viewModel.bestStreak.collectAsState()
+    val completedHabits by viewModel.completedHabits.collectAsState()
+    val weeklyCompletion by viewModel.weeklyCompletion.collectAsState()
+    val activeDaysThisMonth by viewModel.activeDaysThisMonth.collectAsState()
+    val mostFrequentHabit by viewModel.mostFrequentHabit.collectAsState()
+    val barChartData by viewModel.barChartData.collectAsState()
+    val pieChartData by viewModel.pieChartData.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.loadStats()
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -51,6 +73,19 @@ fun StatsPersonalScreen() {
 
         Spacer(modifier = Modifier.height(24.dp))
 
+        if (isLoading) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text("Cargando estadísticas...")
+            }
+            return
+        }
+        if (error != null) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text("Error: $error")
+            }
+            return
+        }
+
         // Estadísticas personales
         Column(
             modifier = Modifier.fillMaxWidth(),
@@ -61,31 +96,31 @@ fun StatsPersonalScreen() {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = androidx.compose.foundation.layout.Arrangement.SpaceEvenly
             ) {
-                StatItem(value = 15, label = "Racha actual", modifier = Modifier.weight(1f))
-                StatItem(value = 30, label = "Mejor racha", modifier = Modifier.weight(1f))
+                StatItem(value = currentStreak, label = "Racha actual", modifier = Modifier.weight(1f))
+                StatItem(value = bestStreak, label = "Mejor racha", modifier = Modifier.weight(1f))
             }
             Spacer(modifier = Modifier.height(8.dp))
             androidx.compose.foundation.layout.Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = androidx.compose.foundation.layout.Arrangement.SpaceEvenly
             ) {
-                StatItem(value = 120, label = "Hábitos completados", modifier = Modifier.weight(1f))
-                StatItem(value = 85, label = "% Cumplimiento semanal", modifier = Modifier.weight(1f))
+                StatItem(value = completedHabits, label = "Hábitos completados", modifier = Modifier.weight(1f))
+                StatItem(value = weeklyCompletion, label = "% Cumplimiento semanal", modifier = Modifier.weight(1f))
             }
             Spacer(modifier = Modifier.height(8.dp))
             androidx.compose.foundation.layout.Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = androidx.compose.foundation.layout.Arrangement.SpaceEvenly
             ) {
-                StatItem(value = 7, label = "Días activos este mes", modifier = Modifier.weight(1f))
-                StatItem(value = 3, label = "Hábito más frecuente: Meditar", modifier = Modifier.weight(1f))
+                StatItem(value = activeDaysThisMonth, label = "Días activos este mes", modifier = Modifier.weight(1f))
+                //StatItem(value = mostFrequentHabit.ifBlank { 0 }, label = "Hábito más frecuente", modifier = Modifier.weight(1f))
             }
 
             Spacer(modifier = Modifier.height(32.dp))
 
             // Gráfica de barras: hábitos completados por día
             BarChart(
-                data = listOf(3, 5, 2, 4, 6, 1, 4),
+                data = barChartData,
                 labels = listOf("L", "M", "X", "J", "V", "S", "D"),
                 modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
             )
@@ -94,14 +129,16 @@ fun StatsPersonalScreen() {
 
             // Gráfica de pastel: distribución de tipos de hábitos
             PieChart(
-                data = listOf(40f, 30f, 20f, 10f),
+                data = pieChartData.values.map { it.toFloat() },
                 colors = listOf(
                     Color(0xFF4CAF50), // Verde
                     Color(0xFF2196F3), // Azul
                     Color(0xFFFFC107), // Amarillo
-                    Color(0xFFF44336)  // Rojo
+                    Color(0xFFF44336), // Rojo
+                    Color(0xFF9C27B0), // Extra color si hay más categorías
+                    Color(0xFF009688)
                 ),
-                labels = listOf("Salud", "Productividad", "Bienestar", "Otros"),
+                labels = pieChartData.keys.toList(),
                 modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
             )
 
