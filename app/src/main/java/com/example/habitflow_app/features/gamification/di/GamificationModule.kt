@@ -11,6 +11,7 @@ import com.example.habitflow_app.features.gamification.ui.viewmodel.StatsGlobalV
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -20,7 +21,7 @@ import javax.inject.Singleton
  */
 @Module
 @InstallIn(SingletonComponent::class)
-object GamificationModule {
+object GamificationRepositoryModule {
 
     /**
      * Provides singleton instance of GamificationRepository.
@@ -35,9 +36,14 @@ object GamificationModule {
     ): GamificationRepository {
         return GamificationRepositoryImpl(gamificationDataSource)
     }
+}
+
+@Module
+@InstallIn(ViewModelComponent::class)
+object GamificationViewModelModule {
 
     /**
-     * Provides singleton instance of StatsGlobalViewModel.
+     * Provides instance of StatsGlobalViewModel.
      *
      * @param getGlobalRankingUseCase Injected use case for global ranking
      * @param getCategoriesUseCase Injected use case for categories
@@ -46,7 +52,6 @@ object GamificationModule {
      * @return Configured StatsGlobalViewModel instance
      */
     @Provides
-    @Singleton
     fun provideStatsGlobalViewModel(
         getGlobalRankingUseCase: GetGlobalRankingUseCase,
         getCategoriesUseCase: GetCategoriesUseCase,

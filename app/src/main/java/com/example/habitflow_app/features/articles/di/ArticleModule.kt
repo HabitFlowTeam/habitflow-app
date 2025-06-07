@@ -9,12 +9,13 @@ import com.example.habitflow_app.features.articles.ui.viewmodel.ArticleViewModel
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object ArticleModule {
+object ArticleRepositoryModule {
     @Provides
     @Singleton
     fun provideArticleRepository(
@@ -22,16 +23,19 @@ object ArticleModule {
     ): ArticleRepository {
         return ArticleRepositoryImpl(articleDataSource)
     }
+}
 
+@Module
+@InstallIn(ViewModelComponent::class)
+object ArticleViewModelModule {
     @Provides
-    @Singleton
     fun provideArticleViewModel(
         getUserTopLikedArticlesUseCase: GetUserTopLikedArticlesUseCase,
-        getRankedArticles: GetRankedArticles
+        getRankedArticles: GetRankedArticles,
     ): ArticleViewModel {
         return ArticleViewModel(
             getUserTopLikedArticlesUseCase,
-            getRankedArticles
+            getRankedArticles,
         )
     }
 }
