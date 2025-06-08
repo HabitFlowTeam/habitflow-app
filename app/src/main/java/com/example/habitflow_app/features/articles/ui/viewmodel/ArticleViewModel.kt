@@ -35,7 +35,8 @@ class ArticleViewModel @Inject constructor(
     private companion object {
         const val TAG = "ArticleViewModel"
     }
-    private val _profileArticles = MutableStateFlow<List< ProfileArticle>>(emptyList())
+
+    private val _profileArticles = MutableStateFlow<List<ProfileArticle>>(emptyList())
     val profileArticles: StateFlow<List<ProfileArticle>> = _profileArticles
 
     private val _isLoading = MutableStateFlow(false)

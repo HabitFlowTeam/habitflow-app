@@ -28,13 +28,17 @@ fun ArticlesMainScreen(
         viewModel.fetchAllArticles()
     }
 
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-        Text(text = "Recomendados para ti",
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .padding(16.dp)) {
+        Text(
+            text = "Recomendados para ti",
             fontWeight = FontWeight.Bold,
             fontSize = 24.sp,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 16.dp),)
+                .padding(vertical = 16.dp),
+        )
         Spacer(modifier = Modifier.height(16.dp))
         when {
             isLoading -> Text("Cargando artículos...")
