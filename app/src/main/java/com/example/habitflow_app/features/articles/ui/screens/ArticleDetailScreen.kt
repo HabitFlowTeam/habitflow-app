@@ -3,6 +3,8 @@ package com.example.habitflow_app.features.articles.ui.screens
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Icon
@@ -14,7 +16,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -36,6 +42,7 @@ fun ArticleDetailScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
                     .padding(24.dp)
             ) {
                 // Flecha de regreso y título
@@ -85,7 +92,10 @@ fun ArticleDetailScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                 }
                 // Contenido
-                Text(text = it.content, fontSize = 16.sp)
+                Text(
+                    text = parseRichText(it.content),
+                    fontSize = 16.sp
+                )
                 Spacer(modifier = Modifier.height(32.dp))
             }
         } ?: Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -94,6 +104,36 @@ fun ArticleDetailScreen(
         // Likes flotante
         article?.let {
             FloatingLikes(likes = it.likesCount, modifier = Modifier.align(Alignment.BottomEnd))
+        }
+    }
+}
+
+private fun parseRichText(text: String): AnnotatedString {
+    return buildAnnotatedString {
+        var i = 0
+        while (i < text.length) {
+            when {
+                text.startsWith("**", i) -> {
+                    val end = text.indexOf("**", i + 2)
+                    if (end != -1) {
+                        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                            append(text.substring(i + 2, end))
+                        }
+                        i = end + 2
+                    } else {
+                        append("**")
+                        i += 2
+                    }
+                }
+                text.startsWith("//", i) -> {
+                    append("\n")
+                    i += 2
+                }
+                else -> {
+                    append(text[i])
+                    i++
+                }
+            }
         }
     }
 }
