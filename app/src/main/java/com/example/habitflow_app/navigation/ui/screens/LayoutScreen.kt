@@ -54,7 +54,7 @@ fun LayoutScreen(
                 navController = barNavController,
                 startDestination = NavDestinations.HOME,
             ) {
-                composable(NavDestinations.HOME) { HomeScreen(navController) }
+                composable(NavDestinations.HOME) { HomeScreen(navController = navController) }
                 composable(NavDestinations.ARTICLES) {
                     ArticlesMainScreen(
                         navController,

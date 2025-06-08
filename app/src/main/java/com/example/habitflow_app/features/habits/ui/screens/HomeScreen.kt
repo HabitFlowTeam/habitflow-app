@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.example.habitflow_app.features.articles.ui.components.ArticleCard
 import com.example.habitflow_app.features.articles.ui.viewmodel.ArticleViewModel
 import com.example.habitflow_app.features.habits.ui.components.Calendar
@@ -31,6 +32,7 @@ import com.example.habitflow_app.features.habits.ui.components.InlineLoadingText
 import com.example.habitflow_app.features.habits.ui.extensions.getTodayHabits
 import com.example.habitflow_app.features.habits.ui.viewmodel.CalendarViewModelImpl
 import com.example.habitflow_app.features.habits.ui.viewmodel.ListHabitsViewModel
+import com.example.habitflow_app.navigation.NavDestinations
 
 /**
  * HomeScreen is the main screen of the application.
@@ -40,7 +42,8 @@ import com.example.habitflow_app.features.habits.ui.viewmodel.ListHabitsViewMode
  */
 @Composable
 fun HomeScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navController: NavController
 ) {
     val scrollState = rememberScrollState()
 
@@ -55,7 +58,7 @@ fun HomeScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         // Featured articles
-        ArticlesSection()
+        ArticlesSection(navController = navController)
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -96,7 +99,8 @@ fun CalendarSection(
  */
 @Composable
 private fun ArticlesSection(
-    viewModel: ArticleViewModel = hiltViewModel()
+    viewModel: ArticleViewModel = hiltViewModel(),
+    navController: NavController
 ) {
     val articles by viewModel.rankedArticles.collectAsState()
     val isLoading by viewModel.rankedIsLoading.collectAsState()
@@ -135,6 +139,11 @@ private fun ArticlesSection(
                             authorImageUrl = article.authorImageUrl,
                             title = article.title,
                             description = article.content,
+                            articleId = article.articleId,
+
+                            onClick = { id ->
+                                navController.navigate(NavDestinations.articleDetailRoute(id))
+                            },
                             modifier = Modifier.width(260.dp)
                         )
                     }
