@@ -15,9 +15,12 @@ import androidx.compose.ui.unit.sp
 import com.example.habitflow_app.features.articles.ui.components.ArticleCard
 import com.example.habitflow_app.features.articles.ui.viewmodel.ArticleViewModel
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import com.example.habitflow_app.navigation.NavDestinations
 
 @Composable
 fun ArticlesMainScreen(
+    navController: NavController,
     viewModel: ArticleViewModel = hiltViewModel()
 ) {
     val articles by viewModel.allArticles.collectAsState()
@@ -50,6 +53,10 @@ fun ArticlesMainScreen(
                         authorImageUrl = article.authorImageUrl,
                         title = article.title,
                         description = article.content,
+                        articleId = article.articleId,
+                        onClick = { id ->
+                            navController.navigate(NavDestinations.articleDetailRoute(id))
+                        },
                         modifier = Modifier.fillMaxWidth()
                     )
                 }

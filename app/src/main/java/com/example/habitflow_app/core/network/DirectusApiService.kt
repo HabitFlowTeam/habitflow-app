@@ -236,20 +236,27 @@ interface DirectusApiService {
         @Query("fields") fields: String = "id,full_name,streak,avatar_url"
     ): Response<LeaderboardResponse>
 
-
     /**
      * Retrieves the category-specific leaderboard ranking for habits.
      *
      * This endpoint returns user IDs and streak counts for habits matching the specified category,
      * filtered to exclude deleted habits and sorted by streak in descending order.
-     * Returns only one habit per user (the one with highest streak).
      *
      * @param categoryName Exact name of the category to filter by
+     * @param isDeleted Filter for deleted habits (default: false)
+     * @param sort Sorting criteria (default: "-streak" for descending order by streak)
+     * @param limit Maximum number of results to return (default: 10)
+     * @param fields Comma-separated list of fields to include in the response
+     * @return Retrofit Response containing habit ranking data wrapped in HabitRankingResponse
      */
-    @GET("items/category_ranking_view")
+    @GET("items/habits")
     suspend fun getCategoryRanking(
-        @Query("filter[category_name][_eq]") categoryName: String
-    ): Response<LeaderboardResponse>
+        @Query("filter[category_id][name][_eq]") categoryName: String,
+        @Query("filter[is_deleted][_eq]") isDeleted: Boolean = false,
+        @Query("sort") sort: String = "-streak",
+        @Query("limit") limit: Int = 10,
+        @Query("fields") fields: String = "user_id,streak"
+    ): Response<HabitRankingResponse>
 
     /**
      * Retrieves profile information for multiple users by their IDs.
@@ -290,7 +297,7 @@ interface DirectusApiService {
      */
     @GET("items/ranked_articles_view")
     suspend fun getRankedArticles(
-        @Query("fields") fields: String = "title,content,author_name,author_image_url,likes_count"
+        @Query("fields") fields: String = "title,content,author_name,author_image_url,likes_count,id,category_name,created_at,image_url"
     ): Response<RankedArticlesResponse>
 
     /* Profile Endpoints */

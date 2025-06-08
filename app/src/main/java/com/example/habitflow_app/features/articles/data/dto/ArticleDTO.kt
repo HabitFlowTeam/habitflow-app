@@ -32,11 +32,14 @@ data class RankedArticleDTO(
     val content: String,
     val author_name: String,
     val author_image_url: String?,
-    val likes_count: Int
+    val likes_count: Int,
+    val id: String,
+    val category_name: String,
+    val created_at: String,
+    val image_url: String?
 )
 
 @Serializable
 data class RankedArticlesResponse(
     val data: List<RankedArticleDTO>
 )
-

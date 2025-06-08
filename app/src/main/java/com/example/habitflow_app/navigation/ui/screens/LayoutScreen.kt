@@ -14,6 +14,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.habitflow_app.R
 import com.example.habitflow_app.core.ui.components.BottomNavigationBar
 import com.example.habitflow_app.features.articles.ui.screens.ArticlesMainScreen
+import com.example.habitflow_app.features.articles.ui.viewmodel.ArticleViewModel
 import com.example.habitflow_app.features.gamification.ui.screens.StatsScreen
 import com.example.habitflow_app.features.habits.ui.screens.HabitsScreen
 import com.example.habitflow_app.features.habits.ui.screens.HomeScreen
@@ -30,7 +31,8 @@ import com.example.habitflow_app.navigation.ui.components.BottomNavItem
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LayoutScreen(
-    navController: NavController = rememberNavController()
+    navController: NavController = rememberNavController(),
+    articlesViewModel: ArticleViewModel
 ) {
     val barNavController = rememberNavController()
     val bottomNavItem = listOf(
@@ -52,8 +54,13 @@ fun LayoutScreen(
                 navController = barNavController,
                 startDestination = NavDestinations.HOME,
             ) {
-                composable(NavDestinations.HOME) { HomeScreen() }
-                composable(NavDestinations.ARTICLES) { ArticlesMainScreen() }
+                composable(NavDestinations.HOME) { HomeScreen(navController) }
+                composable(NavDestinations.ARTICLES) {
+                    ArticlesMainScreen(
+                        navController,
+                        viewModel = articlesViewModel
+                    )
+                }
                 composable(NavDestinations.HABITS) {
                     HabitsScreen(
                         navController = navController,
@@ -65,13 +72,9 @@ fun LayoutScreen(
                 composable(NavDestinations.GAMIFICATION) { StatsScreen() }
             }
         }
-
-
         BottomNavigationBar(
             items = bottomNavItem,
             navController = barNavController
         )
-
     }
-
 }

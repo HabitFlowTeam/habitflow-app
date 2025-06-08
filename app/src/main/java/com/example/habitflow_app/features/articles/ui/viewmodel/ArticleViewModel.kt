@@ -10,12 +10,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import com.example.habitflow_app.core.network.DirectusApiService
 import com.example.habitflow_app.domain.models.RankedArticle
 import com.example.habitflow_app.domain.usecases.GetRankedArticles
 import com.example.habitflow_app.domain.usecases.GetAllArticlesUseCase
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.withContext
 
 /**
@@ -64,6 +62,10 @@ class ArticleViewModel @Inject constructor(
 
     private val _allArticlesError = MutableStateFlow<String?>(null)
     val allArticlesError: StateFlow<String?> = _allArticlesError
+
+    // --- Artículo seleccionado ---
+    private val _selectedArticle = MutableStateFlow<RankedArticle?>(null)
+    val selectedArticle: StateFlow<RankedArticle?> = _selectedArticle
 
     /**
      * Loads the top liked articles for the specified user and updates the UI state.
@@ -118,5 +120,12 @@ class ArticleViewModel @Inject constructor(
                 _allArticlesIsLoading.value = false
             }
         }
+    }
+
+    fun selectArticleById(articleId: String) {
+        Log.e(TAG, "Selecting article with ID: $articleId")
+        Log.e(TAG, "Articles available: ${_allArticles.value}")
+        val article = _allArticles.value.find { it.articleId == articleId }
+        _selectedArticle.value = article
     }
 }

@@ -5,6 +5,9 @@ data class RankedArticle(
     val content: String,
     val authorName: String,
     val authorImageUrl: String?,
-    val likesCount: Int
+    val likesCount: Int,
+    val articleId: String,
+    val categoryName: String,
+    val createdAt: String,
+    val imageUrl: String? = null
 )
-

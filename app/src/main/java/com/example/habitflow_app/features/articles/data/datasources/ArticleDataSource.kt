@@ -17,7 +17,7 @@ import javax.inject.Inject
  */
 class ArticleDataSource @Inject constructor(
     private val directusApiService: DirectusApiService
-){
+) {
     companion object {
         private const val TAG = "ArticleDataSource"
     }
@@ -29,26 +29,30 @@ class ArticleDataSource @Inject constructor(
      * @throws ApiException if an API error or unexpected error occurs.
      * @throws NetworkConnectionException if a network connection error occurs.
      */
-    suspend fun getUserArticles(userId: String): List<ProfileArticle> = withContext(Dispatchers.IO) {
-        try {
-            val response = directusApiService.getUserArticles(userId)
-            if (!response.isSuccessful) {
-                Log.e(TAG, "Error al obtener artículos: ${response.code()} ${response.message()}")
-                throw Exception("Error al obtener artículos: ${response.code()}")
+    suspend fun getUserArticles(userId: String): List<ProfileArticle> =
+        withContext(Dispatchers.IO) {
+            try {
+                val response = directusApiService.getUserArticles(userId)
+                if (!response.isSuccessful) {
+                    Log.e(
+                        TAG,
+                        "Error al obtener artículos: ${response.code()} ${response.message()}"
+                    )
+                    throw Exception("Error al obtener artículos: ${response.code()}")
+                }
+                val articles = response.body()?.data ?: emptyList()
+                articles.map { dto ->
+                    ProfileArticle(
+                        title = dto.title,
+                        imageUrl = dto.image_url,
+                        likes = dto.likes_count,
+                    )
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error al obtener artículos", e)
+                throw Exception("Error al obtener artículos: ${e.message}")
             }
-            val articles = response.body()?.data ?: emptyList()
-            articles.map { dto ->
-                ProfileArticle(
-                    title = dto.title,
-                    imageUrl = dto.image_url,
-                    likes = dto.likes_count,
-                )
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "Error al obtener artículos", e)
-            throw Exception("Error al obtener artículos: ${e.message}")
         }
-    }
 
     suspend fun getRankedArticles(): List<RankedArticle> = withContext(Dispatchers.IO) {
         try {
@@ -65,6 +69,10 @@ class ArticleDataSource @Inject constructor(
                     authorName = dto.author_name,
                     authorImageUrl = dto.author_image_url,
                     likesCount = dto.likes_count,
+                    articleId = dto.id,
+                    categoryName = dto.category_name,
+                    createdAt = dto.created_at,
+                    imageUrl = dto.image_url
                 )
             }
         } catch (e: Exception) {
@@ -73,5 +81,3 @@ class ArticleDataSource @Inject constructor(
         }
     }
 }
-
-
