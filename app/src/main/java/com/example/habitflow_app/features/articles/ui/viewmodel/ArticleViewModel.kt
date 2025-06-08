@@ -13,6 +13,7 @@ import javax.inject.Inject
 import com.example.habitflow_app.core.network.DirectusApiService
 import com.example.habitflow_app.domain.models.RankedArticle
 import com.example.habitflow_app.domain.usecases.GetRankedArticles
+import com.example.habitflow_app.domain.usecases.GetAllArticlesUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.withContext
@@ -28,7 +29,8 @@ import kotlinx.coroutines.withContext
 @HiltViewModel
 class ArticleViewModel @Inject constructor(
     private val getUserTopLikedArticlesUseCase: GetUserTopLikedArticlesUseCase,
-    private val getRankedArticle: GetRankedArticles
+    private val getRankedArticle: GetRankedArticles,
+    private val getAllArticlesUseCase: GetAllArticlesUseCase
 ) : ViewModel() {
     private companion object {
         const val TAG = "ArticleViewModel"
@@ -51,6 +53,16 @@ class ArticleViewModel @Inject constructor(
 
     private val _rankedError = MutableStateFlow<String?>(null)
     val rankedError: StateFlow<String?> = _rankedError
+
+    // --- Todos los artículos ---
+    private val _allArticles = MutableStateFlow<List<RankedArticle>>(emptyList())
+    val allArticles: StateFlow<List<RankedArticle>> = _allArticles
+
+    private val _allArticlesIsLoading = MutableStateFlow(false)
+    val allArticlesIsLoading: StateFlow<Boolean> = _allArticlesIsLoading
+
+    private val _allArticlesError = MutableStateFlow<String?>(null)
+    val allArticlesError: StateFlow<String?> = _allArticlesError
 
     /**
      * Loads the top liked articles for the specified user and updates the UI state.
@@ -86,6 +98,23 @@ class ArticleViewModel @Inject constructor(
                 _rankedError.value = "Error de red: ${e.localizedMessage}"
             } finally {
                 _rankedIsLoading.value = false
+            }
+        }
+    }
+
+    fun fetchAllArticles() {
+        _allArticlesIsLoading.value = true
+        viewModelScope.launch {
+            try {
+                val response = withContext(Dispatchers.IO) {
+                    getAllArticlesUseCase()
+                }
+                _allArticles.value = response
+                _allArticlesError.value = null
+            } catch (e: Exception) {
+                _allArticlesError.value = "Error de red: ${e.localizedMessage}"
+            } finally {
+                _allArticlesIsLoading.value = false
             }
         }
     }
