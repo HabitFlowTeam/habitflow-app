@@ -31,4 +31,5 @@ SELECT
     avatar_url,
     category_name
 FROM RankedHabits
-WHERE rank <= 10; 
+WHERE rank <= 10
+ORDER BY streak DESC; 

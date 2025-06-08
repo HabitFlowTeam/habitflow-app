@@ -247,7 +247,8 @@ interface DirectusApiService {
      */
     @GET("items/category_ranking_view")
     suspend fun getCategoryRanking(
-        @Query("filter[category_name][_eq]") categoryName: String
+        @Query("filter[category_name][_eq]") categoryName: String,
+        @Query("sort") sort: String = "-streak"
     ): Response<LeaderboardResponse>
 
     /**
