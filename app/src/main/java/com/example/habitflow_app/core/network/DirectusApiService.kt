@@ -2,6 +2,8 @@ package com.example.habitflow_app.core.network
 
 import com.example.habitflow_app.features.habits.data.dto.HabitsResponse
 import com.example.habitflow_app.domain.models.Habit
+import com.example.habitflow_app.features.articles.data.dto.ArticleLikeRequest
+import com.example.habitflow_app.features.articles.data.dto.DeleteArticleLikeFilter
 import com.example.habitflow_app.features.articles.data.dto.ProfileArticlesResponse
 import com.example.habitflow_app.features.articles.data.dto.RankedArticlesResponse
 import com.example.habitflow_app.features.authentication.data.dto.CreateProfileRequest
@@ -308,4 +310,35 @@ interface DirectusApiService {
      */
     @GET("items/categories")
     suspend fun getCategories(): Response<CategoriesResponse>
+
+    /**
+     * Creates a new article like record.
+     * This endpoint creates a new record in the articles_liked table.
+     * The table structure is:
+     * - user_id: UUID (FK to directus_users)
+     * - article_id: UUID (FK to articles)
+     * 
+     * @param request The ArticleLikeRequest containing article_id and user_id
+     * @return Response containing the created like record
+     */
+    @POST("items/articles_liked")
+    suspend fun createArticleLike(@Body request: ArticleLikeRequest): Response<DirectusResponse<Map<String, Any>>>
+
+    @GET("items/articles_liked")
+    suspend fun getLikeId(
+        @Query("filter[article_id][_eq]") articleId: String,
+        @Query("filter[user_id][_eq]") userId: String,
+        @Query("fields") fields: String = "id"
+    ): Response<DirectusResponse<List<Map<String, String>>>>
+
+    @DELETE("items/articles_liked/{id}")
+    suspend fun deleteArticleLike(
+        @Path("id") id: String
+    ): Response<Unit>
+
+    @GET("items/articles_liked")
+    suspend fun isArticleLiked(
+        @Query("filter[article_id][_eq]") articleId: String,
+        @Query("filter[user_id][_eq]") userId: String
+    ): Response<DirectusResponse<List<Map<String, Any>>>>
 }

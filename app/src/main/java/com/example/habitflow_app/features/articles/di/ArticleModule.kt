@@ -4,6 +4,9 @@ import com.example.habitflow_app.domain.repositories.ArticleRepository
 import com.example.habitflow_app.domain.usecases.GetAllArticlesUseCase
 import com.example.habitflow_app.domain.usecases.GetRankedArticles
 import com.example.habitflow_app.domain.usecases.GetUserTopLikedArticlesUseCase
+import com.example.habitflow_app.domain.usecases.LikeArticleUseCase
+import com.example.habitflow_app.domain.usecases.UnlikeArticleUseCase
+import com.example.habitflow_app.domain.usecases.IsArticleLikedUseCase
 import com.example.habitflow_app.features.articles.data.datasources.ArticleDataSource
 import com.example.habitflow_app.features.articles.data.repositories.ArticleRepositoryImpl
 import com.example.habitflow_app.features.articles.ui.viewmodel.ArticleViewModel
@@ -33,12 +36,18 @@ object ArticleViewModelModule {
     fun provideArticleViewModel(
         getUserTopLikedArticlesUseCase: GetUserTopLikedArticlesUseCase,
         getRankedArticles: GetRankedArticles,
-        getAllArticlesUseCase: GetAllArticlesUseCase
+        getAllArticlesUseCase: GetAllArticlesUseCase,
+        likeArticleUseCase: LikeArticleUseCase,
+        unlikeArticleUseCase: UnlikeArticleUseCase,
+        isArticleLikedUseCase: IsArticleLikedUseCase
     ): ArticleViewModel {
         return ArticleViewModel(
             getUserTopLikedArticlesUseCase,
             getRankedArticles,
-            getAllArticlesUseCase
+            getAllArticlesUseCase,
+            likeArticleUseCase,
+            unlikeArticleUseCase,
+            isArticleLikedUseCase
         )
     }
 }
