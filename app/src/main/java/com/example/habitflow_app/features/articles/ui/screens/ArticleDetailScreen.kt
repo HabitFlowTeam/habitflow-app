@@ -3,10 +3,12 @@ package com.example.habitflow_app.features.articles.ui.screens
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -26,6 +28,20 @@ fun ArticleDetailScreen(
     viewModel: ArticleViewModel
 ) {
     val article by viewModel.selectedArticle.collectAsState()
+    val isLiked by viewModel.isLiked.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+    val error by viewModel.error.collectAsState()
+
+    LaunchedEffect(article) {
+        viewModel.checkLikeStatus(article?.articleId ?: "")
+    }
+
+    if (error != null) {
+        LaunchedEffect(error) {
+            // Mostrar snackbar o toast con el error
+            viewModel.clearError()
+        }
+    }
 
     article?.let {
         Column(
@@ -81,6 +97,41 @@ fun ArticleDetailScreen(
                     modifier = Modifier.padding(8.dp),
                     color = MaterialTheme.colorScheme.primary
                 )
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    IconButton(
+                        onClick = { viewModel.toggleLike(it.articleId) }
+                    ) {
+                        Icon(
+                            imageVector = if (isLiked == true) {
+                                Icons.Filled.Favorite
+                            } else {
+                                Icons.Outlined.FavoriteBorder
+                            },
+                            contentDescription = if (isLiked == true) {
+                                "Unlike article"
+                            } else {
+                                "Like article"
+                            },
+                            tint = if (isLiked == true) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.onSurface
+                            }
+                        )
+                    }
+                }
             }
         }
     } ?: Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

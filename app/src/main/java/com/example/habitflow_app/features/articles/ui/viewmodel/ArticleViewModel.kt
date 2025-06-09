@@ -15,11 +15,14 @@ import com.example.habitflow_app.domain.usecases.GetRankedArticles
 import com.example.habitflow_app.domain.usecases.GetAllArticlesUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import com.example.habitflow_app.domain.usecases.LikeArticleUseCase
+import com.example.habitflow_app.domain.usecases.UnlikeArticleUseCase
+import com.example.habitflow_app.domain.usecases.IsArticleLikedUseCase
 
 /**
  * ViewModel for managing and exposing article-related UI state.
  *
- * This ViewModel interacts with the use case to retrieve the top liked articles for a user,
+ * This ViewModel interacts with the use cases to retrieve articles, manage likes,
  * and exposes state flows for the UI to observe articles, loading, and error states.
  *
  * @property getUserTopLikedArticlesUseCase Use case to fetch top liked articles for a user
@@ -28,7 +31,10 @@ import kotlinx.coroutines.withContext
 class ArticleViewModel @Inject constructor(
     private val getUserTopLikedArticlesUseCase: GetUserTopLikedArticlesUseCase,
     private val getRankedArticle: GetRankedArticles,
-    private val getAllArticlesUseCase: GetAllArticlesUseCase
+    private val getAllArticlesUseCase: GetAllArticlesUseCase,
+    private val likeArticleUseCase: LikeArticleUseCase,
+    private val unlikeArticleUseCase: UnlikeArticleUseCase,
+    private val isArticleLikedUseCase: IsArticleLikedUseCase
 ) : ViewModel() {
     private companion object {
         const val TAG = "ArticleViewModel"
@@ -66,6 +72,10 @@ class ArticleViewModel @Inject constructor(
     // --- Artículo seleccionado ---
     private val _selectedArticle = MutableStateFlow<RankedArticle?>(null)
     val selectedArticle: StateFlow<RankedArticle?> = _selectedArticle
+
+    // Like-related state
+    private val _isLiked = MutableStateFlow<Boolean?>(null)
+    val isLiked: StateFlow<Boolean?> = _isLiked
 
     /**
      * Loads the top liked articles for the specified user and updates the UI state.
@@ -127,5 +137,72 @@ class ArticleViewModel @Inject constructor(
         Log.e(TAG, "Articles available: ${_allArticles.value}")
         val article = _allArticles.value.find { it.articleId == articleId }
         _selectedArticle.value = article
+    }
+
+    fun checkLikeStatus(articleId: String) {
+        if (articleId.isEmpty()) return
+        
+        viewModelScope.launch {
+            _isLoading.value = true
+            isArticleLikedUseCase(articleId)
+                .onSuccess { liked ->
+                    _isLiked.value = liked
+                }
+                .onFailure { exception ->
+                    _error.value = exception.message
+                }
+            _isLoading.value = false
+        }
+    }
+
+    fun toggleLike(articleId: String) {
+        Log.d(TAG, "PASO 1: Iniciando operación de toggle like")
+        if (articleId.isEmpty()) {
+            Log.e(TAG, "PASO 1.1: Error - articleId está vacío")
+            return
+        }
+        
+        viewModelScope.launch {
+            Log.d(TAG, "PASO 2: Iniciando coroutine para toggle like")
+            _isLoading.value = true
+            val currentLikeState = _isLiked.value
+            Log.d(TAG, "PASO 2.1: Estado actual del like: $currentLikeState")
+            
+            val result = if (currentLikeState == true) {
+                Log.d(TAG, "PASO 3: Ejecutando unlike - llamando a unlikeArticleUseCase")
+                unlikeArticleUseCase(articleId)
+            } else {
+                Log.d(TAG, "PASO 3: Ejecutando like - llamando a likeArticleUseCase")
+                likeArticleUseCase(articleId)
+            }
+
+            result
+                .onSuccess { success ->
+                    Log.d(TAG, "PASO 4: Resultado de la operación: $success")
+                    if (success) {
+                        _isLiked.value = !currentLikeState!!
+                        _selectedArticle.value = _selectedArticle.value?.let { article ->
+                            article.copy(
+                                likesCount = article.likesCount + (if (currentLikeState) -1 else 1)
+                            )
+                        }
+                        Log.d(TAG, "PASO 4.1: Estado actualizado - likes: ${_selectedArticle.value?.likesCount}, isLiked: ${_isLiked.value}")
+                    } else {
+                        _error.value = "No se pudo actualizar el estado del like"
+                        Log.e(TAG, "PASO 4.2: Error - No se pudo actualizar el estado")
+                    }
+                }
+                .onFailure { exception ->
+                    _error.value = exception.message
+                    Log.e(TAG, "PASO 4.3: Error en la operación", exception)
+                }
+            
+            _isLoading.value = false
+            Log.d(TAG, "PASO 5: Operación de toggle like completada")
+        }
+    }
+
+    fun clearError() {
+        _error.value = null
     }
 }
