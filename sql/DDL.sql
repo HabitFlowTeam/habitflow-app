@@ -53,11 +53,12 @@ CREATE TABLE articles (
 );
 
 CREATE TABLE articles_liked (
+    id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id     UUID NOT NULL,
     article_id  UUID NOT NULL,
-    PRIMARY KEY (user_id, article_id),
     FOREIGN KEY (user_id) REFERENCES directus_users(id) ON DELETE CASCADE,
-    FOREIGN KEY (article_id) REFERENCES articles(id) ON DELETE CASCADE
+    FOREIGN KEY (article_id) REFERENCES articles(id) ON DELETE CASCADE,
+    CONSTRAINT articles_liked_unique UNIQUE (user_id, article_id)
 );
 
 CREATE TABLE articles_saved (
