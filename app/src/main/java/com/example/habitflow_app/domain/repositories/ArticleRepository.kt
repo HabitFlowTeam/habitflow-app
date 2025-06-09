@@ -16,5 +16,26 @@ interface ArticleRepository {
     suspend fun getUserArticles(userId: String): List<ProfileArticle>
 
     suspend fun getRankedArticles(): List<RankedArticle>
+
+    /**
+     * Adds a like to an article for the current user
+     * @param articleId The ID of the article to like
+     * @return true if the operation was successful, false otherwise
+     */
+    suspend fun likeArticle(articleId: String): Boolean
+
+    /**
+     * Removes a like from an article for the current user
+     * @param articleId The ID of the article to unlike
+     * @return true if the operation was successful, false otherwise
+     */
+    suspend fun unlikeArticle(articleId: String): Boolean
+
+    /**
+     * Checks if the current user has liked a specific article
+     * @param articleId The ID of the article to check
+     * @return true if the user has liked the article, false otherwise
+     */
+    suspend fun isArticleLiked(articleId: String): Boolean
 }
 

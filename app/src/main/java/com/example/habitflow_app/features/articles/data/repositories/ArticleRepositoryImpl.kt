@@ -30,5 +30,17 @@ class ArticleRepositoryImpl @Inject constructor(
     override suspend fun getRankedArticles(): List<RankedArticle> {
         return articleDataSource.getRankedArticles()
     }
+
+    override suspend fun likeArticle(articleId: String): Boolean {
+        return articleDataSource.likeArticle(articleId)
+    }
+
+    override suspend fun unlikeArticle(articleId: String): Boolean {
+        return articleDataSource.unlikeArticle(articleId)
+    }
+
+    override suspend fun isArticleLiked(articleId: String): Boolean {
+        return articleDataSource.isArticleLiked(articleId)
+    }
 }
 
