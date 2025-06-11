@@ -18,7 +18,6 @@ import com.example.habitflow_app.navigation.AppNavGraph
 import com.example.habitflow_app.navigation.NavDestinations
 import dagger.hilt.android.AndroidEntryPoint
 
-
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,12 +32,16 @@ class MainActivity : ComponentActivity() {
                 LaunchedEffect(Unit) {
                     val token = localDataStore.getAccessTokenOnce()
                     Log.d("AuthDebug", "Token al iniciar: ${token?.take(5)}...")
-                    Log.d("AuthDebug", "Token vencido? ${JwtUtils.isTokenExpired(token.toString())}...")
+
                     if (token != null && !JwtUtils.isTokenExpired(token)) {
+                        Log.d("AuthDebug", "Token válido encontrado")
+
                         navController.navigate(NavDestinations.MAIN) {
                             popUpTo(NavDestinations.LOGIN) { inclusive = true }
                         }
+
                     } else {
+                        Log.d("AuthDebug", "Token expirado o no encontrado")
                         localDataStore.clearAccessToken()
                     }
                 }

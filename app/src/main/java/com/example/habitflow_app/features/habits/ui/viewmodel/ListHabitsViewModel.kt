@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.habitflow_app.domain.repositories.HabitsRepository
+import com.example.habitflow_app.domain.usecases.StreakManagementUseCase
 import com.example.habitflow_app.features.habits.data.dto.ActiveHabitDto
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -14,7 +15,8 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class ListHabitsViewModel @Inject constructor(
-    private val habitsRepository: HabitsRepository
+    private val habitsRepository: HabitsRepository,
+    private val streakManagementUseCase: StreakManagementUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HabitsUiState())
@@ -58,6 +60,7 @@ class ListHabitsViewModel @Inject constructor(
 
                 val habitTrackingId = currentHabit?.habitTrackingId
 
+                // Update habit tracking
                 val habitTracking = if (habitTrackingId != null) {
                     habitsRepository.updateHabitTrackingCheck(habitTrackingId, isChecked)
                 } else {
@@ -69,12 +72,26 @@ class ListHabitsViewModel @Inject constructor(
                     "Database updated successfully: ${habitTracking.isChecked}"
                 )
 
+                // Simple streak management: only calculate when user interacts
+                val newStreak = try {
+                    val streakResult = streakManagementUseCase(habitId, isChecked)
+                    streakResult.getOrElse {
+                        Log.e("HabitsViewModel", "Error managing streak: ${it.message}")
+                        currentHabit?.streak ?: 0
+                    }
+                } catch (e: Exception) {
+                    Log.e("HabitsViewModel", "Exception managing streak: ${e.message}")
+                    currentHabit?.streak ?: 0
+                }
+
+                // Update UI state with new tracking status and streak
                 val currentHabits = _uiState.value.habits
                 val updatedHabits = currentHabits.map { habit ->
                     if (habit.id == habitId) {
                         habit.copy(
                             habitTrackingId = habitTracking.id,
-                            isChecked = habitTracking.isChecked
+                            isChecked = habitTracking.isChecked,
+                            streak = newStreak
                         )
                     } else {
                         habit
@@ -84,7 +101,7 @@ class ListHabitsViewModel @Inject constructor(
                 _uiState.value = _uiState.value.copy(habits = updatedHabits)
                 Log.d(
                     "HabitsViewModel",
-                    "UI State updated, new habits count: ${updatedHabits.size}"
+                    "UI State updated, new habits count: ${updatedHabits.size}, new streak: $newStreak"
                 )
 
             } catch (e: Exception) {

@@ -4,16 +4,15 @@ import com.example.habitflow_app.domain.repositories.HabitsRepository
 import com.example.habitflow_app.domain.repositories.ProfileRepository
 import com.example.habitflow_app.domain.usecases.DeleteHabitUseCase
 import com.example.habitflow_app.domain.usecases.GetUserHabitCategoriesUseCase
-import com.example.habitflow_app.features.authentication.validation.RegisterFormValidator
+import com.example.habitflow_app.domain.usecases.StreakManagementUseCase
 import com.example.habitflow_app.features.habits.data.datasources.HabitsDataSource
 import com.example.habitflow_app.features.habits.data.repositories.HabitsRepositoryImpl
-import com.example.habitflow_app.features.profile.data.repositories.ProfileRepositoryImpl
 import com.example.habitflow_app.features.habits.validation.EditHabitFormValidator
 import com.example.habitflow_app.features.habits.validation.HabitFormValidator
+import com.example.habitflow_app.features.profile.data.repositories.ProfileRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -60,4 +59,16 @@ object HabitsModule {
     fun provideProfileRepository(
         impl: ProfileRepositoryImpl
     ): ProfileRepository = impl
+
+    /**
+     * Provides the simplified streak management use case that doesn't depend on complex APIs.
+     */
+    @Provides
+    @Singleton
+    fun provideStreakManagementUseCase(
+        habitsRepository: HabitsRepository
+    ): StreakManagementUseCase {
+        return StreakManagementUseCase(habitsRepository)
+    }
+
 }

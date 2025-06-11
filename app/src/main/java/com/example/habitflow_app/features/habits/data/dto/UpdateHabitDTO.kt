@@ -14,7 +14,7 @@ data class UpdateHabitDaysRequest(
     val days: List<String>
 )
 
-// Response para operaciones de actualización
+// Response for update operations
 data class HabitUpdateResponse(
     val success: Boolean,
     val updatedCount: Int

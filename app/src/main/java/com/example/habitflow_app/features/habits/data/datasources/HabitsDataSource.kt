@@ -194,21 +194,25 @@ class HabitsDataSource @Inject constructor(
                 throw Exception("Habit with ID $normalizedHabitId does not exist")
             }
             Log.d("HabitsDataSource", "Habit exists, proceeding with day updates")
-            
-            // 1. Obtener días existentes para este hábito
+
+            // 1. Get existing days for this habit
             Log.d("HabitsDataSource", "Fetching existing days...")
             val existingDays = getHabitDays(normalizedHabitId)
 
-            // 2. Eliminar días existentes usando sus IDs
+            // 2. Delete existing days using their IDs
             if (existingDays.isNotEmpty()) {
                 Log.d("HabitsDataSource", "Deleting ${existingDays.size} existing days...")
                 val idsToDelete = existingDays.map { it.id }
                 Log.d("DELETE_REQUEST", "Deleting IDs: ${idsToDelete.joinToString()}")
-                val deleteResponse = directusApiService.deleteHabitDays(DeleteHabitDaysRequest(idsToDelete))
+                val deleteResponse =
+                    directusApiService.deleteHabitDays(DeleteHabitDaysRequest(idsToDelete))
 
                 if (!deleteResponse.isSuccessful) {
                     val errorBody = deleteResponse.errorBody()?.string()
-                    Log.e("HabitsDataSource", "Delete failed. Code: ${deleteResponse.code()}, Error: $errorBody")
+                    Log.e(
+                        "HabitsDataSource",
+                        "Delete failed. Code: ${deleteResponse.code()}, Error: $errorBody"
+                    )
                     throw Exception("Failed to delete existing days: $errorBody")
                 }
                 Log.d("HabitsDataSource", "Existing days deleted successfully")
@@ -216,7 +220,7 @@ class HabitsDataSource @Inject constructor(
                 Log.d("HabitsDataSource", "No existing days to delete")
             }
 
-            // 3. Crear nuevos días
+            // 3. Create new days
             Log.d("HabitsDataSource", "Creating ${request.days.size} new days...")
             val createdCount = request.days.mapIndexed { index, dayId ->
                 val normalizedDayId = dayId.normalizeUUID()
@@ -225,12 +229,18 @@ class HabitsDataSource @Inject constructor(
                     HabitDayApiRequest(normalizedHabitId, normalizedDayId)
                 )
                 if (!response.isSuccessful) {
-                    Log.e("HabitsDataSource", "Failed to create day $normalizedDayId: ${response.errorBody()?.string()}")
+                    Log.e(
+                        "HabitsDataSource",
+                        "Failed to create day $normalizedDayId: ${response.errorBody()?.string()}"
+                    )
                 }
                 response.isSuccessful
             }.count { it }
 
-            Log.d("HabitsDataSource", "Successfully created $createdCount/${request.days.size} days")
+            Log.d(
+                "HabitsDataSource",
+                "Successfully created $createdCount/${request.days.size} days"
+            )
             return HabitUpdateResponse(
                 success = createdCount == request.days.size,
                 updatedCount = createdCount
@@ -279,25 +289,81 @@ class HabitsDataSource @Inject constructor(
         if (response.isSuccessful) {
             return response.body()?.data?.map { dto ->
                 HabitWithCategory(
-                    trackingId = dto.tracking_id,
-                    habitId = dto.habit_id,
-                    habitName = dto.habit_name,
+                    trackingId = dto.trackingId,
+                    habitId = dto.habitId,
+                    habitName = dto.habitName,
                     streak = dto.streak,
-                    notificationsEnable = dto.notifications_enable,
-                    reminderTime = dto.reminder_time,
-                    isDeleted = dto.is_deleted,
-                    createdAt = dto.created_at,
-                    expirationDate = dto.expiration_date,
-                    categoryId = dto.category_id,
-                    userId = dto.user_id,
-                    isChecked = dto.is_checked,
-                    trackingDate = dto.tracking_date,
-                    categoryName = dto.category_name
+                    notificationsEnable = dto.notificationsEnable,
+                    reminderTime = dto.reminderTime,
+                    isDeleted = dto.isDeleted,
+                    createdAt = dto.createdAt,
+                    expirationDate = dto.expirationDate,
+                    categoryId = dto.categoryId,
+                    userId = dto.userId,
+                    isChecked = dto.isChecked,
+                    trackingDate = dto.trackingDate,
+                    categoryName = dto.categoryName
                 )
             } ?: emptyList()
         } else {
-            throw Exception("Error getting user habit categories view: ${response.errorBody()?.string()}")
+            throw Exception(
+                "Error getting user habit categories view: ${
+                    response.errorBody()?.string()
+                }"
+            )
         }
+    }
+
+    /**
+     * Gets the scheduled days for a habit.
+     */
+    suspend fun getHabitScheduledDays(habitId: String): List<String> {
+        val response = directusApiService.getHabitScheduledDaysWithNames(habitId)
+        if (!response.isSuccessful) {
+            throw Exception("Error getting habit scheduled days: ${response.errorBody()?.string()}")
+        }
+
+        return response.body()?.data?.map { it.dayName } ?: emptyList()
+    }
+
+    /**
+     * Updates the streak value for a specific habit.
+     */
+    suspend fun updateHabitStreak(habitId: String, newStreak: Int): Boolean {
+        val response = directusApiService.updateHabitStreak(
+            habitId = habitId,
+            request = mapOf("streak" to newStreak)
+        )
+
+        return response.isSuccessful
+    }
+
+    /**
+     * Gets the current streak for a habit.
+     */
+    suspend fun getCurrentHabitStreak(habitId: String): Int {
+        val response = directusApiService.getHabitById(habitId)
+        if (response.isSuccessful) {
+            return response.body()?.data?.firstOrNull()?.streak ?: 0
+        }
+        throw Exception("Error getting habit streak: ${response.errorBody()?.string()}")
+    }
+
+    /**
+     * Checks if a habit was completed on a specific date.
+     */
+    suspend fun wasHabitCompletedOnDate(habitId: String, date: LocalDate): Boolean {
+        val response = directusApiService.getHabitTrackingForDate(
+            habitId = habitId,
+            date = date.toString()
+        )
+
+        if (response.isSuccessful) {
+            val tracking = response.body()?.data?.firstOrNull()
+            return tracking?.isChecked == true
+        }
+
+        return false
     }
 
 }

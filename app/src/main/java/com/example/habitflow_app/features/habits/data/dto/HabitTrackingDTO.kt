@@ -21,7 +21,6 @@ data class HabitTrackingResponseDto(
     val habitId: String
 ) : Serializable {
     fun toDomainModel(): HabitTracking {
-        // Agregar logs para debug
         Log.d("HabitTrackingDTO", "Converting to domain model:")
         Log.d("HabitTrackingDTO", "id: $id")
         Log.d("HabitTrackingDTO", "habitId: $habitId")
@@ -33,36 +32,73 @@ data class HabitTrackingResponseDto(
             LocalDate.parse(trackingDate, dateFormatter)
         } catch (e: Exception) {
             Log.e("HabitTrackingDTO", "Error parsing date: ${e.message}")
-            LocalDate.now() // Default value if parsing fails
+            LocalDate.now()
         }
 
         return HabitTracking(
             id = id,
             isChecked = isChecked,
-            trackingDate = localDate, habitId = habitId
+            trackingDate = localDate,
+            habitId = habitId
         )
     }
 }
 
-@kotlinx.serialization.Serializable
 data class UserHabitCategoriesViewDTO(
-    val tracking_id: String?,
-    val habit_id: String?,
-    val habit_name: String?,
+    @SerializedName("tracking_id")
+    val trackingId: String?,
+
+    @SerializedName("habit_id")
+    val habitId: String?,
+
+    @SerializedName("habit_name")
+    val habitName: String?,
+
+    @SerializedName("streak")
     val streak: Int?,
-    val notifications_enable: Boolean?,
-    val reminder_time: String?,
-    val is_deleted: Boolean?,
-    val created_at: String?,
-    val expiration_date: String?,
-    val category_id: String?,
-    val user_id: String?,
-    val is_checked: Boolean?,
-     val tracking_date: String?,
-    val category_name: String?
+
+    @SerializedName("notifications_enable")
+    val notificationsEnable: Boolean?,
+
+    @SerializedName("reminder_time")
+    val reminderTime: String?,
+
+    @SerializedName("is_deleted")
+    val isDeleted: Boolean?,
+
+    @SerializedName("created_at")
+    val createdAt: String?,
+
+    @SerializedName("expiration_date")
+    val expirationDate: String?,
+
+    @SerializedName("category_id")
+    val categoryId: String?,
+
+    @SerializedName("user_id")
+    val userId: String?,
+
+    @SerializedName("is_checked")
+    val isChecked: Boolean?,
+
+    @SerializedName("tracking_date")
+    val trackingDate: String?,
+
+    @SerializedName("category_name")
+    val categoryName: String?
 )
 
-@kotlinx.serialization.Serializable
 data class UserHabitCategoriesViewResponse(
+    @SerializedName("data")
     val data: List<UserHabitCategoriesViewDTO>
+)
+
+data class HabitScheduledDayDTO(
+    @SerializedName("day_name")
+    val dayName: String
+)
+
+data class HabitTrackingDateDTO(
+    @SerializedName("is_checked")
+    val isChecked: Boolean
 )

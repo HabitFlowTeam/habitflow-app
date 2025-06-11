@@ -3,7 +3,6 @@ package com.example.habitflow_app.core.network
 import com.example.habitflow_app.features.habits.data.dto.HabitsResponse
 import com.example.habitflow_app.domain.models.Habit
 import com.example.habitflow_app.features.articles.data.dto.ArticleLikeRequest
-import com.example.habitflow_app.features.articles.data.dto.DeleteArticleLikeFilter
 import com.example.habitflow_app.features.articles.data.dto.ProfileArticlesResponse
 import com.example.habitflow_app.features.articles.data.dto.RankedArticlesResponse
 import com.example.habitflow_app.features.authentication.data.dto.CreateProfileRequest
@@ -12,13 +11,13 @@ import com.example.habitflow_app.features.authentication.data.dto.LoginResponse
 import com.example.habitflow_app.features.authentication.data.dto.PasswordResetRequest
 import com.example.habitflow_app.features.authentication.data.dto.RegisterUserRequest
 import com.example.habitflow_app.features.category.data.dto.CategoriesResponse
-import com.example.habitflow_app.features.gamification.data.dto.HabitRankingResponse
 import com.example.habitflow_app.features.gamification.data.dto.LeaderboardResponse
-import com.example.habitflow_app.features.gamification.data.dto.ProfileRankingResponse
 import com.example.habitflow_app.features.habits.data.dto.HabitApiRequest
 import com.example.habitflow_app.features.habits.data.dto.HabitDayApiRequest
 import com.example.habitflow_app.features.habits.data.dto.HabitDayResponse
+import com.example.habitflow_app.features.habits.data.dto.HabitScheduledDayDTO
 import com.example.habitflow_app.features.habits.data.dto.HabitTrackingApiRequest
+import com.example.habitflow_app.features.habits.data.dto.HabitTrackingDateDTO
 import com.example.habitflow_app.features.habits.data.dto.HabitTrackingResponseDto
 import com.example.habitflow_app.features.habits.data.dto.UserHabitCategoriesViewResponse
 import com.example.habitflow_app.features.profile.data.dto.ProfileDTO
@@ -92,13 +91,6 @@ interface DirectusApiService {
         @Body request: PasswordResetRequest
     ): Response<Unit>
 
-    /**
-     * Invalidates the current user's authentication session.
-     * Note: This endpoint might require token invalidation on the server side.
-     */
-    @POST("auth/logout")
-    suspend fun logout()
-
     @GET("items/profiles/{id}")
     suspend fun getProfile(@Path("id") userId: String): Response<ProfileResponse>
     data class ProfileResponse(val data: ProfileDTO)
@@ -116,15 +108,6 @@ interface DirectusApiService {
         @Body request: HabitTrackingApiRequest
     ): Response<DirectusResponse<HabitTrackingResponseDto>>
     /* Habit Endpoints */
-
-    /**
-     * Retrieves all habits for a specific user.
-     *
-     * @param userId The ID of the user to filter habits by
-     * @return Response containing a list of Habit objects for the specified user
-     */
-    @GET("items/habits")
-    suspend fun getHabits(@Query("filter[user_id][_eq]") userId: String): Response<List<Habit>>
 
     /**
      * Creates a new habit in the system.
@@ -145,15 +128,6 @@ interface DirectusApiService {
     suspend fun createHabitDay(@Body request: HabitDayApiRequest): Response<ResponseBody>
 
     /**
-     * Creates a new habit tracking record.
-     *
-     * @param request The HabitTrackingApiRequest object containing tracking details
-     * @return Response with status of the operation (no content body expected)
-     */
-    // @POST("items/habits_tracking")
-    // suspend fun createHabitTracking(@Body request: HabitTrackingApiRequest): Response<Unit>
-
-    /**
      * Retrieves all day associations for a specific habit.
      *
      * @param habitId The ID of the habit to get days for
@@ -169,8 +143,6 @@ interface DirectusApiService {
     /**
      * Deletes all day associations for a specific habit.
      *
-     * @param habitId The ID of the habit whose day associations should be deleted
-     * @return Response with status of the operation (no content body expected)
      */
     @HTTP(method = "DELETE", path = "items/habits_days", hasBody = true)
     suspend fun deleteHabitDays(@Body request: DeleteHabitDaysRequest): Response<Unit>
@@ -253,25 +225,6 @@ interface DirectusApiService {
         @Query("sort") sort: String = "-streak"
     ): Response<LeaderboardResponse>
 
-    /**
-     * Retrieves profile information for multiple users by their IDs.
-     *
-     * This endpoint is typically used to fetch additional user details (full name, avatar)
-     * after obtaining user IDs from the category ranking endpoint.
-     *
-     * @param userIds Comma-separated list of user IDs to retrieve
-     * @param fields Comma-separated list of fields to include in the response
-     * @return Retrofit Response containing profile data wrapped in ProfileRankingResponse
-     */
-    @GET("items/profiles")
-    suspend fun getProfileRanking(
-        @Query("filter[id][_in]") userIds: String,
-        @Query("fields") fields: String = "id,full_name,avatar_url"
-    ): Response<ProfileRankingResponse>
-
-    /* Habits Endpoints */
-    // TODO: Add habits-related endpoints as needed
-
     /* Articles Endpoints */
 
     /**
@@ -288,15 +241,12 @@ interface DirectusApiService {
     ): Response<ProfileArticlesResponse>
 
     /**
-     * Obtiene los artículos destacados con información de autor y likes desde la view RANKED_ARTICLES_VIEW.
+     * Gets featured articles with author information and likes from the RANKED_ARTICLES_VIEW view.
      */
     @GET("items/ranked_articles_view")
     suspend fun getRankedArticles(
         @Query("fields") fields: String = "title,content,author_name,author_image_url,likes_count,id,category_name,created_at,image_url"
     ): Response<RankedArticlesResponse>
-
-    /* Profile Endpoints */
-    // TODO: Add user profile-related endpoints as needed
 
     /* Category Endpoint */
     /**
@@ -317,7 +267,7 @@ interface DirectusApiService {
      * The table structure is:
      * - user_id: UUID (FK to directus_users)
      * - article_id: UUID (FK to articles)
-     * 
+     *
      * @param request The ArticleLikeRequest containing article_id and user_id
      * @return Response containing the created like record
      */
@@ -341,4 +291,35 @@ interface DirectusApiService {
         @Query("filter[article_id][_eq]") articleId: String,
         @Query("filter[user_id][_eq]") userId: String
     ): Response<DirectusResponse<List<Map<String, Any>>>>
+
+    // Add these methods to your existing DirectusApiService interface:
+
+    /**
+     * Gets scheduled days for a habit with day names.
+     */
+    @GET("items/habits_days")
+    suspend fun getHabitScheduledDaysWithNames(
+        @Query("filter[habit_id][_eq]") habitId: String,
+        @Query("fields") fields: String = "week_day_id.name"
+    ): Response<DirectusResponse<List<HabitScheduledDayDTO>>>
+
+    /**
+     * Updates the streak value for a specific habit.
+     */
+    @PATCH("items/habits/{habit_id}")
+    suspend fun updateHabitStreak(
+        @Path("habit_id") habitId: String,
+        @Body request: Map<String, Int>
+    ): Response<Unit>
+
+    /**
+     * Gets habit tracking for a specific date.
+     */
+    @GET("items/habits_tracking")
+    suspend fun getHabitTrackingForDate(
+        @Query("filter[habit_id][_eq]") habitId: String,
+        @Query("filter[tracking_date][_eq]") date: String,
+        @Query("fields") fields: String = "is_checked"
+    ): Response<DirectusResponse<List<HabitTrackingDateDTO>>>
+
 }

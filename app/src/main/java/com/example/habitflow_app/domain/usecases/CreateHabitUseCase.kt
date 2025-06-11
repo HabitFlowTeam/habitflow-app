@@ -1,9 +1,5 @@
 package com.example.habitflow_app.domain.usecases
 
-import android.util.Log
-import com.example.habitflow_app.domain.models.Habit
-import com.example.habitflow_app.domain.models.User
-import com.example.habitflow_app.domain.repositories.AuthRepository
 import com.example.habitflow_app.domain.repositories.HabitsRepository
 import com.example.habitflow_app.features.habits.data.dto.CreateHabitRequest
 import com.example.habitflow_app.features.habits.data.dto.HabitResponse
