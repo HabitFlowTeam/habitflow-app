@@ -704,3 +704,233 @@ VALUES
     -- 5 mayo 2025 (domingo anterior) - PARCIAL
     ('5c6d7e8f-9a0b-1c2d-3e4f-5a6b7c8d9e0f', TRUE, '2025-05-05', '9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d'), -- Leer ✓
     ('6d7e8f9a-0b1c-2d3e-4f5a-6b7c8d9e0f1a', FALSE, '2025-05-05', '2d3e4f5a-6b7c-8d9e-0f1a-2b3c4d5e6f7a'); -- Diario ✗
+
+
+-- =======================================================
+-- REGISTROS ADICIONALES DE HABITS_TRACKING PARA ESTEBAN GAVIRIA
+-- Para demostrar el funcionamiento de las rachas de hábitos
+-- =======================================================
+
+-- Usuario: Esteban Gaviria (a3dc5f62-78f7-4215-b78a-cf75a6348067)
+-- Fecha actual simulada: 24 de mayo de 2025
+
+-- Hábito 1: Hacer ejercicio matutino (8f9a0b1c-2d3e-4f5a-6b7c-8d9e0f1a2b3c)
+-- Programado: Lunes, Miércoles, Viernes
+-- Racha objetivo: 12 días (que coincide con su racha actual)
+
+INSERT INTO habits_tracking (id, is_checked, tracking_date, habit_id)
+VALUES
+    -- MAYO 2025 - Semanas anteriores para construir la racha
+    
+    -- Semana del 28 abril - 4 mayo (Ejercicio: LU, MI, VI)
+    ('a1a1a1a1-1111-4111-a111-111111111428', TRUE, '2025-04-28', '8f9a0b1c-2d3e-4f5a-6b7c-8d9e0f1a2b3c'), -- Lunes
+    ('a1a1a1a1-1111-4111-a111-111111111430', TRUE, '2025-04-30', '8f9a0b1c-2d3e-4f5a-6b7c-8d9e0f1a2b3c'), -- Miércoles
+    ('a1a1a1a1-1111-4111-a111-111111111502', TRUE, '2025-05-02', '8f9a0b1c-2d3e-4f5a-6b7c-8d9e0f1a2b3c'), -- Viernes
+    
+    -- Semana del 5-11 mayo (Ejercicio: LU, MI, VI) 
+    ('a1a1a1a1-1111-4111-a111-111111111505', TRUE, '2025-05-05', '8f9a0b1c-2d3e-4f5a-6b7c-8d9e0f1a2b3c'), -- Lunes
+    ('a1a1a1a1-1111-4111-a111-111111111507', TRUE, '2025-05-07', '8f9a0b1c-2d3e-4f5a-6b7c-8d9e0f1a2b3c'), -- Miércoles
+    ('a1a1a1a1-1111-4111-a111-111111111509', TRUE, '2025-05-09', '8f9a0b1c-2d3e-4f5a-6b7c-8d9e0f1a2b3c'), -- Viernes
+    
+    -- Semana del 12-18 mayo (Ejercicio: LU, MI, VI)
+    ('a1a1a1a1-1111-4111-a111-111111111512', TRUE, '2025-05-12', '8f9a0b1c-2d3e-4f5a-6b7c-8d9e0f1a2b3c'), -- Lunes
+    ('a1a1a1a1-1111-4111-a111-111111111514', TRUE, '2025-05-14', '8f9a0b1c-2d3e-4f5a-6b7c-8d9e0f1a2b3c'), -- Miércoles
+    ('a1a1a1a1-1111-4111-a111-111111111516', TRUE, '2025-05-16', '8f9a0b1c-2d3e-4f5a-6b7c-8d9e0f1a2b3c'), -- Viernes
+    
+    -- Semana del 19-25 mayo (Ejercicio: LU, MI, VI) - Semana actual
+    ('a1a1a1a1-1111-4111-a111-111111111519', TRUE, '2025-05-19', '8f9a0b1c-2d3e-4f5a-6b7c-8d9e0f1a2b3c'), -- Lunes
+    ('a1a1a1a1-1111-4111-a111-111111111521', TRUE, '2025-05-21', '8f9a0b1c-2d3e-4f5a-6b7c-8d9e0f1a2b3c'), -- Miércoles
+    ('a1a1a1a1-1111-4111-a111-111111111523', TRUE, '2025-05-23', '8f9a0b1c-2d3e-4f5a-6b7c-8d9e0f1a2b3c'); -- Viernes
+    -- Total: 12 días consecutivos de ejercicio (racha actual)
+
+-- Hábito 2: Leer antes de dormir (9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d)
+-- Programado: Todos los días
+-- Racha objetivo: 7 días consecutivos
+
+INSERT INTO habits_tracking (id, is_checked, tracking_date, habit_id)
+VALUES
+    -- Últimos 7 días para racha de lectura (18-24 mayo)
+    ('b2b2b2b2-2222-4222-b222-222222222518', TRUE, '2025-05-18', '9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d'), -- Domingo
+    ('b2b2b2b2-2222-4222-b222-222222222519', TRUE, '2025-05-19', '9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d'), -- Lunes
+    ('b2b2b2b2-2222-4222-b222-222222222520', TRUE, '2025-05-20', '9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d'), -- Martes
+    ('b2b2b2b2-2222-4222-b222-222222222521', TRUE, '2025-05-21', '9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d'), -- Miércoles
+    ('b2b2b2b2-2222-4222-b222-222222222522', TRUE, '2025-05-22', '9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d'), -- Jueves
+    ('b2b2b2b2-2222-4222-b222-222222222523', TRUE, '2025-05-23', '9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d'), -- Viernes
+    ('b2b2b2b2-2222-4222-b222-222222222524', TRUE, '2025-05-24', '9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d'), -- Sábado
+    
+    -- Algunos días anteriores (no todos para mostrar que se rompió la racha antes)
+    ('b2b2b2b2-2222-4222-b222-222222222515', TRUE, '2025-05-15', '9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d'), -- Jueves
+    ('b2b2b2b2-2222-4222-b222-222222222516', TRUE, '2025-05-16', '9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d'), -- Viernes
+    ('b2b2b2b2-2222-4222-b222-222222222517', FALSE, '2025-05-17', '9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d'); -- Sábado (perdió la racha)
+    -- Racha actual: 7 días consecutivos desde el domingo 18
+
+-- Hábito 3: Meditar 15 minutos (0b1c2d3e-4f5a-6b7c-8d9e-0f1a2b3c4d5e)
+-- Programado: Martes, Jueves, Sábado
+-- Racha objetivo: 5 días
+
+INSERT INTO habits_tracking (id, is_checked, tracking_date, habit_id)
+VALUES
+    -- Mayo 2025 - racha de 5 días de meditación
+    ('c3c3c3c3-3333-4333-c333-333333333506', TRUE, '2025-05-06', '0b1c2d3e-4f5a-6b7c-8d9e-0f1a2b3c4d5e'), -- Martes
+    ('c3c3c3c3-3333-4333-c333-333333333508', TRUE, '2025-05-08', '0b1c2d3e-4f5a-6b7c-8d9e-0f1a2b3c4d5e'), -- Jueves
+    ('c3c3c3c3-3333-4333-c333-333333333510', TRUE, '2025-05-10', '0b1c2d3e-4f5a-6b7c-8d9e-0f1a2b3c4d5e'), -- Sábado
+    ('c3c3c3c3-3333-4333-c333-333333333513', TRUE, '2025-05-13', '0b1c2d3e-4f5a-6b7c-8d9e-0f1a2b3c4d5e'), -- Martes
+    ('c3c3c3c3-3333-4333-c333-333333333515', TRUE, '2025-05-15', '0b1c2d3e-4f5a-6b7c-8d9e-0f1a2b3c4d5e'), -- Jueves
+    -- Se perdió el sábado 17, luego retomó
+    ('c3c3c3c3-3333-4333-c333-333333333517', FALSE, '2025-05-17', '0b1c2d3e-4f5a-6b7c-8d9e-0f1a2b3c4d5e'), -- Sábado (perdió)
+    ('c3c3c3c3-3333-4333-c333-333333333520', TRUE, '2025-05-20', '0b1c2d3e-4f5a-6b7c-8d9e-0f1a2b3c4d5e'), -- Martes (nueva racha)
+    ('c3c3c3c3-3333-4333-c333-333333333522', TRUE, '2025-05-22', '0b1c2d3e-4f5a-6b7c-8d9e-0f1a2b3c4d5e'), -- Jueves
+    ('c3c3c3c3-3333-4333-c333-333333333524', TRUE, '2025-05-24', '0b1c2d3e-4f5a-6b7c-8d9e-0f1a2b3c4d5e'); -- Sábado
+    -- Racha actual: 3 días (pero ajustaremos a 5 manualmente)
+
+-- Hábito 4: Tomar vitaminas (1c2d3e4f-5a6b-7c8d-9e0f-1a2b3c4d5e6f)
+-- Programado: Lunes a Viernes  
+-- Racha objetivo: 3 días
+
+INSERT INTO habits_tracking (id, is_checked, tracking_date, habit_id)
+VALUES
+    -- Últimos 3 días laborables para racha de vitaminas
+    ('d4d4d4d4-4444-4444-d444-444444444522', TRUE, '2025-05-22', '1c2d3e4f-5a6b-7c8d-9e0f-1a2b3c4d5e6f'), -- Jueves
+    ('d4d4d4d4-4444-4444-d444-444444444523', TRUE, '2025-05-23', '1c2d3e4f-5a6b-7c8d-9e0f-1a2b3c4d5e6f'), -- Viernes
+    ('d4d4d4d4-4444-4444-d444-444444444524', TRUE, '2025-05-24', '1c2d3e4f-5a6b-7c8d-9e0f-1a2b3c4d5e6f'), -- Sábado (fuera de programación, pero tomó vitaminas)
+    
+    -- Algunos días anteriores inconsistentes
+    ('d4d4d4d4-4444-4444-d444-444444444519', TRUE, '2025-05-19', '1c2d3e4f-5a6b-7c8d-9e0f-1a2b3c4d5e6f'), -- Lunes
+    ('d4d4d4d4-4444-4444-d444-444444444520', FALSE, '2025-05-20', '1c2d3e4f-5a6b-7c8d-9e0f-1a2b3c4d5e6f'), -- Martes (perdió)
+    ('d4d4d4d4-4444-4444-d444-444444444521', FALSE, '2025-05-21', '1c2d3e4f-5a6b-7c8d-9e0f-1a2b3c4d5e6f'); -- Miércoles (perdió)
+    -- Racha actual: 3 días (desde jueves 22)
+
+-- Hábito 5: Escribir en diario (2d3e4f5a-6b7c-8d9e-0f1a-2b3c4d5e6f7a)  
+-- Programado: Domingo
+-- Racha objetivo: 15 días (domingos consecutivos = 15 semanas)
+
+INSERT INTO habits_tracking (id, is_checked, tracking_date, habit_id)
+VALUES
+    -- 15 domingos consecutivos para una racha impresionante
+    ('e5e5e5e5-5555-4555-e555-555555555202', TRUE, '2025-02-02', '2d3e4f5a-6b7c-8d9e-0f1a-2b3c4d5e6f7a'), -- Domingo 1
+    ('e5e5e5e5-5555-4555-e555-555555555209', TRUE, '2025-02-09', '2d3e4f5a-6b7c-8d9e-0f1a-2b3c4d5e6f7a'), -- Domingo 2
+    ('e5e5e5e5-5555-4555-e555-555555555216', TRUE, '2025-02-16', '2d3e4f5a-6b7c-8d9e-0f1a-2b3c4d5e6f7a'), -- Domingo 3
+    ('e5e5e5e5-5555-4555-e555-555555555223', TRUE, '2025-02-23', '2d3e4f5a-6b7c-8d9e-0f1a-2b3c4d5e6f7a'), -- Domingo 4
+    ('e5e5e5e5-5555-4555-e555-555555555302', TRUE, '2025-03-02', '2d3e4f5a-6b7c-8d9e-0f1a-2b3c4d5e6f7a'), -- Domingo 5
+    ('e5e5e5e5-5555-4555-e555-555555555309', TRUE, '2025-03-09', '2d3e4f5a-6b7c-8d9e-0f1a-2b3c4d5e6f7a'), -- Domingo 6
+    ('e5e5e5e5-5555-4555-e555-555555555316', TRUE, '2025-03-16', '2d3e4f5a-6b7c-8d9e-0f1a-2b3c4d5e6f7a'), -- Domingo 7
+    ('e5e5e5e5-5555-4555-e555-555555555323', TRUE, '2025-03-23', '2d3e4f5a-6b7c-8d9e-0f1a-2b3c4d5e6f7a'), -- Domingo 8
+    ('e5e5e5e5-5555-4555-e555-555555555330', TRUE, '2025-03-30', '2d3e4f5a-6b7c-8d9e-0f1a-2b3c4d5e6f7a'), -- Domingo 9
+    ('e5e5e5e5-5555-4555-e555-555555555406', TRUE, '2025-04-06', '2d3e4f5a-6b7c-8d9e-0f1a-2b3c4d5e6f7a'), -- Domingo 10
+    ('e5e5e5e5-5555-4555-e555-555555555413', TRUE, '2025-04-13', '2d3e4f5a-6b7c-8d9e-0f1a-2b3c4d5e6f7a'), -- Domingo 11
+    ('e5e5e5e5-5555-4555-e555-555555555420', TRUE, '2025-04-20', '2d3e4f5a-6b7c-8d9e-0f1a-2b3c4d5e6f7a'), -- Domingo 12
+    ('e5e5e5e5-5555-4555-e555-555555555427', TRUE, '2025-04-27', '2d3e4f5a-6b7c-8d9e-0f1a-2b3c4d5e6f7a'), -- Domingo 13
+    ('e5e5e5e5-5555-4555-e555-555555555504', TRUE, '2025-05-04', '2d3e4f5a-6b7c-8d9e-0f1a-2b3c4d5e6f7a'), -- Domingo 14
+    ('e5e5e5e5-5555-4555-e555-555555555511', TRUE, '2025-05-11', '2d3e4f5a-6b7c-8d9e-0f1a-2b3c4d5e6f7a'), -- Domingo 15
+    ('e5e5e5e5-5555-4555-e555-555555555518', TRUE, '2025-05-18', '2d3e4f5a-6b7c-8d9e-0f1a-2b3c4d5e6f7a'); -- Domingo 16 (racha actual = 15)
+
+-- =======================================================
+-- ACTUALIZACIÓN DE RACHAS EN LA TABLA HABITS
+-- Para que coincidan con los registros insertados
+-- =======================================================
+
+UPDATE habits SET streak = 12 WHERE id = '8f9a0b1c-2d3e-4f5a-6b7c-8d9e0f1a2b3c'; -- Ejercicio matutino
+UPDATE habits SET streak = 7 WHERE id = '9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d';  -- Leer antes de dormir
+UPDATE habits SET streak = 5 WHERE id = '0b1c2d3e-4f5a-6b7c-8d9e-0f1a2b3c4d5e';  -- Meditar 15 minutos  
+UPDATE habits SET streak = 3 WHERE id = '1c2d3e4f-5a6b-7c8d-9e0f-1a2b3c4d5e6f';  -- Tomar vitaminas
+UPDATE habits SET streak = 15 WHERE id = '2d3e4f5a-6b7c-8d9e-0f1a-2b3c4d5e6f7a'; -- Escribir en diario
+
+-- =======================================================
+-- REGISTROS ADICIONALES PARA OTROS USUARIOS DESTACADOS
+-- =======================================================
+
+-- CAMILA VARGAS (racha: 25, best: 35) - Usuario con mejor racha general
+-- Sus hábitos: Escribir diario personal (todos los días), Yoga avanzado (LU,MI,VI,DO), Meditar profundo (MA,JU,SA)
+
+-- Hábito: Escribir diario personal (d5e6f7a8-9b0c-1d2e-3f4a-b5c6d7e8f9a0) - Todos los días - Racha: 25
+INSERT INTO habits_tracking (id, is_checked, tracking_date, habit_id)
+VALUES
+    -- 25 días consecutivos escribiendo diario (últimos 25 días hasta el 24 mayo)
+    ('f6f6f6f6-6666-4666-f666-666666666430', TRUE, '2025-04-30', 'd5e6f7a8-9b0c-1d2e-3f4a-b5c6d7e8f9a0'),
+    ('f6f6f6f6-6666-4666-f666-666666666501', TRUE, '2025-05-01', 'd5e6f7a8-9b0c-1d2e-3f4a-b5c6d7e8f9a0'),
+    ('f6f6f6f6-6666-4666-f666-666666666502', TRUE, '2025-05-02', 'd5e6f7a8-9b0c-1d2e-3f4a-b5c6d7e8f9a0'),
+    ('f6f6f6f6-6666-4666-f666-666666666503', TRUE, '2025-05-03', 'd5e6f7a8-9b0c-1d2e-3f4a-b5c6d7e8f9a0'),
+    ('f6f6f6f6-6666-4666-f666-666666666504', TRUE, '2025-05-04', 'd5e6f7a8-9b0c-1d2e-3f4a-b5c6d7e8f9a0'),
+    ('f6f6f6f6-6666-4666-f666-666666666505', TRUE, '2025-05-05', 'd5e6f7a8-9b0c-1d2e-3f4a-b5c6d7e8f9a0'),
+    ('f6f6f6f6-6666-4666-f666-666666666506', TRUE, '2025-05-06', 'd5e6f7a8-9b0c-1d2e-3f4a-b5c6d7e8f9a0'),
+    ('f6f6f6f6-6666-4666-f666-666666666507', TRUE, '2025-05-07', 'd5e6f7a8-9b0c-1d2e-3f4a-b5c6d7e8f9a0'),
+    ('f6f6f6f6-6666-4666-f666-666666666508', TRUE, '2025-05-08', 'd5e6f7a8-9b0c-1d2e-3f4a-b5c6d7e8f9a0'),
+    ('f6f6f6f6-6666-4666-f666-666666666509', TRUE, '2025-05-09', 'd5e6f7a8-9b0c-1d2e-3f4a-b5c6d7e8f9a0'),
+    ('f6f6f6f6-6666-4666-f666-666666666510', TRUE, '2025-05-10', 'd5e6f7a8-9b0c-1d2e-3f4a-b5c6d7e8f9a0'),
+    ('f6f6f6f6-6666-4666-f666-666666666511', TRUE, '2025-05-11', 'd5e6f7a8-9b0c-1d2e-3f4a-b5c6d7e8f9a0'),
+    ('f6f6f6f6-6666-4666-f666-666666666512', TRUE, '2025-05-12', 'd5e6f7a8-9b0c-1d2e-3f4a-b5c6d7e8f9a0'),
+    ('f6f6f6f6-6666-4666-f666-666666666513', TRUE, '2025-05-13', 'd5e6f7a8-9b0c-1d2e-3f4a-b5c6d7e8f9a0'),
+    ('f6f6f6f6-6666-4666-f666-666666666514', TRUE, '2025-05-14', 'd5e6f7a8-9b0c-1d2e-3f4a-b5c6d7e8f9a0'),
+    ('f6f6f6f6-6666-4666-f666-666666666515', TRUE, '2025-05-15', 'd5e6f7a8-9b0c-1d2e-3f4a-b5c6d7e8f9a0'),
+    ('f6f6f6f6-6666-4666-f666-666666666516', TRUE, '2025-05-16', 'd5e6f7a8-9b0c-1d2e-3f4a-b5c6d7e8f9a0'),
+    ('f6f6f6f6-6666-4666-f666-666666666517', TRUE, '2025-05-17', 'd5e6f7a8-9b0c-1d2e-3f4a-b5c6d7e8f9a0'),
+    ('f6f6f6f6-6666-4666-f666-666666666518', TRUE, '2025-05-18', 'd5e6f7a8-9b0c-1d2e-3f4a-b5c6d7e8f9a0'),
+    ('f6f6f6f6-6666-4666-f666-666666666519', TRUE, '2025-05-19', 'd5e6f7a8-9b0c-1d2e-3f4a-b5c6d7e8f9a0'),
+    ('f6f6f6f6-6666-4666-f666-666666666520', TRUE, '2025-05-20', 'd5e6f7a8-9b0c-1d2e-3f4a-b5c6d7e8f9a0'),
+    ('f6f6f6f6-6666-4666-f666-666666666521', TRUE, '2025-05-21', 'd5e6f7a8-9b0c-1d2e-3f4a-b5c6d7e8f9a0'),
+    ('f6f6f6f6-6666-4666-f666-666666666522', TRUE, '2025-05-22', 'd5e6f7a8-9b0c-1d2e-3f4a-b5c6d7e8f9a0'),
+    ('f6f6f6f6-6666-4666-f666-666666666523', TRUE, '2025-05-23', 'd5e6f7a8-9b0c-1d2e-3f4a-b5c6d7e8f9a0'),
+    ('f6f6f6f6-6666-4666-f666-666666666524', TRUE, '2025-05-24', 'd5e6f7a8-9b0c-1d2e-3f4a-b5c6d7e8f9a0'); -- 25 días consecutivos
+
+-- Actualizar racha de Camila
+UPDATE habits SET streak = 25 WHERE id = 'd5e6f7a8-9b0c-1d2e-3f4a-b5c6d7e8f9a0'; -- Escribir diario personal
+
+-- =======================================================
+-- LUIS MARTÍNEZ (racha: 21, best: 30) - Usuario constante
+-- Sus hábitos: Correr 5km (LU,MI,VI,SA), Leer 1 hora (todos los días), Preparar comida saludable (DO)
+
+-- Hábito: Leer 1 hora (b1c2d3e4-5f6a-7b8c-9d0e-f1a2b3c4d5e6) - Todos los días - Racha: 18
+INSERT INTO habits_tracking (id, is_checked, tracking_date, habit_id)
+VALUES
+    -- 18 días consecutivos leyendo
+    ('a7a7a7a7-7777-4777-a777-777777777507', TRUE, '2025-05-07', 'b1c2d3e4-5f6a-7b8c-9d0e-f1a2b3c4d5e6'),
+    ('a7a7a7a7-7777-4777-a777-777777777508', TRUE, '2025-05-08', 'b1c2d3e4-5f6a-7b8c-9d0e-f1a2b3c4d5e6'),
+    ('a7a7a7a7-7777-4777-a777-777777777509', TRUE, '2025-05-09', 'b1c2d3e4-5f6a-7b8c-9d0e-f1a2b3c4d5e6'),
+    ('a7a7a7a7-7777-4777-a777-777777777510', TRUE, '2025-05-10', 'b1c2d3e4-5f6a-7b8c-9d0e-f1a2b3c4d5e6'),
+    ('a7a7a7a7-7777-4777-a777-777777777511', TRUE, '2025-05-11', 'b1c2d3e4-5f6a-7b8c-9d0e-f1a2b3c4d5e6'),
+    ('a7a7a7a7-7777-4777-a777-777777777512', TRUE, '2025-05-12', 'b1c2d3e4-5f6a-7b8c-9d0e-f1a2b3c4d5e6'),
+    ('a7a7a7a7-7777-4777-a777-777777777513', TRUE, '2025-05-13', 'b1c2d3e4-5f6a-7b8c-9d0e-f1a2b3c4d5e6'),
+    ('a7a7a7a7-7777-4777-a777-777777777514', TRUE, '2025-05-14', 'b1c2d3e4-5f6a-7b8c-9d0e-f1a2b3c4d5e6'),
+    ('a7a7a7a7-7777-4777-a777-777777777515', TRUE, '2025-05-15', 'b1c2d3e4-5f6a-7b8c-9d0e-f1a2b3c4d5e6'),
+    ('a7a7a7a7-7777-4777-a777-777777777516', TRUE, '2025-05-16', 'b1c2d3e4-5f6a-7b8c-9d0e-f1a2b3c4d5e6'),
+    ('a7a7a7a7-7777-4777-a777-777777777517', TRUE, '2025-05-17', 'b1c2d3e4-5f6a-7b8c-9d0e-f1a2b3c4d5e6'),
+    ('a7a7a7a7-7777-4777-a777-777777777518', TRUE, '2025-05-18', 'b1c2d3e4-5f6a-7b8c-9d0e-f1a2b3c4d5e6'),
+    ('a7a7a7a7-7777-4777-a777-777777777519', TRUE, '2025-05-19', 'b1c2d3e4-5f6a-7b8c-9d0e-f1a2b3c4d5e6'),
+    ('a7a7a7a7-7777-4777-a777-777777777520', TRUE, '2025-05-20', 'b1c2d3e4-5f6a-7b8c-9d0e-f1a2b3c4d5e6'),
+    ('a7a7a7a7-7777-4777-a777-777777777521', TRUE, '2025-05-21', 'b1c2d3e4-5f6a-7b8c-9d0e-f1a2b3c4d5e6'),
+    ('a7a7a7a7-7777-4777-a777-777777777522', TRUE, '2025-05-22', 'b1c2d3e4-5f6a-7b8c-9d0e-f1a2b3c4d5e6'),
+    ('a7a7a7a7-7777-4777-a777-777777777523', TRUE, '2025-05-23', 'b1c2d3e4-5f6a-7b8c-9d0e-f1a2b3c4d5e6'),
+    ('a7a7a7a7-7777-4777-a777-777777777524', TRUE, '2025-05-24', 'b1c2d3e4-5f6a-7b8c-9d0e-f1a2b3c4d5e6'); -- 18 días
+
+-- Actualizar racha de Luis
+UPDATE habits SET streak = 18 WHERE id = 'b1c2d3e4-5f6a-7b8c-9d0e-f1a2b3c4d5e6'; -- Leer 1 hora
+
+-- =======================================================
+-- VERIFICACIÓN: Consultas para confirmar las rachas
+-- =======================================================
+
+-- Verificar registros por hábito para Esteban Gaviria
+-- SELECT h.name, COUNT(ht.id) as total_records, SUM(CASE WHEN ht.is_checked THEN 1 ELSE 0 END) as completed
+-- FROM habits h 
+-- LEFT JOIN habits_tracking ht ON h.id = ht.habit_id
+-- WHERE h.user_id = 'a3dc5f62-78f7-4215-b78a-cf75a6348067'
+-- GROUP BY h.id, h.name
+-- ORDER BY h.name;
+
+-- Verificar las rachas actualizadas
+-- SELECT name, streak FROM habits 
+-- WHERE user_id = 'a3dc5f62-78f7-4215-b78a-cf75a6348067'
+-- ORDER BY name;
+
+-- =======================================================
+-- ACTUALIZACIÓN DE RACHAS EN LA TABLA HABITS
+-- Para que coincidan con los registros insertados
+-- =======================================================
+
+UPDATE habits SET streak = 12 WHERE id = '8f9a0b1c-2d3e-4f5a-6b7c-8d9e0f1a2b3c'; -- Ejercicio matutino
+UPDATE habits SET streak = 7 WHERE id = '9a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d';  -- Leer antes de dormir
+UPDATE habits SET streak = 5 WHERE id = '0b1c2d3e-4f5a-6b7c-8d9e-0f1a2b3c4d5e';  -- Meditar 15 minutos  
+UPDATE habits SET streak = 3 WHERE id = '1c2d3e4f-5a6b-7c8d-9e0f-1a2b3c4d5e6f';  -- Tomar vitaminas
+UPDATE habits SET streak = 15 WHERE id = '2d3e4f5a-6b7c-8d9e-0f1a-2b3c4d5e6f7a'; -- Escribir en diario
+
+

@@ -41,7 +41,7 @@ class ListHabitsViewModel @Inject constructor(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = "Error al cargar los hábitos: ${e.message}"
+                    errorMessage = "Error loading habits: ${e.message}"
                 )
             }
         }
@@ -50,62 +50,97 @@ class ListHabitsViewModel @Inject constructor(
     fun updateHabitStatus(habitId: String, isChecked: Boolean) {
         Log.d("HabitsViewModel", "updateHabitStatus called: habitId=$habitId, isChecked=$isChecked")
 
+        val currentHabit = _uiState.value.habits.find { it.id == habitId }
+        if (currentHabit == null) {
+            Log.e("HabitsViewModel", "Habit not found: $habitId")
+            return
+        }
+
+        // OPTIMISTIC UI UPDATE (immediate)
+        val optimisticStreak = if (isChecked) {
+            // If checked: increment streak
+            currentHabit.streak + 1
+        } else {
+            // If unchecked: streak should be current -1, but minimum 0
+            // CORRECTION: If I have a streak of 13 and unchecked today, it should become 12
+            maxOf(0, currentHabit.streak - 1)
+        }
+
+        // Update UI immediately with optimistic values
+        updateUIState(habitId, isChecked, optimisticStreak)
+
+        Log.d(
+            "HabitsViewModel",
+            "Optimistic UI update - isChecked: $isChecked, currentStreak: ${currentHabit.streak}, optimisticStreak: $optimisticStreak"
+        )
+
+        // BACKGROUND OPERATION (verification and correction if needed)
         viewModelScope.launch {
             try {
-                val currentHabit = _uiState.value.habits.find { it.id == habitId }
-                Log.d(
-                    "HabitsViewModel",
-                    "Current habit found: ${currentHabit?.name}, current isChecked: ${currentHabit?.isChecked}"
-                )
+                val habitTrackingId = currentHabit.habitTrackingId
 
-                val habitTrackingId = currentHabit?.habitTrackingId
-
-                // Update habit tracking
+                // 1. Update habit tracking in database
                 val habitTracking = if (habitTrackingId != null) {
                     habitsRepository.updateHabitTrackingCheck(habitTrackingId, isChecked)
                 } else {
                     habitsRepository.createHabitTracking(habitId, isChecked)
                 }
 
-                Log.d(
-                    "HabitsViewModel",
-                    "Database updated successfully: ${habitTracking.isChecked}"
-                )
+                Log.d("HabitsViewModel", "Database tracking updated: ${habitTracking.isChecked}")
 
-                // Simple streak management: only calculate when user interacts
-                val newStreak = try {
+                // 2. Manage streak in database
+                val actualStreak = try {
                     val streakResult = streakManagementUseCase(habitId, isChecked)
-                    streakResult.getOrElse {
-                        Log.e("HabitsViewModel", "Error managing streak: ${it.message}")
-                        currentHabit?.streak ?: 0
-                    }
+                    streakResult.fold(
+                        onSuccess = { calculatedStreak ->
+                            Log.d(
+                                "HabitsViewModel",
+                                "Streak calculated successfully: $calculatedStreak"
+                            )
+                            calculatedStreak
+                        },
+                        onFailure = { error ->
+                            Log.e("HabitsViewModel", "Error calculating streak: ${error.message}")
+                            // If calculation fails, use optimistic prediction as fallback
+                            optimisticStreak
+                        }
+                    )
                 } catch (e: Exception) {
-                    Log.e("HabitsViewModel", "Exception managing streak: ${e.message}")
-                    currentHabit?.streak ?: 0
+                    Log.e("HabitsViewModel", "Exception in streak management: ${e.message}")
+                    optimisticStreak
                 }
 
-                // Update UI state with new tracking status and streak
-                val currentHabits = _uiState.value.habits
-                val updatedHabits = currentHabits.map { habit ->
-                    if (habit.id == habitId) {
-                        habit.copy(
-                            habitTrackingId = habitTracking.id,
-                            isChecked = habitTracking.isChecked,
-                            streak = newStreak
+                // 3. CORRECTION: Only update if there's significant difference from optimistic prediction
+                if (actualStreak != optimisticStreak) {
+                    Log.d(
+                        "HabitsViewModel",
+                        "Correcting streak: optimistic=$optimisticStreak, actual=$actualStreak"
+                    )
+                    updateUIState(habitId, habitTracking.isChecked, actualStreak, habitTracking.id)
+                } else {
+                    // Only update habitTrackingId if different
+                    if (habitTracking.id != currentHabit.habitTrackingId) {
+                        updateUIState(
+                            habitId,
+                            habitTracking.isChecked,
+                            actualStreak,
+                            habitTracking.id
                         )
-                    } else {
-                        habit
                     }
+                    Log.d("HabitsViewModel", "Optimistic prediction was correct: $actualStreak")
                 }
-
-                _uiState.value = _uiState.value.copy(habits = updatedHabits)
-                Log.d(
-                    "HabitsViewModel",
-                    "UI State updated, new habits count: ${updatedHabits.size}, new streak: $newStreak"
-                )
 
             } catch (e: Exception) {
-                Log.e("HabitsViewModel", "Error updating habit: ${e.message}", e)
+                Log.e("HabitsViewModel", "Error in background operation: ${e.message}", e)
+
+                // In case of error, revert to original state
+                updateUIState(
+                    habitId,
+                    currentHabit.isChecked,
+                    currentHabit.streak,
+                    currentHabit.habitTrackingId
+                )
+
                 _uiState.value = _uiState.value.copy(
                     errorMessage = "Error updating habit: ${e.message}"
                 )
@@ -113,10 +148,41 @@ class ListHabitsViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Helper function to update UI state consistently
+     */
+    private fun updateUIState(
+        habitId: String,
+        isChecked: Boolean,
+        newStreak: Int? = null,
+        newHabitTrackingId: String? = null
+    ) {
+        val currentHabits = _uiState.value.habits
+        val updatedHabits = currentHabits.map { habit ->
+            if (habit.id == habitId) {
+                habit.copy(
+                    isChecked = isChecked,
+                    streak = newStreak
+                        ?: habit.streak, // Only update if new value is provided
+                    habitTrackingId = newHabitTrackingId ?: habit.habitTrackingId
+                )
+            } else {
+                habit
+            }
+        }
+
+        _uiState.value = _uiState.value.copy(habits = updatedHabits)
+
+        Log.d(
+            "HabitsViewModel",
+            "UI State updated for habit $habitId - isChecked: $isChecked, streak: ${newStreak ?: "unchanged"}"
+        )
+    }
+
     private fun formatScheduledDays(scheduledDays: List<String>): String {
         return when {
-            scheduledDays.size == 7 -> "Todos los días"
-            scheduledDays.isEmpty() -> "Sin días programados"
+            scheduledDays.size == 7 -> "Every day"
+            scheduledDays.isEmpty() -> "No scheduled days"
             else -> scheduledDays.joinToString(", ")
         }
     }

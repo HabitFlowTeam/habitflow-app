@@ -5,46 +5,53 @@ import com.example.habitflow_app.domain.repositories.HabitsRepository
 import javax.inject.Inject
 
 /**
- * Simplified version of streak management that doesn't require complex API calls.
- * This version only handles basic streak increment/decrement based on user actions.
+ * Fixed version of streak management that properly handles increment/decrement.
+ * This version correctly decreases streak when habits are unchecked.
  */
 class StreakManagementUseCase @Inject constructor(
     private val habitsRepository: HabitsRepository
 ) {
     private companion object {
-        const val TAG = "SimpleStreakManagement"
+        const val TAG = "StreakManagement"
     }
 
     /**
-     * Simple streak update: increment if checked, keep if unchecked for today.
-     * More complex logic can be added later when API issues are resolved.
+     * Enhanced streak update: increment if checked, decrement if unchecked.
+     *
+     * @param habitId The ID of the habit to update
+     * @param isCompleted Whether the habit was completed today
+     * @return Result containing the new streak value
      */
     suspend operator fun invoke(
         habitId: String,
         isCompleted: Boolean
     ): Result<Int> {
         return try {
-            Log.d(TAG, "Simple streak management for habit $habitId, completed: $isCompleted")
+            Log.d(TAG, "Managing streak for habit $habitId, completed: $isCompleted")
 
             // Get current streak
             val currentStreak = habitsRepository.getCurrentHabitStreak(habitId)
+            Log.d(TAG, "Current streak: $currentStreak")
 
             val newStreak = if (isCompleted) {
-                // If completed, increment streak
+                // If completed: increment streak
                 currentStreak + 1
             } else {
-                // If unchecked, we could either:
-                // 1. Keep current streak (user might complete later today)
-                // 2. Reset to 0 (strict mode)
-                // For now, let's keep it simple and just maintain current streak
-                currentStreak
+                // If unchecked: decrement streak (minimum 0)
+                // FIXED: This was the missing logic!
+                maxOf(0, currentStreak - 1)
             }
 
-            // Update the streak
+            Log.d(TAG, "Calculated new streak: $currentStreak -> $newStreak")
+
+            // Update the streak in database
             val success = habitsRepository.updateHabitStreak(habitId, newStreak)
 
             if (success) {
-                Log.d(TAG, "Updated streak for habit $habitId from $currentStreak to $newStreak")
+                Log.d(
+                    TAG,
+                    "Successfully updated streak for habit $habitId from $currentStreak to $newStreak"
+                )
                 Result.success(newStreak)
             } else {
                 Log.e(TAG, "Failed to update streak for habit $habitId")
@@ -52,10 +59,11 @@ class StreakManagementUseCase @Inject constructor(
             }
 
         } catch (e: Exception) {
-            Log.e(TAG, "Error in simple streak management", e)
+            Log.e(TAG, "Error in streak management", e)
             // Return current streak as fallback
             try {
                 val currentStreak = habitsRepository.getCurrentHabitStreak(habitId)
+                Log.w(TAG, "Using fallback streak: $currentStreak")
                 Result.success(currentStreak)
             } catch (fallbackError: Exception) {
                 Log.e(TAG, "Even fallback failed", fallbackError)
@@ -63,5 +71,4 @@ class StreakManagementUseCase @Inject constructor(
             }
         }
     }
-
 }
