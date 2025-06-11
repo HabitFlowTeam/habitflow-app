@@ -181,8 +181,8 @@ class ListHabitsViewModel @Inject constructor(
 
     private fun formatScheduledDays(scheduledDays: List<String>): String {
         return when {
-            scheduledDays.size == 7 -> "Every day"
-            scheduledDays.isEmpty() -> "No scheduled days"
+            scheduledDays.size == 7 -> "Todos los días"
+            scheduledDays.isEmpty() -> "No hay días programados"
             else -> scheduledDays.joinToString(", ")
         }
     }
