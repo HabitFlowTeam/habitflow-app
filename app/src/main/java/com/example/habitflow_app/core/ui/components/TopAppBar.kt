@@ -20,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,12 +32,12 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.habitflow_app.navigation.NavDestinations
-
+import com.example.habitflow_app.core.ui.viewmodel.TopAppBarViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 
 /**
  * A top app bar component, displaying notifications, user profile, and streak count.
  *
- * @param streakCount The current streak count to display.
  * @param onNotificationsClick Callback triggered when the notifications button is clicked.
  * @param onSettingsClick Callback triggered when the settings button is clicked.
  * @param onProfileClick Callback triggered when the profile button is clicked.
@@ -45,11 +46,11 @@ import com.example.habitflow_app.navigation.NavDestinations
 @Composable
 fun TopAppBar(
     navController: NavController = rememberNavController(),
-    streakCount: Int,
     onNotificationsClick: () -> Unit,
     onSettingsClick: () -> Unit,
     onProfileClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: TopAppBarViewModel = hiltViewModel()
 ) {
     Row(
         modifier = modifier
@@ -87,7 +88,7 @@ fun TopAppBar(
                 )
 
                 Text(
-                    text = "$streakCount",
+                    text = "${viewModel.streak}",
                     style = MaterialTheme.typography.bodyMedium.copy(
                         fontWeight = FontWeight.Bold,
                         color = Color.Gray,

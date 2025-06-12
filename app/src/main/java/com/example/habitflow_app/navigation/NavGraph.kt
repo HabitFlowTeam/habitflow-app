@@ -48,7 +48,6 @@ fun AppNavGraph(
             if (currentDestination != null && currentDestination != NavDestinations.LOGIN && currentDestination != NavDestinations.REGISTER && currentDestination != NavDestinations.FORGOT_PASSWORD) {
                 TopAppBar(
                     navController = navController,
-                    streakCount = 2,
                     onNotificationsClick = {},
                     onSettingsClick = {},
                     onProfileClick = {}

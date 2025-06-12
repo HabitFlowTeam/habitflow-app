@@ -46,6 +46,7 @@ if "%DML_FILE%"=="" set DML_FILE=sql\DML.sql
 set USER_ARTICLES_VIEW_FILE=sql\USER_ARTICLES_VIEW.sql
 set USER_HABIT_TRACKING_VIEW_FILE=sql\USER_HABIT_TRACKING_VIEW.sql
 set USER_HABIT_CATEGORIES_VIEW_FILE=sql\USER_HABIT_CATEGORIES_VIEW.sql
+set CALCULATE_HABIT_STREAK_VIEW_FILE=sql\CALCULATE_HABIT_STREAK.sql
 
 :: Copiar archivos SQL al contenedor
 docker cp "%DDL_FILE%" "%CONTAINER_NAME%:/tmp/DDL.sql"
@@ -57,6 +58,7 @@ docker cp "%CATEGORY_RANKING_VIEW_FILE%" "%CONTAINER_NAME%:/tmp/CATEGORY_RANKING
 docker cp "%USER_ARTICLES_VIEW_FILE%" "%CONTAINER_NAME%:/tmp/USER_ARTICLES_VIEW.sql"
 docker cp "%USER_HABIT_TRACKING_VIEW_FILE%" "%CONTAINER_NAME%:/tmp/USER_HABIT_TRACKING_VIEW.sql"
 docker cp "%USER_HABIT_CATEGORIES_VIEW_FILE%" "%CONTAINER_NAME%:/tmp/USER_HABIT_CATEGORIES_VIEW.sql"
+docker cp "%CALCULATE_HABIT_STREAK_VIEW_FILE%" "%CONTAINER_NAME%:/tmp/CALCULATE_HABIT_STREAK.sql"
 docker cp "%DML_FILE%" "%CONTAINER_NAME%:/tmp/DML.sql"
 
 :: Ejecutar los scripts SQL
@@ -69,4 +71,5 @@ docker exec -it "%CONTAINER_NAME%" psql -U "%DB_USER%" -d "%DB_NAME%" -f /tmp/CA
 docker exec -it "%CONTAINER_NAME%" psql -U "%DB_USER%" -d "%DB_NAME%" -f /tmp/USER_ARTICLES_VIEW.sql
 docker exec -it "%CONTAINER_NAME%" psql -U "%DB_USER%" -d "%DB_NAME%" -f /tmp/USER_HABIT_TRACKING_VIEW.sql
 docker exec -it "%CONTAINER_NAME%" psql -U "%DB_USER%" -d "%DB_NAME%" -f /tmp/USER_HABIT_CATEGORIES_VIEW.sql
+docker exec -it "%CONTAINER_NAME%" psql -U "%DB_USER%" -d "%DB_NAME%" -f /tmp/CALCULATE_HABIT_STREAK.sql
 docker exec -it "%CONTAINER_NAME%" psql -U "%DB_USER%" -d "%DB_NAME%" -f /tmp/DML.sql
