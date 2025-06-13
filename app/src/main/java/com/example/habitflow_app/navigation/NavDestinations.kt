@@ -16,6 +16,7 @@ object NavDestinations {
     const val CREATE_HABIT = "create_habit"
     const val EDIT_HABIT = "edit_habit/{habitId}"
     const val ARTICLE_DETAIL = "article_detail/{articleId}"
+    const val CREATE_ARTICLE = "create_article"
 
     // Helper function to create edit habit route
     fun editHabitRoute(habitId: String) = "edit_habit/$habitId"

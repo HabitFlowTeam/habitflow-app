@@ -1,7 +1,10 @@
 package com.example.habitflow_app.features.articles.di
 
+import com.example.habitflow_app.core.utils.ExtractInfoToken
 import com.example.habitflow_app.domain.repositories.ArticleRepository
+import com.example.habitflow_app.domain.usecases.CreateArticleUseCase
 import com.example.habitflow_app.domain.usecases.GetAllArticlesUseCase
+import com.example.habitflow_app.domain.usecases.GetCategoriesUseCase
 import com.example.habitflow_app.domain.usecases.GetRankedArticles
 import com.example.habitflow_app.domain.usecases.GetUserTopLikedArticlesUseCase
 import com.example.habitflow_app.domain.usecases.LikeArticleUseCase
@@ -10,6 +13,8 @@ import com.example.habitflow_app.domain.usecases.IsArticleLikedUseCase
 import com.example.habitflow_app.features.articles.data.datasources.ArticleDataSource
 import com.example.habitflow_app.features.articles.data.repositories.ArticleRepositoryImpl
 import com.example.habitflow_app.features.articles.ui.viewmodel.ArticleViewModel
+import com.example.habitflow_app.features.articles.ui.viewmodel.CreateArticleViewModel
+import com.example.habitflow_app.features.authentication.data.datasources.LocalDataStore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -39,7 +44,9 @@ object ArticleViewModelModule {
         getAllArticlesUseCase: GetAllArticlesUseCase,
         likeArticleUseCase: LikeArticleUseCase,
         unlikeArticleUseCase: UnlikeArticleUseCase,
-        isArticleLikedUseCase: IsArticleLikedUseCase
+        isArticleLikedUseCase: IsArticleLikedUseCase,
+        localDataStore: LocalDataStore,
+        extractInfoToken: ExtractInfoToken
     ): ArticleViewModel {
         return ArticleViewModel(
             getUserTopLikedArticlesUseCase,
@@ -47,7 +54,20 @@ object ArticleViewModelModule {
             getAllArticlesUseCase,
             likeArticleUseCase,
             unlikeArticleUseCase,
-            isArticleLikedUseCase
+            isArticleLikedUseCase,
+            localDataStore,
+            extractInfoToken
+        )
+    }
+
+    @Provides
+    fun provideCreateArticleViewModel(
+        createArticleUseCase: CreateArticleUseCase,
+        getCategoriesUseCase: GetCategoriesUseCase
+    ): CreateArticleViewModel {
+        return CreateArticleViewModel(
+            createArticleUseCase,
+            getCategoriesUseCase
         )
     }
 }

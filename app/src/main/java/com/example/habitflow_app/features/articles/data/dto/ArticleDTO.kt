@@ -36,7 +36,8 @@ data class RankedArticleDTO(
     val id: String,
     val category_name: String,
     val created_at: String,
-    val image_url: String?
+    val image_url: String?,
+    val user_id: String
 )
 
 @Serializable

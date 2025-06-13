@@ -1,5 +1,7 @@
 package com.example.habitflow_app.domain.repositories
 
+import android.content.Context
+import android.net.Uri
 import com.example.habitflow_app.domain.models.ProfileArticle
 import com.example.habitflow_app.domain.models.RankedArticle
 
@@ -37,5 +39,22 @@ interface ArticleRepository {
      * @return true if the user has liked the article, false otherwise
      */
     suspend fun isArticleLiked(articleId: String): Boolean
+
+    /**
+     * Creates a new article
+     * @param title The title of the article
+     * @param content The content of the article
+     * @param imageUri Optional URI of the image to upload
+     * @param categoryId The ID of the category the article belongs to
+     * @param context Android context for image processing
+     * @return The ID of the created article
+     */
+    suspend fun createArticle(
+        title: String,
+        content: String,
+        imageUri: Uri?,
+        categoryId: String,
+        context: Context
+    ): String
 }
 

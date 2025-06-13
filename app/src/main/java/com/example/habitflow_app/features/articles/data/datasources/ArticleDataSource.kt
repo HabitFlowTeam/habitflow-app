@@ -12,6 +12,13 @@ import com.example.habitflow_app.features.articles.data.dto.createDeleteFilter
 import com.example.habitflow_app.features.authentication.data.datasources.LocalDataStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import android.content.Context
+import android.net.Uri
+import com.example.habitflow_app.BuildConfig
+import com.example.habitflow_app.features.articles.data.dto.CreateArticleRequest
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import javax.inject.Inject
 
 
@@ -77,7 +84,8 @@ class ArticleDataSource @Inject constructor(
                     articleId = dto.id,
                     categoryName = dto.category_name,
                     createdAt = dto.created_at,
-                    imageUrl = dto.image_url
+                    imageUrl = dto.image_url,
+                    userId = dto.user_id
                 )
             }
         } catch (e: Exception) {
@@ -217,6 +225,100 @@ class ArticleDataSource @Inject constructor(
         } catch (e: Exception) {
             Log.e(TAG, "Exception while checking if article is liked", e)
             false
+        }
+    }
+
+    /**
+     * Uploads an image file to Directus
+     * @param imageUri The URI of the image to upload
+     * @param context Android context for reading the file
+     * @return The URL of the uploaded image
+     */
+    suspend fun uploadImage(imageUri: Uri, context: Context): String = withContext(Dispatchers.IO) {
+        try {
+            Log.d(TAG, "Uploading image: $imageUri")
+
+            val inputStream = context.contentResolver.openInputStream(imageUri)
+                ?: throw Exception("Cannot open image file")
+
+            val fileName = "article_image_${System.currentTimeMillis()}.jpg"
+            val requestFile = inputStream.readBytes().toRequestBody("image/*".toMediaTypeOrNull())
+            val body = MultipartBody.Part.createFormData("file", fileName, requestFile)
+
+            val response = directusApiService.uploadFile(body)
+
+            if (!response.isSuccessful) {
+                val errorBody = response.errorBody()?.string()
+                Log.e(TAG, "Error uploading image: ${response.code()} - $errorBody")
+                throw Exception("Error uploading image: ${response.code()}")
+            }
+
+            val fileData = response.body()?.data
+                ?: throw Exception("No file data received")
+
+            val imageUrl = "${BuildConfig.DIRECTUS_URL}assets/${fileData.id}"
+            Log.d(TAG, "Image uploaded successfully: $imageUrl")
+
+            if (!imageUrl.startsWith("http")) {
+                Log.w(TAG, "URL might be malformed: $imageUrl")
+            }
+
+            imageUrl
+        } catch (e: Exception) {
+            Log.e(TAG, "Exception while uploading image", e)
+            throw Exception("Error uploading image: ${e.message}")
+        }
+    }
+
+    /**
+     * Creates a new article for the current user
+     * @param title The title of the article
+     * @param content The content of the article
+     * @param imageUri Optional URI of the image to upload
+     * @param categoryId The ID of the category the article belongs to
+     * @param context Android context for image processing
+     * @return The ID of the created article
+     */
+    suspend fun createArticle(
+        title: String,
+        content: String,
+        imageUri: Uri?,
+        categoryId: String,
+        context: Context
+    ): String = withContext(Dispatchers.IO) {
+        try {
+            val userId = getCurrentUserId()
+            Log.d(TAG, "Creating article for user: $userId")
+
+            // Upload image if provided
+            val imageUrl = imageUri?.let { uri ->
+                uploadImage(uri, context)
+            }
+
+            val request = CreateArticleRequest(
+                title = title,
+                content = content,
+                image_url = imageUrl,
+                category_id = categoryId,
+                user_id = userId
+            )
+
+            val response = directusApiService.createArticle(request)
+
+            if (!response.isSuccessful) {
+                val errorBody = response.errorBody()?.string()
+                Log.e(TAG, "Error creating article: ${response.code()} - $errorBody")
+                throw Exception("Error creating article: ${response.code()}")
+            }
+
+            val articleData = response.body()?.data
+                ?: throw Exception("No data received from server")
+
+            Log.d(TAG, "Article created successfully with ID: ${articleData.id}")
+            articleData.id
+        } catch (e: Exception) {
+            Log.e(TAG, "Exception while creating article", e)
+            throw Exception("Error creating article: ${e.message}")
         }
     }
 }

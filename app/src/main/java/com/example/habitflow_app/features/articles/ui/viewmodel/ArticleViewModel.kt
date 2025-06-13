@@ -3,8 +3,10 @@ package com.example.habitflow_app.features.articles.ui.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.habitflow_app.core.utils.ExtractInfoToken
 import com.example.habitflow_app.domain.models.ProfileArticle
 import com.example.habitflow_app.domain.usecases.GetUserTopLikedArticlesUseCase
+import com.example.habitflow_app.features.authentication.data.datasources.LocalDataStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,14 +21,6 @@ import com.example.habitflow_app.domain.usecases.LikeArticleUseCase
 import com.example.habitflow_app.domain.usecases.UnlikeArticleUseCase
 import com.example.habitflow_app.domain.usecases.IsArticleLikedUseCase
 
-/**
- * ViewModel for managing and exposing article-related UI state.
- *
- * This ViewModel interacts with the use cases to retrieve articles, manage likes,
- * and exposes state flows for the UI to observe articles, loading, and error states.
- *
- * @property getUserTopLikedArticlesUseCase Use case to fetch top liked articles for a user
- */
 @HiltViewModel
 class ArticleViewModel @Inject constructor(
     private val getUserTopLikedArticlesUseCase: GetUserTopLikedArticlesUseCase,
@@ -34,7 +28,9 @@ class ArticleViewModel @Inject constructor(
     private val getAllArticlesUseCase: GetAllArticlesUseCase,
     private val likeArticleUseCase: LikeArticleUseCase,
     private val unlikeArticleUseCase: UnlikeArticleUseCase,
-    private val isArticleLikedUseCase: IsArticleLikedUseCase
+    private val isArticleLikedUseCase: IsArticleLikedUseCase,
+    private val localDataStore: LocalDataStore,
+    private val extractInfoToken: ExtractInfoToken
 ) : ViewModel() {
     private companion object {
         const val TAG = "ArticleViewModel"
@@ -69,6 +65,19 @@ class ArticleViewModel @Inject constructor(
     private val _allArticlesError = MutableStateFlow<String?>(null)
     val allArticlesError: StateFlow<String?> = _allArticlesError
 
+    // --- Artículos del usuario actual ---
+    private val _userArticles = MutableStateFlow<List<RankedArticle>>(emptyList())
+    val userArticles: StateFlow<List<RankedArticle>> = _userArticles
+
+    private val _userArticlesIsLoading = MutableStateFlow(false)
+    val userArticlesIsLoading: StateFlow<Boolean> = _userArticlesIsLoading
+
+    private val _userArticlesError = MutableStateFlow<String?>(null)
+    val userArticlesError: StateFlow<String?> = _userArticlesError
+
+    private val _otherArticles = MutableStateFlow<List<RankedArticle>>(emptyList())
+    val otherArticles: StateFlow<List<RankedArticle>> = _otherArticles
+
     // --- Artículo seleccionado ---
     private val _selectedArticle = MutableStateFlow<RankedArticle?>(null)
     val selectedArticle: StateFlow<RankedArticle?> = _selectedArticle
@@ -77,11 +86,36 @@ class ArticleViewModel @Inject constructor(
     private val _isLiked = MutableStateFlow<Boolean?>(null)
     val isLiked: StateFlow<Boolean?> = _isLiked
 
-    /**
-     * Loads the top liked articles for the specified user and updates the UI state.
-     *
-     * @param userId The ID of the user whose articles are to be loaded
-     */
+    private suspend fun getCurrentUserId(): String? {
+        return try {
+            val token = localDataStore.getAccessTokenOnce()
+            token?.let { extractInfoToken.extractUserIdFromToken(it) }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error getting current user ID", e)
+            null
+        }
+    }
+
+    private suspend fun getUserArticlesFromApi(userId: String): List<RankedArticle> {
+        return try {
+            Log.d(TAG, "Buscando artículos del usuario: $userId")
+
+            val allArticles = getAllArticlesUseCase()
+
+            val userArticles = allArticles.filter { article ->
+                Log.d(TAG, "Comparando artículo: authorName=${article.authorName}, buscado userId=$userId")
+
+                article.authorName.contains(userId) || article.authorName == userId
+            }
+
+            Log.d(TAG, "Encontrados ${userArticles.size} artículos del usuario")
+            userArticles
+        } catch (e: Exception) {
+            Log.e(TAG, "Error obteniendo artículos del usuario", e)
+            emptyList()
+        }
+    }
+
     fun loadUserArticles(userId: String) {
         _isLoading.value = true
         viewModelScope.launch {
@@ -104,7 +138,6 @@ class ArticleViewModel @Inject constructor(
                 val response = withContext(Dispatchers.IO) {
                     getRankedArticle()
                 }
-                Log.e(TAG, "This is the result: $response")
                 _rankedArticles.value = response
                 _rankedError.value = null
             } catch (e: Exception) {
@@ -119,29 +152,57 @@ class ArticleViewModel @Inject constructor(
         _allArticlesIsLoading.value = true
         viewModelScope.launch {
             try {
+                val currentUserId = getCurrentUserId()
+                Log.d(TAG, "Current user ID: $currentUserId")
+
                 val response = withContext(Dispatchers.IO) {
                     getAllArticlesUseCase()
                 }
                 _allArticles.value = response
                 _allArticlesError.value = null
+
+                if (currentUserId != null) {
+                    val userArticlesList = response.filter { article ->
+                        article.userId == currentUserId
+                    }
+                    val otherArticlesList = response.filter { article ->
+                        article.userId != currentUserId
+                    }
+
+                    _userArticles.value = userArticlesList
+                    _otherArticles.value = otherArticlesList
+
+                    Log.d(TAG, "User articles: ${userArticlesList.size}, Other articles: ${otherArticlesList.size}")
+
+                    userArticlesList.forEach { article ->
+                        Log.d(TAG, "User article: id=${article.articleId}, title=${article.title}, userId=${article.userId}")
+                    }
+                } else {
+                    _userArticles.value = emptyList()
+                    _otherArticles.value = response
+                }
             } catch (e: Exception) {
                 _allArticlesError.value = "Error de red: ${e.localizedMessage}"
+                Log.e(TAG, "Error fetching articles", e)
             } finally {
                 _allArticlesIsLoading.value = false
             }
         }
     }
 
+    fun refreshArticles() {
+        fetchAllArticles()
+    }
+
     fun selectArticleById(articleId: String) {
-        Log.e(TAG, "Selecting article with ID: $articleId")
-        Log.e(TAG, "Articles available: ${_allArticles.value}")
+        Log.d(TAG, "Selecting article with ID: $articleId")
         val article = _allArticles.value.find { it.articleId == articleId }
         _selectedArticle.value = article
     }
 
     fun checkLikeStatus(articleId: String) {
         if (articleId.isEmpty()) return
-        
+
         viewModelScope.launch {
             _isLoading.value = true
             isArticleLikedUseCase(articleId)
@@ -156,29 +217,20 @@ class ArticleViewModel @Inject constructor(
     }
 
     fun toggleLike(articleId: String) {
-        Log.d(TAG, "PASO 1: Iniciando operación de toggle like")
-        if (articleId.isEmpty()) {
-            Log.e(TAG, "PASO 1.1: Error - articleId está vacío")
-            return
-        }
-        
+        if (articleId.isEmpty()) return
+
         viewModelScope.launch {
-            Log.d(TAG, "PASO 2: Iniciando coroutine para toggle like")
             _isLoading.value = true
             val currentLikeState = _isLiked.value
-            Log.d(TAG, "PASO 2.1: Estado actual del like: $currentLikeState")
-            
+
             val result = if (currentLikeState == true) {
-                Log.d(TAG, "PASO 3: Ejecutando unlike - llamando a unlikeArticleUseCase")
                 unlikeArticleUseCase(articleId)
             } else {
-                Log.d(TAG, "PASO 3: Ejecutando like - llamando a likeArticleUseCase")
                 likeArticleUseCase(articleId)
             }
 
             result
                 .onSuccess { success ->
-                    Log.d(TAG, "PASO 4: Resultado de la operación: $success")
                     if (success) {
                         _isLiked.value = !currentLikeState!!
                         _selectedArticle.value = _selectedArticle.value?.let { article ->
@@ -186,19 +238,15 @@ class ArticleViewModel @Inject constructor(
                                 likesCount = article.likesCount + (if (currentLikeState) -1 else 1)
                             )
                         }
-                        Log.d(TAG, "PASO 4.1: Estado actualizado - likes: ${_selectedArticle.value?.likesCount}, isLiked: ${_isLiked.value}")
                     } else {
                         _error.value = "No se pudo actualizar el estado del like"
-                        Log.e(TAG, "PASO 4.2: Error - No se pudo actualizar el estado")
                     }
                 }
                 .onFailure { exception ->
                     _error.value = exception.message
-                    Log.e(TAG, "PASO 4.3: Error en la operación", exception)
                 }
-            
+
             _isLoading.value = false
-            Log.d(TAG, "PASO 5: Operación de toggle like completada")
         }
     }
 

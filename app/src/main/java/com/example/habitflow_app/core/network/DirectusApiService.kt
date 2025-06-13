@@ -3,6 +3,8 @@ package com.example.habitflow_app.core.network
 import com.example.habitflow_app.features.habits.data.dto.HabitsResponse
 import com.example.habitflow_app.domain.models.Habit
 import com.example.habitflow_app.features.articles.data.dto.ArticleLikeRequest
+import com.example.habitflow_app.features.articles.data.dto.CreateArticleRequest
+import com.example.habitflow_app.features.articles.data.dto.CreateArticleResponse
 import com.example.habitflow_app.features.articles.data.dto.DeleteArticleLikeFilter
 import com.example.habitflow_app.features.articles.data.dto.ProfileArticlesResponse
 import com.example.habitflow_app.features.articles.data.dto.RankedArticlesResponse
@@ -23,6 +25,7 @@ import com.example.habitflow_app.features.habits.data.dto.HabitTrackingResponseD
 import com.example.habitflow_app.features.habits.data.dto.UserHabitCategoriesViewResponse
 import com.example.habitflow_app.features.profile.data.dto.ProfileDTO
 import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.Serializable
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
@@ -33,6 +36,10 @@ import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import retrofit2.http.Multipart
+import retrofit2.http.Part
 
 /**
  * Retrofit service interface defining all API endpoints for Directus backend communication.
@@ -292,7 +299,7 @@ interface DirectusApiService {
      */
     @GET("items/ranked_articles_view")
     suspend fun getRankedArticles(
-        @Query("fields") fields: String = "title,content,author_name,author_image_url,likes_count,id,category_name,created_at,image_url"
+        @Query("fields") fields: String = "title,content,author_name,author_image_url,likes_count,id,category_name,created_at,image_url,user_id"
     ): Response<RankedArticlesResponse>
 
     /* Profile Endpoints */
@@ -323,6 +330,42 @@ interface DirectusApiService {
      */
     @POST("items/articles_liked")
     suspend fun createArticleLike(@Body request: ArticleLikeRequest): Response<DirectusResponse<Map<String, Any>>>
+
+    /**
+     * Creates a new article in the system.
+     *
+     * @param request The CreateArticleRequest containing article details
+     * @return Response with the created article data
+     */
+    @POST("items/articles")
+    suspend fun createArticle(@Body request: CreateArticleRequest): Response<CreateArticleResponse>
+
+    /**
+     * Uploads a file to Directus files collection
+     * @param requestBody The multipart request body containing the file
+     * @return Response with the uploaded file information
+     */
+    @Multipart
+    @POST("files")
+    suspend fun uploadFile(
+        @Part file: MultipartBody.Part,
+        @Part("title") title: RequestBody? = null
+    ): Response<DirectusFileResponse>
+
+    @Serializable
+    data class DirectusFileResponse(
+        val data: DirectusFileData
+    )
+
+    @Serializable
+    data class DirectusFileData(
+        val id: String,
+        val filename_download: String,
+        val type: String,
+        val filesize: Int,
+        val width: Int?,
+        val height: Int?
+    )
 
     @GET("items/articles_liked")
     suspend fun getLikeId(

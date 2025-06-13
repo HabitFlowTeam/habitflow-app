@@ -18,6 +18,7 @@ import com.example.habitflow_app.core.ui.components.TopAppBar
 import com.example.habitflow_app.features.articles.ui.viewmodel.ArticleViewModel
 import com.example.habitflow_app.features.profile.ui.screens.ProfileScreen
 import com.example.habitflow_app.navigation.routes.ArticleDetailRoute
+import com.example.habitflow_app.navigation.routes.CreateArticleRoute
 import com.example.habitflow_app.navigation.routes.CreateHabitRoute
 import com.example.habitflow_app.navigation.routes.EditHabitRoute
 import com.example.habitflow_app.navigation.routes.ForgotPasswordRoute
@@ -113,6 +114,10 @@ fun AppNavGraph(
                         articleId = articleId,
                         viewModel = articlesViewModel
                     )
+                }
+
+                composable(NavDestinations.CREATE_ARTICLE) {
+                    CreateArticleRoute(navController = navController)
                 }
             }
         }

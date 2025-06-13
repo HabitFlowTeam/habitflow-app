@@ -1,5 +1,7 @@
 package com.example.habitflow_app.features.articles.data.repositories
 
+import android.content.Context
+import android.net.Uri
 import com.example.habitflow_app.domain.models.ProfileArticle
 import com.example.habitflow_app.domain.models.RankedArticle
 import com.example.habitflow_app.domain.repositories.ArticleRepository
@@ -41,6 +43,16 @@ class ArticleRepositoryImpl @Inject constructor(
 
     override suspend fun isArticleLiked(articleId: String): Boolean {
         return articleDataSource.isArticleLiked(articleId)
+    }
+
+    override suspend fun createArticle(
+        title: String,
+        content: String,
+        imageUri: Uri?,
+        categoryId: String,
+        context: Context
+    ): String {
+        return articleDataSource.createArticle(title, content, imageUri, categoryId, context)
     }
 }
 
